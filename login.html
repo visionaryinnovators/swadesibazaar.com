@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwaDesi Bazaar | Login & Sign Up</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    
+    <style>
+        :root {
+            --primary: #D4AF37;
+            --primary-dark: #B8860B;
+            --secondary: #1A1A1A;
+            --accent: #8B4513;
+            --light: #F8F5F0;
+            --gray: #6C757D;
+            --white: #FFFFFF;
+            --error: #e74c3c;
+            --success: #2ecc71;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--secondary);
+            background-color: var(--light);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Logo */
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+
+        .logo h1 {
+            font-size: 28px;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+        }
+
+        .logo span {
+            color: var(--secondary);
+        }
+
+        /* Authentication Page Styles */
+        .auth-container {
+            display: flex;
+            background: var(--white);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            min-height: 600px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .auth-left {
+            flex: 1;
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.9) 0%, rgba(139, 69, 19, 0.8) 100%), url('https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80') no-repeat center center;
+            background-size: cover;
+            color: rgb(255, 255, 255);
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .auth-left h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .auth-left p {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+
+        .features-list {
+            list-style: none;
+            margin-top: 30px;
+        }
+
+        .features-list li {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .features-list i {
+            color: var(--primary);
+            font-size: 18px;
+        }
+
+        .auth-right {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .auth-tab {
+            padding: 15px 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border-bottom: 3px solid transparent;
+        }
+
+        .auth-tab.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 15px;
+            border: 1px solid #E5E5E5;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: var(--transition);
+            background-color: #f9f9f9;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+        }
+
+        .password-input {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--gray);
+            cursor: pointer;
+        }
+
+        .phone-input {
+            display: flex;
+            gap: 10px;
+        }
+
+        .country-code {
+            width: 100px;
+            flex-shrink: 0;
+        }
+
+        .phone-number {
+            flex: 1;
+        }
+
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .forgot-password {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .forgot-password:hover {
+            color: var(--primary-dark);
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-google {
+            background: white;
+            color: var(--secondary);
+            border: 1px solid #E5E5E5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-google:hover {
+            background: #f5f5f5;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 25px 0;
+            color: var(--gray);
+        }
+
+        .divider::before, .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #E5E5E5;
+        }
+
+        .divider span {
+            padding: 0 15px;
+            font-size: 14px;
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 30px;
+            color: var(--gray);
+        }
+
+        .auth-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .message {
+            padding: 12px 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .message.error {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--error);
+            border: 1px solid rgba(231, 76, 60, 0.2);
+            display: block;
+        }
+
+        .message.success {
+            background: rgba(46, 204, 113, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(46, 204, 113, 0.2);
+            display: block;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(212, 175, 55, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 3000;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateX(-50%) translateY(100px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .auth-container {
+                flex-direction: column;
+                min-height: auto;
+            }
+            
+            .auth-left {
+                padding: 30px 20px;
+            }
+            
+            .auth-right {
+                padding: 30px 20px;
+            }
+            
+            .auth-left h2 {
+                font-size: 28px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .form-options {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .phone-input {
+                flex-direction: column;
+            }
+            
+            .country-code {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="auth-container">
+            <div class="auth-left">
+                <h2>Discover Authentic Local Treasures</h2>
+                <p>Join our community of artisans and buyers. Experience the convenience of modern e-commerce with the authenticity of traditional craftsmanship.</p>
+                
+                <ul class="features-list">
+                    <li><i class="fas fa-check-circle"></i> Secure authentication with Firebase</li>
+                    <li><i class="fas fa-check-circle"></i> Connect with local artisans</li>
+                    <li><i class="fas fa-check-circle"></i> Same-day delivery options</li>
+                    <li><i class="fas fa-check-circle"></i> AI-powered shopping assistant</li>
+                    <li><i class="fas fa-check-circle"></i> Multiple payment options</li>
+                </ul>
+            </div>
+            
+            <div class="auth-right">
+                <div class="logo">
+                    <h1>Swa<span>Desi</span> Bazaar</h1>
+                </div>
+                
+                <div class="auth-tabs">
+                    <div class="auth-tab active" data-tab="login">Login</div>
+                    <div class="auth-tab" data-tab="signup">Sign Up</div>
+                </div>
+                
+                <div id="message" class="message"></div>
+                
+                <div class="loading" id="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Processing your request...</p>
+                </div>
+                
+                <!-- Login Form -->
+                <form id="loginForm" class="auth-form active">
+                    <div class="form-group">
+                        <label for="loginEmail">Email Address</label>
+                        <input type="email" id="loginEmail" class="form-control" placeholder="Enter your email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <div class="password-input">
+                            <input type="password" id="loginPassword" class="form-control" placeholder="Enter your password" required>
+                            <button type="button" class="password-toggle" id="loginPasswordToggle">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-options">
+                        <div class="remember-me">
+                            <input type="checkbox" id="rememberMe">
+                            <label for="rememberMe">Remember me</label>
+                        </div>
+                        <a href="#" class="forgot-password" id="forgotPassword">Forgot Password?</a>
+                    </div>
+                    
+                    <button type="submit" class="btn" id="loginBtn">Login</button>
+                    
+                    <div class="divider">
+                        <span>or continue with</span>
+                    </div>
+                    
+                    <button type="button" class="btn btn-google" id="googleLoginBtn">
+                        <i class="fab fa-google"></i> Google
+                    </button>
+                    
+                    <div class="auth-footer">
+                        Don't have an account? <a href="#" id="switchToSignup">Sign up</a>
+                    </div>
+                </form>
+                
+                <!-- Signup Form -->
+                <form id="signupForm" class="auth-form">
+                    <div class="form-group">
+                        <label for="signupName">Full Name</label>
+                        <input type="text" id="signupName" class="form-control" placeholder="Enter your full name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="signupEmail">Email Address</label>
+                        <input type="email" id="signupEmail" class="form-control" placeholder="Enter your email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="signupPhone">Phone Number</label>
+                        <div class="phone-input">
+                            <select id="countryCode" class="form-control country-code">
+                                <option value="+91">+91 (IN)</option>
+                                <option value="+1">+1 (US)</option>
+                                <option value="+44">+44 (UK)</option>
+                                <option value="+61">+61 (AU)</option>
+                            </select>
+                            <input type="tel" id="signupPhone" class="form-control phone-number" placeholder="Phone number" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="signupPassword">Password</label>
+                        <div class="password-input">
+                            <input type="password" id="signupPassword" class="form-control" placeholder="Create a password" required>
+                            <button type="button" class="password-toggle" id="signupPasswordToggle">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <small style="color: var(--gray); margin-top: 5px; display: block;">Password must be at least 6 characters</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password</label>
+                        <div class="password-input">
+                            <input type="password" id="confirmPassword" class="form-control" placeholder="Confirm your password" required>
+                            <button type="button" class="password-toggle" id="confirmPasswordToggle">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="remember-me">
+                            <input type="checkbox" id="agreeTerms" required>
+                            <label for="agreeTerms">I agree to the <a href="#" style="color: var(--primary);">Terms of Service</a> and <a href="#" style="color: var(--primary);">Privacy Policy</a></label>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn" id="signupBtn">Create Account</button>
+                    
+                    <div class="divider">
+                        <span>or continue with</span>
+                    </div>
+                    
+                    <button type="button" class="btn btn-google" id="googleSignupBtn">
+                        <i class="fab fa-google"></i> Google
+                    </button>
+                    
+                    <div class="auth-footer">
+                        Already have an account? <a href="#" id="switchToLogin">Login</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC4wGDrRHs4gQN6p8Q9X7VqY9t8d4Jk8Xw",
+            authDomain: "swadesi-bazaar.firebaseapp.com",
+            projectId: "swadesi-bazaar",
+            storageBucket: "swadesi-bazaar.appspot.com",
+            messagingSenderId: "123456789012",
+            appId: "1:123456789012:web:abcdef1234567890"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Authentication Functionality
+        const loginForm = document.getElementById('loginForm');
+        const signupForm = document.getElementById('signupForm');
+        const loginTab = document.querySelector('[data-tab="login"]');
+        const signupTab = document.querySelector('[data-tab="signup"]');
+        const switchToSignup = document.getElementById('switchToSignup');
+        const switchToLogin = document.getElementById('switchToLogin');
+        const messageDiv = document.getElementById('message');
+        const loadingDiv = document.getElementById('loading');
+        const loginPasswordToggle = document.getElementById('loginPasswordToggle');
+        const signupPasswordToggle = document.getElementById('signupPasswordToggle');
+        const confirmPasswordToggle = document.getElementById('confirmPasswordToggle');
+        const googleLoginBtn = document.getElementById('googleLoginBtn');
+        const googleSignupBtn = document.getElementById('googleSignupBtn');
+        const forgotPasswordLink = document.getElementById('forgotPassword');
+
+        // Tab Switching
+        loginTab.addEventListener('click', () => switchAuthTab('login'));
+        signupTab.addEventListener('click', () => switchAuthTab('signup'));
+        switchToSignup.addEventListener('click', (e) => {
+            e.preventDefault();
+            switchAuthTab('signup');
+        });
+        switchToLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            switchAuthTab('login');
+        });
+
+        function switchAuthTab(tab) {
+            if (tab === 'login') {
+                loginTab.classList.add('active');
+                signupTab.classList.remove('active');
+                loginForm.classList.add('active');
+                signupForm.classList.remove('active');
+            } else {
+                loginTab.classList.remove('active');
+                signupTab.classList.add('active');
+                loginForm.classList.remove('active');
+                signupForm.classList.add('active');
+            }
+            hideMessage();
+        }
+
+        // Password Toggle
+        function setupPasswordToggle(toggleBtn, passwordField) {
+            toggleBtn.addEventListener('click', () => {
+                const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordField.setAttribute('type', type);
+                toggleBtn.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+            });
+        }
+
+        setupPasswordToggle(loginPasswordToggle, document.getElementById('loginPassword'));
+        setupPasswordToggle(signupPasswordToggle, document.getElementById('signupPassword'));
+        setupPasswordToggle(confirmPasswordToggle, document.getElementById('confirmPassword'));
+
+        // Show Message
+        function showMessage(message, type) {
+            messageDiv.textContent = message;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+        }
+
+        function hideMessage() {
+            messageDiv.style.display = 'none';
+        }
+
+        // Show/Hide Loading
+        function showLoading() {
+            loadingDiv.style.display = 'block';
+        }
+
+        function hideLoading() {
+            loadingDiv.style.display = 'none';
+        }
+
+        // Form Validation
+        function validateSignupForm() {
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const phone = document.getElementById('signupPhone').value.trim();
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const agreeTerms = document.getElementById('agreeTerms').checked;
+
+            if (name.length < 2) {
+                showMessage('Please enter a valid name', 'error');
+                return false;
+            }
+
+            if (!isValidEmail(email)) {
+                showMessage('Please enter a valid email address', 'error');
+                return false;
+            }
+
+            if (!isValidPhone(phone)) {
+                showMessage('Please enter a valid phone number', 'error');
+                return false;
+            }
+
+            if (password.length < 6) {
+                showMessage('Password must be at least 6 characters', 'error');
+                return false;
+            }
+
+            if (password !== confirmPassword) {
+                showMessage('Passwords do not match', 'error');
+                return false;
+            }
+
+            if (!agreeTerms) {
+                showMessage('Please agree to the Terms of Service and Privacy Policy', 'error');
+                return false;
+            }
+
+            return true;
+        }
+
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        function isValidPhone(phone) {
+            const phoneRegex = /^\d{10}$/;
+            return phoneRegex.test(phone);
+        }
+
+        // Login with Email/Password
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                showMessage('Please fill in all fields', 'error');
+                return;
+            }
+
+            showLoading();
+            
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Signed in
+                    const user = userCredential.user;
+                    showMessage('Login successful! Redirecting...', 'success');
+                    
+                    // Update user data in Firestore if needed
+                    updateUserData(user);
+                    
+                    // Redirect to marketplace page after a short delay
+                    setTimeout(() => {
+                        window.location.href = 'marketplace.html'; // Replace with your marketplace page URL
+                    }, 1500);
+                })
+                .catch((error) => {
+                    hideLoading();
+                    const errorCode = error.code;
+                    let errorMessage = 'An error occurred during login';
+                    
+                    if (errorCode === 'auth/user-not-found') {
+                        errorMessage = 'No account found with this email';
+                    } else if (errorCode === 'auth/wrong-password') {
+                        errorMessage = 'Incorrect password';
+                    } else if (errorCode === 'auth/invalid-email') {
+                        errorMessage = 'Invalid email address';
+                    } else if (errorCode === 'auth/too-many-requests') {
+                        errorMessage = 'Too many failed attempts. Please try again later';
+                    }
+                    
+                    showMessage(errorMessage, 'error');
+                });
+        });
+
+        // Signup with Email/Password
+        signupForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            if (!validateSignupForm()) {
+                return;
+            }
+
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const countryCode = document.getElementById('countryCode').value;
+            const phone = document.getElementById('signupPhone').value.trim();
+            const password = document.getElementById('signupPassword').value;
+
+            showLoading();
+
+            auth.createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Signed up
+                    const user = userCredential.user;
+                    
+                    // Save user data to Firestore
+                    return db.collection('users').doc(user.uid).set({
+                        name: name,
+                        email: email,
+                        phone: countryCode + phone,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                })
+                .then(() => {
+                    showMessage('Account created successfully! Redirecting...', 'success');
+                    
+                    // Redirect to marketplace page after a short delay
+                    setTimeout(() => {
+                        window.location.href = 'marketplace.html'; // Replace with your marketplace page URL
+                    }, 1500);
+                })
+                .catch((error) => {
+                    hideLoading();
+                    const errorCode = error.code;
+                    let errorMessage = 'An error occurred during signup';
+                    
+                    if (errorCode === 'auth/email-already-in-use') {
+                        errorMessage = 'An account with this email already exists';
+                    } else if (errorCode === 'auth/weak-password') {
+                        errorMessage = 'Password is too weak';
+                    } else if (errorCode === 'auth/invalid-email') {
+                        errorMessage = 'Invalid email address';
+                    }
+                    
+                    showMessage(errorMessage, 'error');
+                });
+        });
+
+        // Google Authentication
+        function signInWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            provider.addScope('profile');
+            provider.addScope('email');
+            
+            showLoading();
+            
+            auth.signInWithPopup(provider)
+                .then((result) => {
+                    // This gives you a Google Access Token
+                    const credential = result.credential;
+                    const token = credential.accessToken;
+                    
+                    // The signed-in user info
+                    const user = result.user;
+                    
+                    // Check if user exists in Firestore
+                    const userRef = db.collection('users').doc(user.uid);
+                    
+                    userRef.get().then((doc) => {
+                        if (doc.exists) {
+                            // User exists, update last login
+                            userRef.update({
+                                lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                        } else {
+                            // User doesn't exist, create new document
+                            userRef.set({
+                                name: user.displayName,
+                                email: user.email,
+                                phone: user.phoneNumber || '',
+                                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                                lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                        }
+                        
+                        showMessage('Login successful! Redirecting...', 'success');
+                        
+                        // Redirect to marketplace page after a short delay
+                        setTimeout(() => {
+                            window.location.href = 'marketplace.html'; // Replace with your marketplace page URL
+                        }, 1500);
+                    });
+                })
+                .catch((error) => {
+                    hideLoading();
+                    const errorCode = error.code;
+                    let errorMessage = 'An error occurred during Google authentication';
+                    
+                    if (errorCode === 'auth/popup-closed-by-user') {
+                        errorMessage = 'Authentication cancelled';
+                    } else if (errorCode === 'auth/popup-blocked') {
+                        errorMessage = 'Popup was blocked by your browser. Please allow popups for this site';
+                    }
+                    
+                    showMessage(errorMessage, 'error');
+                });
+        }
+
+        googleLoginBtn.addEventListener('click', signInWithGoogle);
+        googleSignupBtn.addEventListener('click', signInWithGoogle);
+
+        // Forgot Password
+        forgotPasswordLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            
+            if (!email) {
+                showMessage('Please enter your email address to reset password', 'error');
+                return;
+            }
+            
+            if (!isValidEmail(email)) {
+                showMessage('Please enter a valid email address', 'error');
+                return;
+            }
+            
+            showLoading();
+            
+            auth.sendPasswordResetEmail(email)
+                .then(() => {
+                    hideLoading();
+                    showMessage('Password reset email sent! Check your inbox.', 'success');
+                })
+                .catch((error) => {
+                    hideLoading();
+                    const errorCode = error.code;
+                    let errorMessage = 'An error occurred while sending reset email';
+                    
+                    if (errorCode === 'auth/user-not-found') {
+                        errorMessage = 'No account found with this email';
+                    } else if (errorCode === 'auth/invalid-email') {
+                        errorMessage = 'Invalid email address';
+                    }
+                    
+                    showMessage(errorMessage, 'error');
+                });
+        });
+
+        // Update user data in Firestore
+        function updateUserData(user) {
+            const userRef = db.collection('users').doc(user.uid);
+            
+            userRef.get().then((doc) => {
+                if (doc.exists) {
+                    // Update last login
+                    userRef.update({
+                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+            });
+        }
+
+        // Check if user is already logged in
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // User is signed in, redirect to marketplace page
+                window.location.href = 'marketplace.html'; // Replace with your marketplace page URL
+            }
+        });
+
+        // Toast notification function
+        function showToast(message) {
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            
+            document.body.appendChild(toast);
+            
+            // Remove toast after 3 seconds
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

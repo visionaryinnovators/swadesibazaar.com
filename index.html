@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwaDesi Bazaar | Your Local Market, Powered by AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #D4AF37;
+            --primary-dark: #B8860B;
+            --secondary: #1A1A1A;
+            --accent: #8B4513;
+            --light: #F8F5F0;
+            --gray: #6C757D;
+            --white: #FFFFFF;
+            --error: #e74c3c;
+            --success: #2ecc71;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--secondary);
+            background-color: var(--light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: var(--white);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .logo h1 {
+            font-size: 28px;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+        }
+
+        .logo span {
+            color: var(--secondary);
+        }
+
+        .search-bar {
+            flex: 1;
+            max-width: 600px;
+            margin: 0 30px;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 14px 20px;
+            border: 1px solid #E5E5E5;
+            border-radius: 50px;
+            font-size: 16px;
+            transition: var(--transition);
+            background-color: #f9f9f9;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+        }
+
+        .search-bar button {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 9px 20px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .search-bar button:hover {
+            background: var(--primary-dark);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .language-selector select {
+            padding: 8px 15px;
+            border: 1px solid #E5E5E5;
+            border-radius: 5px;
+            background-color: white;
+            font-size: 14px;
+        }
+
+        .auth-buttons a {
+            text-decoration: none;
+            color: var(--secondary);
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: var(--transition);
+        }
+
+        .auth-buttons a.login {
+            color: var(--gray);
+        }
+
+        .auth-buttons a.signup {
+            background: var(--primary);
+            color: white;
+        }
+
+        .auth-buttons a.signup:hover {
+            background: var(--primary-dark);
+        }
+
+        .cart-icon {
+            position: relative;
+            font-size: 22px;
+            color: var(--secondary);
+            cursor: pointer;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--primary);
+            color: white;
+            font-size: 12px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 0.5s ease;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--secondary);
+            cursor: pointer;
+        }
+
+        /* Navigation */
+        nav {
+            background-color: var(--secondary);
+            padding: 15px 0;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--primary);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Mobile Navigation */
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--white);
+            z-index: 2000;
+            overflow-y: auto;
+            padding: 20px;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .mobile-nav.active {
+            transform: translateX(0);
+        }
+
+        .mobile-nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .mobile-nav-links {
+            list-style: none;
+        }
+
+        .mobile-nav-links li {
+            margin-bottom: 15px;
+        }
+
+        .mobile-nav-links a {
+            display: block;
+            padding: 12px 15px;
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 500;
+            border-radius: 5px;
+            transition: var(--transition);
+        }
+
+        .mobile-nav-links a:hover {
+            background: #f5f5f5;
+            color: var(--primary);
+        }
+
+        .mobile-nav-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--secondary);
+            cursor: pointer;
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            height: 600px;
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.8) 0%, rgba(139, 69, 19, 0.7) 100%), url('https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80') no-repeat center center;
+            background-size: cover;
+            color: white;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            max-width: 600px;
+            z-index: 2;
+        }
+
+        .hero h2 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 18px;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 14px 30px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .cta-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Features Section */
+        .features {
+            padding: 80px 0;
+            background-color: var(--white);
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .section-title h2 {
+            font-size: 36px;
+            color: var(--secondary);
+            margin-bottom: 15px;
+        }
+
+        .section-title p {
+            color: var(--gray);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            background: var(--white);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            width: 70px;
+            height: 70px;
+            background: rgba(212, 175, 55, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 28px;
+            color: var(--primary);
+        }
+
+        .feature-card h3 {
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+
+        .feature-card p {
+            color: var(--gray);
+        }
+
+        /* Categories Section */
+        .categories {
+            padding: 80px 0;
+            background-color: var(--light);
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+        }
+
+        .category-card {
+            position: relative;
+            height: 300px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .category-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .category-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .category-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .category-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+            color: white;
+            padding: 20px;
+        }
+
+        .category-overlay h3 {
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+
+        /* Trending Products */
+        .trending {
+            padding: 80px 0;
+            background-color: var(--white);
+        }
+
+        .trending-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .trending-header h2 {
+            font-size: 32px;
+        }
+
+        .view-all {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: var(--transition);
+        }
+
+        .view-all:hover {
+            gap: 10px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .product-card {
+            background: var(--white);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-image {
+            height: 220px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.05);
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: var(--primary);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .product-info {
+            padding: 20px;
+        }
+
+        .product-info h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .product-seller {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        .seller-avatar {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background-color: #E5E5E5;
+        }
+
+        .product-location {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            color: var(--gray);
+            margin-bottom: 15px;
+        }
+
+        .product-price {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .price {
+            font-weight: 700;
+            font-size: 20px;
+            color: var(--secondary);
+        }
+
+        .add-to-cart {
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .add-to-cart:hover {
+            background: var(--primary-dark);
+            transform: scale(1.1);
+        }
+
+        /* Local Sellers Section */
+        .local-sellers {
+            padding: 80px 0;
+            background-color: var(--light);
+        }
+
+        .sellers-container {
+            display: flex;
+            gap: 30px;
+            overflow-x: auto;
+            padding: 20px 0;
+            scrollbar-width: thin;
+        }
+
+        .seller-card {
+            min-width: 300px;
+            background: var(--white);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .seller-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .seller-header {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .seller-avatar-lg {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #E5E5E5;
+            overflow: hidden;
+        }
+
+        .seller-avatar-lg img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .seller-info h3 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .seller-rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--primary);
+            font-size: 14px;
+        }
+
+        .seller-products {
+            padding: 20px;
+        }
+
+        .seller-product {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .seller-product:last-child {
+            margin-bottom: 0;
+        }
+
+        .seller-product img {
+            width: 60px;
+            height: 60px;
+            border-radius: 5px;
+            object-fit: cover;
+        }
+
+        .seller-product-info h4 {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .seller-product-info .price {
+            font-size: 16px;
+        }
+
+        .visit-shop {
+            display: block;
+            text-align: center;
+            padding: 12px;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .visit-shop:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--secondary);
+            color: white;
+            padding: 60px 0 0;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: #CCCCCC;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding: 30px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #999;
+            font-size: 14px;
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 3000;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateX(-50%) translateY(100px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .hero h2 {
+                font-size: 40px;
+            }
+            
+            .search-bar {
+                max-width: 400px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-top {
+                flex-wrap: wrap;
+            }
+            
+            .search-bar {
+                order: 3;
+                margin: 15px 0 0;
+                max-width: 100%;
+            }
+            
+            .hero h2 {
+                font-size: 32px;
+            }
+            
+            .hero {
+                height: 500px;
+            }
+            
+            .section-title h2 {
+                font-size: 28px;
+            }
+            
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+            
+            /* Mobile Menu Button */
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            /* Hide desktop navigation on mobile */
+            nav {
+                display: none;
+            }
+            
+            /* Show mobile navigation */
+            .mobile-nav {
+                display: block;
+            }
+            
+            .header-actions .auth-buttons {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h2 {
+                font-size: 28px;
+            }
+            
+            .hero p {
+                font-size: 16px;
+            }
+            
+            .features-grid, .categories-grid, .products-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-top">
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="logo" id="logo">
+                    <h1>Swa<span>Desi</span> Bazaar</h1>
+                </div>
+                <div class="search-bar">
+                    <input type="text" placeholder="Search for products, artisans, or categories...">
+                    <button><i class="fas fa-search"></i></button>
+                </div>
+                <div class="header-actions">
+                    <div class="language-selector">
+                        <select>
+                            <option>English</option>
+                            <option>हिन्दी</option>
+                            <option>தமிழ்</option>
+                            <option>বাংলা</option>
+                            <option>తెలుగు</option>
+                        </select>
+                    </div>
+                    <div class="auth-buttons">
+                        <a href="login.html" class="login">Login</a>
+                        <a href="login.html" class="signup">Sign Up</a>
+                    </div>
+                    <div class="cart-icon" id="cartIcon">
+                        <i class="fas fa-shopping-bag"></i>
+                        <span class="cart-count">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <nav>
+            <div class="container">
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="marketplace.html">All Categories</a></li>
+                    <li><a href="marketplace.html">Marketplace</a></li>
+                    <li><a href="handicrafts.html">Handicrafts</a></li>
+                    <li><a href="home-decor.html">Home Decor</a></li>
+                    <li><a href="clothing.html">Clothing</a></li>
+                    <li><a href="jewelry.html">Jewelry</a></li>
+                    <li><a href="groceries.html">Groceries</a></li>
+                    <li><a href="local-markets.html">Local Markets</a></li>
+                    <li><a href="artisans.html">Artisans</a></li>
+                    <li><a href="weather.html">Weather</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Mobile Navigation -->
+    <div class="mobile-nav" id="mobileNav">
+        <div class="mobile-nav-header">
+            <div class="logo">
+                <h1>Swa<span>Desi</span> Bazaar</h1>
+            </div>
+            <button class="mobile-nav-close" id="mobileNavClose">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <ul class="mobile-nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="marketplace.html">Marketplace</a></li>
+            <li><a href="handicrafts.html">Handicrafts</a></li>
+            <li><a href="home-decor.html">Home Decor</a></li>
+            <li><a href="clothing.html">Clothing</a></li>
+            <li><a href="jewelry.html">Jewelry</a></li>
+            <li><a href="groceries.html">Groceries</a></li>
+            <li><a href="local-markets.html">Local Markets</a></li>
+            <li><a href="artisans.html">Artisans</a></li>
+            <li><a href="auth.html">Login</a></li>
+            <li><a href="auth.html">Sign Up</a></li>
+        </ul>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h2>Discover Authentic Local Treasures</h2>
+                <p>Connect directly with artisans and sellers in your community. Premium quality, handcrafted products with the convenience of modern e-commerce.</p>
+                <a href="marketplace.html" class="cta-button">Explore Local Sellers</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <div class="section-title">
+                <h2>Why Choose SwaDesi Bazaar</h2>
+                <p>We're redefining local commerce with cutting-edge technology and traditional values</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <h3>Hyperlocal Discovery</h3>
+                    <p>Find sellers and products within your neighborhood with our real-time location-based marketplace.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h3>AI-Powered Assistance</h3>
+                    <p>Our multilingual AI assistant helps you navigate the platform in your preferred language.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shipping-fast"></i>
+                    </div>
+                    <h3>Same-Day Delivery</h3>
+                    <p>Get your orders delivered on the same day by our network of local delivery partners.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Secure Transactions</h3>
+                    <p>Shop with confidence using our secure payment gateway with buyer protection.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="categories">
+        <div class="container">
+            <div class="section-title">
+                <h2>Shop By Category</h2>
+                <p>Explore our curated collection of authentic local products</p>
+            </div>
+            <div class="categories-grid">
+                <div class="category-card">
+                    <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Handicrafts">
+                    <div class="category-overlay">
+                        <h3>Handicrafts</h3>
+                        <p>Traditional Artistry</p>
+                    </div>
+                </div>
+                <div class="category-card">
+                    <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Home Decor">
+                    <div class="category-overlay">
+                        <h3>Home Decor</h3>
+                        <p>Elegant & Authentic</p>
+                    </div>
+                </div>
+                <div class="category-card">
+                    <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Clothing">
+                    <div class="category-overlay">
+                        <h3>Clothing</h3>
+                        <p>Traditional Wear</p>
+                    </div>
+                </div>
+                <div class="category-card">
+                    <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Jewelry">
+                    <div class="category-overlay">
+                        <h3>Jewelry</h3>
+                        <p>Handcrafted Pieces</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trending Products -->
+    <section class="trending">
+        <div class="container">
+            <div class="trending-header">
+                <h2>Trending Near You</h2>
+                <a href="marketplace.html" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="products-grid">
+                <div class="product-card" data-product-id="1">
+                    <div class="product-image">
+                        <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Handmade Pot">
+                        <span class="product-badge">Local Favorite</span>
+                    </div>
+                    <div class="product-info">
+                        <h3>Handmade Terracotta Pot</h3>
+                        <div class="product-seller">
+                            <div class="seller-avatar"></div>
+                            <span>Suresh Handmade Pots</span>
+                        </div>
+                        <div class="product-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Varanasi, UP • 2.5 km away</span>
+                        </div>
+                        <div class="product-price">
+                            <span class="price">₹1,250</span>
+                            <button class="add-to-cart">
+                                <i class="fas fa-shopping-bag"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card" data-product-id="2">
+                    <div class="product-image">
+                        <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Silk Saree">
+                        <span class="product-badge">Limited Stock</span>
+                    </div>
+                    <div class="product-info">
+                        <h3>Banarasi Silk Saree</h3>
+                        <div class="product-seller">
+                            <div class="seller-avatar"></div>
+                            <span>Weaves of Varanasi</span>
+                        </div>
+                        <div class="product-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Varanasi, UP • 3.2 km away</span>
+                        </div>
+                        <div class="product-price">
+                            <span class="price">₹8,499</span>
+                            <button class="add-to-cart">
+                                <i class="fas fa-shopping-bag"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card" data-product-id="3">
+                    <div class="product-image">
+                        <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Wooden Sculpture">
+                        <span class="product-badge">Best Seller</span>
+                    </div>
+                    <div class="product-info">
+                        <h3>Handcarved Wooden Elephant</h3>
+                        <div class="product-seller">
+                            <div class="seller-avatar"></div>
+                            <span>Saharanpur Woodcraft</span>
+                        </div>
+                        <div class="product-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Saharanpur, UP • 15 km away</span>
+                        </div>
+                        <div class="product-price">
+                            <span class="price">₹3,200</span>
+                            <button class="add-to-cart">
+                                <i class="fas fa-shopping-bag"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card" data-product-id="4">
+                    <div class="product-image">
+                        <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Brass Diya">
+                        <span class="product-badge">New Arrival</span>
+                    </div>
+                    <div class="product-info">
+                        <h3>Traditional Brass Diya Set</h3>
+                        <div class="product-seller">
+                            <div class="seller-avatar"></div>
+                            <span>Moradabad Metal Art</span>
+                        </div>
+                        <div class="product-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Moradabad, UP • 25 km away</span>
+                        </div>
+                        <div class="product-price">
+                            <span class="price">₹1,850</span>
+                            <button class="add-to-cart">
+                                <i class="fas fa-shopping-bag"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Local Sellers -->
+    <section class="local-sellers">
+        <div class="container">
+            <div class="section-title">
+                <h2>Featured Local Sellers</h2>
+                <p>Connect directly with artisans in your community</p>
+            </div>
+            <div class="sellers-container">
+                <div class="seller-card">
+                    <div class="seller-header">
+                        <div class="seller-avatar-lg">
+                            <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Seller">
+                        </div>
+                        <div class="seller-info">
+                            <h3>Suresh Handmade Pots</h3>
+                            <div class="seller-rating">
+                                <i class="fas fa-star"></i>
+                                <span>4.8 (124 reviews)</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="seller-products">
+                        <div class="seller-product">
+                            <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Product">
+                            <div class="seller-product-info">
+                                <h4>Terracotta Planters Set</h4>
+                                <span class="price">₹2,400</span>
+                            </div>
+                        </div>
+                        <div class="seller-product">
+                            <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Product">
+                            <div class="seller-product-info">
+                                <h4>Handpainted Ceramic Vase</h4>
+                                <span class="price">₹1,850</span>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="marketplace.html" class="visit-shop">Visit Shop</a>
+                </div>
+                <div class="seller-card">
+                    <div class="seller-header">
+                        <div class="seller-avatar-lg">
+                            <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Seller">
+                        </div>
+                        <div class="seller-info">
+                            <h3>Weaves of Varanasi</h3>
+                            <div class="seller-rating">
+                                <i class="fas fa-star"></i>
+                                <span>4.9 (89 reviews)</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="seller-products">
+                        <div class="seller-product">
+                            <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Product">
+                            <div class="seller-product-info">
+                                <h4>Banarasi Silk Saree</h4>
+                                <span class="price">₹8,499</span>
+                            </div>
+                        </div>
+                        <div class="seller-product">
+                            <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Product">
+                            <div class="seller-product-info">
+                                <h4>Zari Work Dupatta</h4>
+                                <span class="price">₹2,200</span>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="marketplace.html" class="visit-shop">Visit Shop</a>
+                </div>
+                <div class="seller-card">
+                    <div class="seller-header">
+                        <div class="seller-avatar-lg">
+                            <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Seller">
+                        </div>
+                        <div class="seller-info">
+                            <h3>Moradabad Metal Art</h3>
+                            <div class="seller-rating">
+                                <i class="fas fa-star"></i>
+                                <span>4.7 (156 reviews)</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="seller-products">
+                        <div class="seller-product">
+                            <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Product">
+                            <div class="seller-product-info">
+                                <h4>Brass Diya Set</h4>
+                                <span class="price">₹1,850</span>
+                            </div>
+                        </div>
+                        <div class="seller-product">
+                            <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Product">
+                            <div class="seller-product-info">
+                                <h4>Copper Water Jug</h4>
+                                <span class="price">₹3,500</span>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="marketplace.html" class="visit-shop">Visit Shop</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>SwaDesi Bazaar</h3>
+                    <p>Your Local Market, Powered by AI. Connecting you with authentic local sellers and artisans in your community.</p>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="marketplace.html">Marketplace</a></li>
+                        <li><a href="#">Sell on SwaDesi</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Customer Service</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Returns & Refunds</a></li>
+                        <li><a href="#">Shipping Info</a></li>
+                        <li><a href="#">Track Your Order</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contact Info</h3>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Local Market, New Delhi, India</li>
+                        <li><i class="fas fa-phone"></i> +91 98765 43210</li>
+                        <li><i class="fas fa-envelope"></i> support@swadesibazaar.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 SwaDesi Bazaar. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile Navigation
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileNav = document.getElementById('mobileNav');
+        const mobileNavClose = document.getElementById('mobileNavClose');
+
+        function openMobileNav() {
+            mobileNav.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeMobileNav() {
+            mobileNav.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        mobileMenuBtn.addEventListener('click', openMobileNav);
+        mobileNavClose.addEventListener('click', closeMobileNav);
+
+        // Cart functionality
+        let cart = [];
+        const cartIcon = document.getElementById('cartIcon');
+        const cartCount = document.querySelector('.cart-count');
+
+        function updateCartCount() {
+            const count = cart.reduce((total, item) => total + item.quantity, 0);
+            cartCount.textContent = count;
+        }
+
+        function addToCart(product) {
+            const existingItem = cart.find(item => item.id === product.id);
+            
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({
+                    ...product,
+                    quantity: 1
+                });
+            }
+            
+            updateCartCount();
+            showToast(`${product.name} added to cart!`);
+        }
+
+        function showToast(message) {
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            
+            document.body.appendChild(toast);
+            
+            // Remove toast after 3 seconds
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Add to Cart Functionality
+        const addToCartButtons = document.querySelectorAll('.add-to-cart');
+        
+        addToCartButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.stopPropagation();
+                
+                const productCard = button.closest('.product-card');
+                const productId = productCard.getAttribute('data-product-id');
+                const productName = productCard.querySelector('h3').textContent;
+                const productPrice = parseInt(productCard.querySelector('.price').textContent.replace('₹', '').replace(',', ''));
+                const productSeller = productCard.querySelector('.product-seller span').textContent;
+                const productImage = productCard.querySelector('img').src;
+                
+                const product = {
+                    id: productId,
+                    name: productName,
+                    price: productPrice,
+                    seller: productSeller,
+                    image: productImage
+                };
+                
+                addToCart(product);
+                
+                // Animation
+                button.style.transform = 'scale(1.3)';
+                setTimeout(() => {
+                    button.style.transform = 'scale(1)';
+                }, 300);
+            });
+        });
+
+        // Initialize cart count
+        updateCartCount();
+    </script>
+</body>
+</html>

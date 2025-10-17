@@ -1,0 +1,2627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LuxeGems | Premium Luxury Jewelry</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --gold-dark: #B8860B;
+            --diamond: #F0F8FF;
+            --platinum: #E5E4E2;
+            --black: #1A1A1A;
+            --charcoal: #2C2C2C;
+            --white: #FFFFFF;
+            --light: #F8F5F0;
+            --gray: #6C757D;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--black);
+            background-color: var(--light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Page Container */
+        .page-container {
+            position: relative;
+            min-height: 100vh;
+        }
+
+        .page {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            min-height: 100vh;
+        }
+
+        .page.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Back Button */
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            color: var(--gold);
+            font-weight: 500;
+            cursor: pointer;
+            padding: 10px 0;
+            margin-bottom: 20px;
+            transition: var(--transition);
+        }
+
+        .back-button:hover {
+            color: var(--gold-dark);
+            transform: translateX(-5px);
+        }
+
+        /* Header Styles */
+        header {
+            background-color: var(--black);
+            color: var(--white);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .logo h1 {
+            font-size: 28px;
+            color: var(--gold);
+            letter-spacing: -0.5px;
+        }
+
+        .logo span {
+            color: var(--white);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--gold);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--gold);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .auth-buttons a {
+            text-decoration: none;
+            color: var(--white);
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: var(--transition);
+        }
+
+        .auth-buttons a.login {
+            color: var(--gray);
+        }
+
+        .auth-buttons a.signup {
+            background: var(--gold);
+            color: var(--black);
+        }
+
+        .auth-buttons a.signup:hover {
+            background: var(--gold-dark);
+        }
+
+        .cart-icon {
+            position: relative;
+            font-size: 22px;
+            color: var(--white);
+            cursor: pointer;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--gold);
+            color: var(--black);
+            font-size: 12px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            height: 80vh;
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.9) 0%, rgba(139, 69, 19, 0.7) 100%), url('https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80') no-repeat center center;
+            background-size: cover;
+            color: white;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            max-width: 700px;
+            z-index: 2;
+        }
+
+        .hero h2 {
+            font-size: 52px;
+            margin-bottom: 20px;
+            line-height: 1.2;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .hero p {
+            font-size: 20px;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: var(--gold);
+            color: var(--black);
+            padding: 16px 35px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .cta-button:hover {
+            background: var(--gold-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Luxury Features */
+        .luxury-features {
+            padding: 100px 0;
+            background: linear-gradient(to bottom, var(--light) 0%, var(--white) 100%);
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-title h2 {
+            font-size: 42px;
+            color: var(--black);
+            margin-bottom: 15px;
+        }
+
+        .section-title p {
+            color: var(--gray);
+            max-width: 600px;
+            margin: 0 auto;
+            font-size: 18px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+
+        .feature-card {
+            background: var(--white);
+            border-radius: 10px;
+            padding: 40px 30px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            text-align: center;
+            border-top: 4px solid var(--gold);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(212, 175, 55, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            font-size: 32px;
+            color: var(--gold);
+        }
+
+        .feature-card h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .feature-card p {
+            color: var(--gray);
+        }
+
+        /* Premium Collection */
+        .premium-collection {
+            padding: 100px 0;
+            background-color: var(--charcoal);
+            color: var(--white);
+        }
+
+        .collection-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 50px;
+        }
+
+        .collection-header h2 {
+            font-size: 42px;
+        }
+
+        .view-all {
+            color: var(--gold);
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: var(--transition);
+        }
+
+        .view-all:hover {
+            gap: 10px;
+        }
+
+        .jewelry-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .jewelry-card {
+            background: var(--white);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            color: var(--black);
+        }
+
+        .jewelry-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .jewelry-image {
+            height: 280px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .jewelry-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .jewelry-card:hover .jewelry-image img {
+            transform: scale(1.05);
+        }
+
+        .jewelry-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: var(--gold);
+            color: var(--black);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .jewelry-info {
+            padding: 25px;
+        }
+
+        .jewelry-info h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .jewelry-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        .jewelry-designer {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .designer-avatar {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background-color: var(--gold);
+            color: var(--black);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .jewelry-price {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .price {
+            font-weight: 700;
+            font-size: 22px;
+            color: var(--black);
+        }
+
+        .book-now {
+            background: var(--gold);
+            color: var(--black);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .book-now:hover {
+            background: var(--gold-dark);
+            transform: scale(1.05);
+        }
+
+        /* Authentication Page Styles */
+        #auth-page {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--charcoal) 0%, var(--black) 100%);
+        }
+
+        .auth-container {
+            display: flex;
+            background: var(--white);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            min-height: 600px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .auth-left {
+            flex: 1;
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.9) 0%, rgba(139, 69, 19, 0.8) 100%), url('https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80') no-repeat center center;
+            background-size: cover;
+            color: white;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .auth-left h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .auth-left p {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+
+        .features-list {
+            list-style: none;
+            margin-top: 30px;
+        }
+
+        .features-list li {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .features-list i {
+            color: var(--gold);
+            font-size: 18px;
+        }
+
+        .auth-right {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .auth-tab {
+            padding: 15px 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border-bottom: 3px solid transparent;
+        }
+
+        .auth-tab.active {
+            color: var(--gold);
+            border-bottom: 3px solid var(--gold);
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 15px;
+            border: 1px solid #E5E5E5;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: var(--transition);
+            background-color: #f9f9f9;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+        }
+
+        .password-input {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--gray);
+            cursor: pointer;
+        }
+
+        .phone-input {
+            display: flex;
+            gap: 10px;
+        }
+
+        .country-code {
+            width: 100px;
+            flex-shrink: 0;
+        }
+
+        .phone-number {
+            flex: 1;
+        }
+
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .forgot-password {
+            color: var(--gold);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .forgot-password:hover {
+            color: var(--gold-dark);
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: var(--gold);
+            color: var(--black);
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: var(--gold-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-google {
+            background: white;
+            color: var(--black);
+            border: 1px solid #E5E5E5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-google:hover {
+            background: #f5f5f5;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 25px 0;
+            color: var(--gray);
+        }
+
+        .divider::before, .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #E5E5E5;
+        }
+
+        .divider span {
+            padding: 0 15px;
+            font-size: 14px;
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 30px;
+            color: var(--gray);
+        }
+
+        .auth-footer a {
+            color: var(--gold);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .message {
+            padding: 12px 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .message.error {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            border: 1px solid rgba(231, 76, 60, 0.2);
+            display: block;
+        }
+
+        .message.success {
+            background: rgba(46, 204, 113, 0.1);
+            color: #2ecc71;
+            border: 1px solid rgba(46, 204, 113, 0.2);
+            display: block;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(212, 175, 55, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--gold);
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Booking Page Styles */
+        #booking-page {
+            padding: 50px 0;
+            background: linear-gradient(to bottom, var(--light) 0%, var(--white) 100%);
+            min-height: 100vh;
+        }
+
+        .booking-container {
+            display: flex;
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .booking-form-container {
+            flex: 1;
+            background: var(--white);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .booking-summary {
+            width: 350px;
+            background: var(--white);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            align-self: flex-start;
+        }
+
+        .booking-header {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .booking-header h2 {
+            font-size: 32px;
+            color: var(--black);
+            margin-bottom: 10px;
+        }
+
+        .booking-header p {
+            color: var(--gray);
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .form-section h3 {
+            margin-bottom: 20px;
+            color: var(--black);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-section h3 i {
+            color: var(--gold);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .jewelry-preview {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 10px;
+        }
+
+        .jewelry-preview-image {
+            width: 120px;
+            height: 120px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .jewelry-preview-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .jewelry-preview-info {
+            flex: 1;
+        }
+
+        .jewelry-preview-info h4 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .jewelry-preview-info p {
+            color: var(--gray);
+            margin-bottom: 5px;
+        }
+
+        .jewelry-preview-price {
+            font-weight: 700;
+            font-size: 20px;
+            color: var(--black);
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .summary-total {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #eee;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .courier-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .courier-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .courier-option.selected {
+            border-color: var(--gold);
+            background: rgba(212, 175, 55, 0.05);
+        }
+
+        .courier-option input {
+            margin: 0;
+        }
+
+        .courier-info {
+            flex: 1;
+        }
+
+        .courier-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .courier-details {
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        .free-delivery {
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        .location-map {
+            height: 300px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 15px;
+            border: 1px solid #ddd;
+        }
+
+        #sellerLocationMap {
+            height: 100%;
+            width: 100%;
+        }
+
+        .submit-btn {
+            background: var(--gold);
+            color: var(--black);
+            border: none;
+            padding: 16px 30px;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: block;
+            width: 100%;
+            margin-top: 30px;
+        }
+
+        .submit-btn:hover {
+            background: var(--gold-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Seller Dashboard */
+        #seller-dashboard {
+            padding: 50px 0;
+            background: linear-gradient(to bottom, var(--light) 0%, var(--white) 100%);
+            min-height: 100vh;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-header h2 {
+            font-size: 32px;
+            color: var(--black);
+        }
+
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            border-top: 4px solid var(--gold);
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--black);
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: var(--gray);
+            font-size: 16px;
+        }
+
+        .bookings-list {
+            background: var(--white);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .bookings-list h3 {
+            margin-bottom: 20px;
+            color: var(--black);
+        }
+
+        .booking-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .booking-item:last-child {
+            border-bottom: none;
+        }
+
+        .booking-info h4 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .booking-info p {
+            color: var(--gray);
+            margin-bottom: 5px;
+        }
+
+        .booking-status {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: rgba(241, 196, 15, 0.1);
+            color: #f1c40f;
+        }
+
+        .status-confirmed {
+            background: rgba(46, 204, 113, 0.1);
+            color: #2ecc71;
+        }
+
+        .status-completed {
+            background: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+        }
+
+        .booking-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-small {
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--gold);
+            color: var(--black);
+        }
+
+        .btn-primary:hover {
+            background: var(--gold-dark);
+        }
+
+        .btn-outline {
+            background: white;
+            color: var(--black);
+            border: 1px solid #ddd;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--black);
+            color: white;
+            padding: 60px 0 0;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: var(--gold);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: #CCCCCC;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--gold);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding: 30px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #999;
+            font-size: 14px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .hero h2 {
+                font-size: 42px;
+            }
+            
+            .booking-container {
+                flex-direction: column;
+            }
+            
+            .booking-summary {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-top {
+                flex-wrap: wrap;
+            }
+            
+            .nav-links {
+                order: 3;
+                margin-top: 15px;
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .hero h2 {
+                font-size: 32px;
+            }
+            
+            .hero {
+                height: 70vh;
+            }
+            
+            .section-title h2 {
+                font-size: 32px;
+            }
+            
+            .auth-container {
+                flex-direction: column;
+            }
+            
+            .auth-left {
+                padding: 30px 20px;
+            }
+            
+            .auth-right {
+                padding: 30px 20px;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .jewelry-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h2 {
+                font-size: 28px;
+            }
+            
+            .hero p {
+                font-size: 16px;
+            }
+            
+            .features-grid, .jewelry-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .jewelry-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <!-- Landing Page -->
+        <div id="landing-page" class="page active">
+            <!-- Header -->
+            <header>
+                <div class="container">
+                    <div class="header-top">
+                        <div class="logo" id="logo">
+                            <h1>Luxe<span>Gems</span></h1>
+                        </div>
+                        <ul class="nav-links">
+                            <li><a href="#">Home</a></li>
+                            <li><a href="#">Collections</a></li>
+                            <li><a href="#">Designers</a></li>
+                            <li><a href="#">About</a></li>
+                            <li><a href="#">Contact</a></li>
+                        </ul>
+                        <div class="header-actions">
+                            <div class="auth-buttons">
+                                <a href="#" class="login" id="login-link">Login</a>
+                                <a href="#" class="signup" id="signup-link">Sign Up</a>
+                            </div>
+                            <div class="cart-icon">
+                                <i class="fas fa-shopping-bag"></i>
+                                <span class="cart-count">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Hero Section -->
+            <section class="hero">
+                <div class="container">
+                    <div class="hero-content">
+                        <h2>Exquisite Luxury Jewelry</h2>
+                        <p>Discover our exclusive collection of handcrafted diamond, gold, and platinum jewelry. Each piece tells a story of elegance and sophistication.</p>
+                        <a href="#" class="cta-button" id="explore-collection">Explore Collection</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Luxury Features -->
+            <section class="luxury-features">
+                <div class="container">
+                    <div class="section-title">
+                        <h2>Why Choose LuxeGems</h2>
+                        <p>Experience the pinnacle of luxury jewelry with our exclusive services</p>
+                    </div>
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-gem"></i>
+                            </div>
+                            <h3>Certified Diamonds</h3>
+                            <p>All our diamonds are GIA certified for quality and authenticity, ensuring you receive only the finest gems.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-hands"></i>
+                            </div>
+                            <h3>Handcrafted Excellence</h3>
+                            <p>Each piece is meticulously crafted by master artisans with decades of experience in luxury jewelry.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <h3>Secure Booking</h3>
+                            <p>Our advanced booking system ensures your purchases are protected with insurance and secure delivery.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-truck"></i>
+                            </div>
+                            <h3>Free Delivery</h3>
+                            <p>Enjoy complimentary insured delivery with premium courier services for all orders above ₹50,000.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Premium Collection -->
+            <section class="premium-collection">
+                <div class="container">
+                    <div class="collection-header">
+                        <h2>Premium Collection</h2>
+                        <a href="#" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="jewelry-grid">
+                        <!-- Jewelry 1 -->
+                        <div class="jewelry-card">
+                            <div class="jewelry-image">
+                                <img src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2067&q=80" alt="Diamond Necklace">
+                                <span class="jewelry-badge">Limited Edition</span>
+                            </div>
+                            <div class="jewelry-info">
+                                <h3>Eternal Diamond Necklace</h3>
+                                <div class="jewelry-meta">
+                                    <div class="jewelry-designer">
+                                        <div class="designer-avatar">VC</div>
+                                        <span>Van Cleef & Arpels</span>
+                                    </div>
+                                </div>
+                                <div class="jewelry-price">
+                                    <span class="price">₹2,85,000</span>
+                                    <button class="book-now" data-product="1">Book Now</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Jewelry 2 -->
+                        <div class="jewelry-card">
+                            <div class="jewelry-image">
+                                <img src="https://images.unsplash.com/photo-1602173574767-37ac01994b2a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2068&q=80" alt="Gold Bracelet">
+                                <span class="jewelry-badge">Best Seller</span>
+                            </div>
+                            <div class="jewelry-info">
+                                <h3>Heritage Gold Bracelet</h3>
+                                <div class="jewelry-meta">
+                                    <div class="jewelry-designer">
+                                        <div class="designer-avatar">TC</div>
+                                        <span>Tiffany & Co.</span>
+                                    </div>
+                                </div>
+                                <div class="jewelry-price">
+                                    <span class="price">₹1,45,000</span>
+                                    <button class="book-now" data-product="2">Book Now</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Jewelry 3 -->
+                        <div class="jewelry-card">
+                            <div class="jewelry-image">
+                                <img src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Platinum Ring">
+                                <span class="jewelry-badge">New Arrival</span>
+                            </div>
+                            <div class="jewelry-info">
+                                <h3>Platinum Eternity Ring</h3>
+                                <div class="jewelry-meta">
+                                    <div class="jewelry-designer">
+                                        <div class="designer-avatar">CB</div>
+                                        <span>Cartier</span>
+                                    </div>
+                                </div>
+                                <div class="jewelry-price">
+                                    <span class="price">₹3,20,000</span>
+                                    <button class="book-now" data-product="3">Book Now</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Jewelry 4 -->
+                        <div class="jewelry-card">
+                            <div class="jewelry-image">
+                                <img src="https://images.unsplash.com/photo-1596944946757-6d93e3699d13?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80" alt="Emerald Earrings">
+                                <span class="jewelry-badge">Exclusive</span>
+                            </div>
+                            <div class="jewelry-info">
+                                <h3>Emerald Drop Earrings</h3>
+                                <div class="jewelry-meta">
+                                    <div class="jewelry-designer">
+                                        <div class="designer-avatar">BG</div>
+                                        <span>Bvlgari</span>
+                                    </div>
+                                </div>
+                                <div class="jewelry-price">
+                                    <span class="price">₹4,15,000</span>
+                                    <button class="book-now" data-product="4">Book Now</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Footer -->
+            <footer>
+                <div class="container">
+                    <div class="footer-content">
+                        <div class="footer-column">
+                            <h3>LuxeGems</h3>
+                            <p>Your premier destination for luxury jewelry. Experience craftsmanship, quality, and elegance in every piece.</p>
+                        </div>
+                        <div class="footer-column">
+                            <h3>Quick Links</h3>
+                            <ul class="footer-links">
+                                <li><a href="#">Home</a></li>
+                                <li><a href="#">Collections</a></li>
+                                <li><a href="#">Designers</a></li>
+                                <li><a href="#">About Us</a></li>
+                                <li><a href="#">Contact</a></li>
+                            </ul>
+                        </div>
+                        <div class="footer-column">
+                            <h3>Customer Service</h3>
+                            <ul class="footer-links">
+                                <li><a href="#">Help Center</a></li>
+                                <li><a href="#">Booking Information</a></li>
+                                <li><a href="#">Shipping & Returns</a></li>
+                                <li><a href="#">Track Your Order</a></li>
+                                <li><a href="#">Privacy Policy</a></li>
+                            </ul>
+                        </div>
+                        <div class="footer-column">
+                            <h3>Contact Info</h3>
+                            <ul class="footer-links">
+                                <li><i class="fas fa-map-marker-alt"></i> 123 Luxury Avenue, Mumbai, India</li>
+                                <li><i class="fas fa-phone"></i> +91 98765 43210</li>
+                                <li><i class="fas fa-envelope"></i> concierge@luxegems.com</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="footer-bottom">
+                        <p>&copy; 2023 LuxeGems. All rights reserved.</p>
+                    </div>
+                </div>
+            </footer>
+        </div>
+
+        <!-- Authentication Page -->
+        <div id="auth-page" class="page">
+            <div class="auth-container">
+                <div class="auth-left">
+                    <h2>Experience Luxury Jewelry</h2>
+                    <p>Join our exclusive community of jewelry connoisseurs. Book premium pieces with our secure system and enjoy complimentary delivery.</p>
+                    
+                    <ul class="features-list">
+                        <li><i class="fas fa-check-circle"></i> Secure authentication with Firebase</li>
+                        <li><i class="fas fa-check-circle"></i> Premium jewelry collections</li>
+                        <li><i class="fas fa-check-circle"></i> Free insured delivery</li>
+                        <li><i class="fas fa-check-circle"></i> Real-time seller notifications</li>
+                        <li><i class="fas fa-check-circle"></i> Multiple payment options</li>
+                    </ul>
+                </div>
+                
+                <div class="auth-right">
+                    <div class="logo" id="auth-logo">
+                        <h1>Luxe<span>Gems</span></h1>
+                    </div>
+                    
+                    <button class="back-button" id="auth-back-button">
+                        <i class="fas fa-arrow-left"></i> Back to Home
+                    </button>
+                    
+                    <div class="auth-tabs">
+                        <div class="auth-tab active" data-tab="login">Login</div>
+                        <div class="auth-tab" data-tab="signup">Sign Up</div>
+                    </div>
+                    
+                    <div id="message" class="message"></div>
+                    
+                    <div class="loading" id="loading">
+                        <div class="loading-spinner"></div>
+                        <p>Processing your request...</p>
+                    </div>
+                    
+                    <!-- Login Form -->
+                    <form id="loginForm" class="auth-form active">
+                        <div class="form-group">
+                            <label for="loginEmail">Email Address</label>
+                            <input type="email" id="loginEmail" class="form-control" placeholder="Enter your email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="loginPassword">Password</label>
+                            <div class="password-input">
+                                <input type="password" id="loginPassword" class="form-control" placeholder="Enter your password" required>
+                                <button type="button" class="password-toggle" id="loginPasswordToggle">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-options">
+                            <div class="remember-me">
+                                <input type="checkbox" id="rememberMe">
+                                <label for="rememberMe">Remember me</label>
+                            </div>
+                            <a href="#" class="forgot-password" id="forgotPassword">Forgot Password?</a>
+                        </div>
+                        
+                        <button type="submit" class="btn" id="loginBtn">Login</button>
+                        
+                        <div class="divider">
+                            <span>or continue with</span>
+                        </div>
+                        
+                        <button type="button" class="btn btn-google" id="googleLoginBtn">
+                            <i class="fab fa-google"></i> Google
+                        </button>
+                        
+                        <div class="auth-footer">
+                            Don't have an account? <a href="#" id="switchToSignup">Sign up</a>
+                        </div>
+                    </form>
+                    
+                    <!-- Signup Form -->
+                    <form id="signupForm" class="auth-form">
+                        <div class="form-group">
+                            <label for="signupName">Full Name</label>
+                            <input type="text" id="signupName" class="form-control" placeholder="Enter your full name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="signupEmail">Email Address</label>
+                            <input type="email" id="signupEmail" class="form-control" placeholder="Enter your email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="signupPhone">Phone Number</label>
+                            <div class="phone-input">
+                                <select id="countryCode" class="form-control country-code">
+                                    <option value="+91">+91 (IN)</option>
+                                    <option value="+1">+1 (US)</option>
+                                    <option value="+44">+44 (UK)</option>
+                                    <option value="+61">+61 (AU)</option>
+                                </select>
+                                <input type="tel" id="signupPhone" class="form-control phone-number" placeholder="Phone number" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="signupPassword">Password</label>
+                            <div class="password-input">
+                                <input type="password" id="signupPassword" class="form-control" placeholder="Create a password" required>
+                                <button type="button" class="password-toggle" id="signupPasswordToggle">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <small style="color: var(--gray); margin-top: 5px; display: block;">Password must be at least 6 characters</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="confirmPassword">Confirm Password</label>
+                            <div class="password-input">
+                                <input type="password" id="confirmPassword" class="form-control" placeholder="Confirm your password" required>
+                                <button type="button" class="password-toggle" id="confirmPasswordToggle">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="remember-me">
+                                <input type="checkbox" id="agreeTerms" required>
+                                <label for="agreeTerms">I agree to the <a href="#" style="color: var(--gold);">Terms of Service</a> and <a href="#" style="color: var(--gold);">Privacy Policy</a></label>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn" id="signupBtn">Create Account</button>
+                        
+                        <div class="divider">
+                            <span>or continue with</span>
+                        </div>
+                        
+                        <button type="button" class="btn btn-google" id="googleSignupBtn">
+                            <i class="fab fa-google"></i> Google
+                        </button>
+                        
+                        <div class="auth-footer">
+                            Already have an account? <a href="#" id="switchToLogin">Login</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Booking Page -->
+        <div id="booking-page" class="page">
+            <!-- Header -->
+            <header>
+                <div class="container">
+                    <div class="header-top">
+                        <div class="logo" id="booking-logo">
+                            <h1>Luxe<span>Gems</span></h1>
+                        </div>
+                        <ul class="nav-links">
+                            <li><a href="#">Home</a></li>
+                            <li><a href="#">Collections</a></li>
+                            <li><a href="#">Designers</a></li>
+                            <li><a href="#">About</a></li>
+                            <li><a href="#">Contact</a></li>
+                        </ul>
+                        <div class="header-actions">
+                            <div class="user-menu">
+                                <div class="user-avatar">RS</div>
+                                <span>Rahul Sharma</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="container">
+                <button class="back-button" id="booking-back-button">
+                    <i class="fas fa-arrow-left"></i> Back to Collection
+                </button>
+                
+                <div class="booking-container">
+                    <div class="booking-form-container">
+                        <div class="booking-header">
+                            <h2>Book Your Luxury Jewelry</h2>
+                            <p>Complete your booking with our secure system</p>
+                        </div>
+
+                        <form id="bookingForm">
+                            <div class="form-section">
+                                <h3><i class="fas fa-gem"></i> Product Details</h3>
+                                
+                                <div class="jewelry-preview">
+                                    <div class="jewelry-preview-image">
+                                        <img src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2067&q=80" alt="Diamond Necklace">
+                                    </div>
+                                    <div class="jewelry-preview-info">
+                                        <h4 id="booking-product-name">Eternal Diamond Necklace</h4>
+                                        <p>Designer: <span id="booking-designer">Van Cleef & Arpels</span></p>
+                                        <p>Product ID: <span id="booking-product-id">VC-001</span></p>
+                                        <div class="jewelry-preview-price">₹2,85,000</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <h3><i class="fas fa-user"></i> Personal Information</h3>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="firstName">First Name</label>
+                                        <input type="text" id="firstName" class="form-control" placeholder="Enter your first name" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="lastName">Last Name</label>
+                                        <input type="text" id="lastName" class="form-control" placeholder="Enter your last name" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="email">Email Address</label>
+                                        <input type="email" id="email" class="form-control" placeholder="Enter your email" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="phone">Phone Number</label>
+                                        <input type="tel" id="phone" class="form-control" placeholder="Enter your phone number" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <h3><i class="fas fa-map-marker-alt"></i> Delivery Address</h3>
+                                
+                                <div class="form-group">
+                                    <label for="address">Full Address</label>
+                                    <input type="text" id="address" class="form-control" placeholder="Enter your complete address" required>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="city">City</label>
+                                        <input type="text" id="city" class="form-control" placeholder="Enter your city" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="state">State</label>
+                                        <input type="text" id="state" class="form-control" placeholder="Enter your state" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="pincode">Pincode</label>
+                                        <input type="text" id="pincode" class="form-control" placeholder="Enter your pincode" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="country">Country</label>
+                                        <input type="text" id="country" class="form-control" value="India" readonly>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <h3><i class="fas fa-truck"></i> Delivery Options</h3>
+                                
+                                <div class="courier-options">
+                                    <div class="courier-option selected">
+                                        <input type="radio" name="courier" id="bluedart" value="bluedart" checked>
+                                        <div class="courier-info">
+                                            <div class="courier-name">Blue Dart</div>
+                                            <div class="courier-details">Premium insured delivery • 2-3 business days</div>
+                                        </div>
+                                        <div class="free-delivery">FREE</div>
+                                    </div>
+                                    
+                                    <div class="courier-option">
+                                        <input type="radio" name="courier" id="delhivery" value="delhivery">
+                                        <div class="courier-info">
+                                            <div class="courier-name">Delhivery</div>
+                                            <div class="courier-details">Express delivery • 1-2 business days</div>
+                                        </div>
+                                        <div class="free-delivery">FREE</div>
+                                    </div>
+                                    
+                                    <div class="courier-option">
+                                        <input type="radio" name="courier" id="dhl" value="dhl">
+                                        <div class="courier-info">
+                                            <div class="courier-name">DHL Express</div>
+                                            <div class="courier-details">International priority • 3-5 business days</div>
+                                        </div>
+                                        <div class="free-delivery">FREE</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <h3><i class="fas fa-map-marked-alt"></i> Seller Location</h3>
+                                <p>Your jewelry will be shipped directly from our certified seller</p>
+                                
+                                <div class="location-map">
+                                    <div id="sellerLocationMap"></div>
+                                </div>
+                                
+                                <div class="seller-info" style="margin-top: 15px; padding: 15px; background: #f9f9f9; border-radius: 5px;">
+                                    <h4>Seller Information</h4>
+                                    <p><strong>Name:</strong> Diamond House</p>
+                                    <p><strong>Location:</strong> Mumbai, Maharashtra</p>
+                                    <p><strong>Rating:</strong> ⭐⭐⭐⭐⭐ (4.9/5)</p>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="submit-btn">Complete Booking</button>
+                        </form>
+                    </div>
+
+                    <div class="booking-summary">
+                        <h3>Order Summary</h3>
+                        
+                        <div class="summary-item">
+                            <span>Product Price</span>
+                            <span>₹2,85,000</span>
+                        </div>
+                        
+                        <div class="summary-item">
+                            <span>GST (18%)</span>
+                            <span>₹51,300</span>
+                        </div>
+                        
+                        <div class="summary-item">
+                            <span>Insurance</span>
+                            <span>₹5,000</span>
+                        </div>
+                        
+                        <div class="summary-item">
+                            <span>Delivery</span>
+                            <span class="free-delivery">FREE</span>
+                        </div>
+                        
+                        <div class="summary-total">
+                            <span>Total Amount</span>
+                            <span>₹3,41,300</span>
+                        </div>
+                        
+                        <div class="booking-features" style="margin-top: 30px; padding: 20px; background: rgba(212, 175, 55, 0.05); border-radius: 10px;">
+                            <h4 style="margin-bottom: 15px; color: var(--gold);">What's Included</h4>
+                            <ul style="list-style: none;">
+                                <li style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                                    <i class="fas fa-check" style="color: var(--gold);"></i>
+                                    <span>GIA Certified Diamond</span>
+                                </li>
+                                <li style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                                    <i class="fas fa-check" style="color: var(--gold);"></i>
+                                    <span>Insurance Coverage</span>
+                                </li>
+                                <li style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                                    <i class="fas fa-check" style="color: var(--gold);"></i>
+                                    <span>Free Premium Delivery</span>
+                                </li>
+                                <li style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                                    <i class="fas fa-check" style="color: var(--gold);"></i>
+                                    <span>Authenticity Certificate</span>
+                                </li>
+                                <li style="display: flex; align-items: center; gap: 10px;">
+                                    <i class="fas fa-check" style="color: var(--gold);"></i>
+                                    <span>Lifetime Warranty</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer>
+                <div class="container">
+                    <div class="footer-content">
+                        <div class="footer-column">
+                            <h3>LuxeGems</h3>
+                            <p>Your premier destination for luxury jewelry. Experience craftsmanship, quality, and elegance in every piece.</p>
+                        </div>
+                        <div class="footer-column">
+                            <h3>Quick Links</h3>
+                            <ul class="footer-links">
+                                <li><a href="#">Home</a></li>
+                                <li><a href="#">Collections</a></li>
+                                <li><a href="#">Designers</a></li>
+                                <li><a href="#">About Us</a></li>
+                                <li><a href="#">Contact</a></li>
+                            </ul>
+                        </div>
+                        <div class="footer-column">
+                            <h3>Customer Service</h3>
+                            <ul class="footer-links">
+                                <li><a href="#">Help Center</a></li>
+                                <li><a href="#">Booking Information</a></li>
+                                <li><a href="#">Shipping & Returns</a></li>
+                                <li><a href="#">Track Your Order</a></li>
+                                <li><a href="#">Privacy Policy</a></li>
+                            </ul>
+                        </div>
+                        <div class="footer-column">
+                            <h3>Contact Info</h3>
+                            <ul class="footer-links">
+                                <li><i class="fas fa-map-marker-alt"></i> 123 Luxury Avenue, Mumbai, India</li>
+                                <li><i class="fas fa-phone"></i> +91 98765 43210</li>
+                                <li><i class="fas fa-envelope"></i> concierge@luxegems.com</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="footer-bottom">
+                        <p>&copy; 2023 LuxeGems. All rights reserved.</p>
+                    </div>
+                </div>
+            </footer>
+        </div>
+
+        <!-- Seller Dashboard -->
+        <div id="seller-dashboard" class="page">
+            <!-- Header -->
+            <header>
+                <div class="container">
+                    <div class="header-top">
+                        <div class="logo" id="dashboard-logo">
+                            <h1>Luxe<span>Gems</span></h1>
+                        </div>
+                        <ul class="nav-links">
+                            <li><a href="#">Dashboard</a></li>
+                            <li><a href="#">Products</a></li>
+                            <li><a href="#">Bookings</a></li>
+                            <li><a href="#">Customers</a></li>
+                            <li><a href="#">Settings</a></li>
+                        </ul>
+                        <div class="header-actions">
+                            <div class="user-menu">
+                                <div class="user-avatar">DH</div>
+                                <span>Diamond House</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="container">
+                <div class="dashboard-header">
+                    <h2>Seller Dashboard</h2>
+                    <button class="btn btn-primary" id="add-product-btn">
+                        <i class="fas fa-plus"></i> Add New Product
+                    </button>
+                </div>
+
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">Total Bookings</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">₹42.5L</div>
+                        <div class="stat-label">Total Revenue</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">4.9</div>
+                        <div class="stat-label">Average Rating</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">3</div>
+                        <div class="stat-label">Pending Bookings</div>
+                    </div>
+                </div>
+
+                <div class="bookings-list">
+                    <h3>Recent Bookings</h3>
+                    
+                    <div class="booking-item">
+                        <div class="booking-info">
+                            <h4>Eternal Diamond Necklace</h4>
+                            <p>Customer: Rahul Sharma • ₹3,41,300</p>
+                            <p>Booked on: 15 Nov 2023 • Delivery: Blue Dart</p>
+                        </div>
+                        <div class="booking-status status-pending">Pending</div>
+                        <div class="booking-actions">
+                            <button class="btn-small btn-primary" onclick="confirmBooking(this)">
+                                <i class="fas fa-check"></i> Confirm
+                            </button>
+                            <button class="btn-small btn-outline">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="booking-item">
+                        <div class="booking-info">
+                            <h4>Platinum Eternity Ring</h4>
+                            <p>Customer: Priya Mehta • ₹3,77,600</p>
+                            <p>Booked on: 14 Nov 2023 • Delivery: DHL Express</p>
+                        </div>
+                        <div class="booking-status status-confirmed">Confirmed</div>
+                        <div class="booking-actions">
+                            <button class="btn-small btn-primary">
+                                <i class="fas fa-shipping-fast"></i> Ship
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="booking-item">
+                        <div class="booking-info">
+                            <h4>Heritage Gold Bracelet</h4>
+                            <p>Customer: Rajiv Kumar • ₹1,71,100</p>
+                            <p>Booked on: 12 Nov 2023 • Delivery: Delhivery</p>
+                        </div>
+                        <div class="booking-status status-completed">Delivered</div>
+                        <div class="booking-actions">
+                            <button class="btn-small btn-outline">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer>
+                <div class="container">
+                    <div class="footer-content">
+                        <div class="footer-column">
+                            <h3>LuxeGems</h3>
+                            <p>Your premier destination for luxury jewelry. Experience craftsmanship, quality, and elegance in every piece.</p>
+                        </div>
+                        <div class="footer-column">
+                            <h3>Quick Links</h3>
+                            <ul class="footer-links">
+                                <li><a href="#">Home</a></li>
+                                <li><a href="#">Collections</a></li>
+                                <li><a href="#">Designers</a></li>
+                                <li><a href="#">About Us</a></li>
+                                <li><a href="#">Contact</a></li>
+                            </ul>
+                        </div>
+                        <div class="footer-column">
+                            <h3>Customer Service</h3>
+                            <ul class="footer-links">
+                                <li><a href="#">Help Center</a></li>
+                                <li><a href="#">Booking Information</a></li>
+                                <li><a href="#">Shipping & Returns</a></li>
+                                <li><a href="#">Track Your Order</a></li>
+                                <li><a href="#">Privacy Policy</a></li>
+                            </ul>
+                        </div>
+                        <div class="footer-column">
+                            <h3>Contact Info</h3>
+                            <ul class="footer-links">
+                                <li><i class="fas fa-map-marker-alt"></i> 123 Luxury Avenue, Mumbai, India</li>
+                                <li><i class="fas fa-phone"></i> +91 98765 43210</li>
+                                <li><i class="fas fa-envelope"></i> concierge@luxegems.com</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="footer-bottom">
+                        <p>&copy; 2023 LuxeGems. All rights reserved.</p>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC4wGDrRHs4gQN6p8Q9X7VqY9t8d4Jk8Xw",
+            authDomain: "luxegems-premium.firebaseapp.com",
+            projectId: "luxegems-premium",
+            storageBucket: "luxegems-premium.appspot.com",
+            messagingSenderId: "123456789012",
+            appId: "1:123456789012:web:abcdef1234567890"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Page Navigation
+        const pages = document.querySelectorAll('.page');
+        const logo = document.getElementById('logo');
+        const authLogo = document.getElementById('auth-logo');
+        const bookingLogo = document.getElementById('booking-logo');
+        const dashboardLogo = document.getElementById('dashboard-logo');
+        const loginLink = document.getElementById('login-link');
+        const signupLink = document.getElementById('signup-link');
+        const exploreCollection = document.getElementById('explore-collection');
+        const authBackButton = document.getElementById('auth-back-button');
+        const bookingBackButton = document.getElementById('booking-back-button');
+        const bookNowButtons = document.querySelectorAll('.book-now');
+
+        function showPage(pageId) {
+            pages.forEach(page => {
+                page.classList.remove('active');
+            });
+            const targetPage = document.getElementById(pageId);
+            targetPage.classList.add('active');
+            
+            // Initialize maps when booking page is shown
+            if (pageId === 'booking-page') {
+                setTimeout(() => {
+                    initSellerLocationMap();
+                }, 100);
+            }
+        }
+
+        logo.addEventListener('click', () => showPage('landing-page'));
+        authLogo.addEventListener('click', () => showPage('landing-page'));
+        bookingLogo.addEventListener('click', () => showPage('landing-page'));
+        dashboardLogo.addEventListener('click', () => showPage('landing-page'));
+        loginLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage('auth-page');
+        });
+        signupLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage('auth-page');
+        });
+        exploreCollection.addEventListener('click', (e) => {
+            e.preventDefault();
+            // In a real app, this would scroll to the collection section
+            document.querySelector('.premium-collection').scrollIntoView({ behavior: 'smooth' });
+        });
+        authBackButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage('landing-page');
+        });
+        bookingBackButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage('landing-page');
+        });
+
+        // Book Now buttons
+        bookNowButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                const productId = button.getAttribute('data-product');
+                // In a real app, you would fetch product details based on productId
+                showPage('booking-page');
+            });
+        });
+
+        // Authentication Functionality
+        const loginForm = document.getElementById('loginForm');
+        const signupForm = document.getElementById('signupForm');
+        const loginTab = document.querySelector('[data-tab="login"]');
+        const signupTab = document.querySelector('[data-tab="signup"]');
+        const switchToSignup = document.getElementById('switchToSignup');
+        const switchToLogin = document.getElementById('switchToLogin');
+        const messageDiv = document.getElementById('message');
+        const loadingDiv = document.getElementById('loading');
+        const loginPasswordToggle = document.getElementById('loginPasswordToggle');
+        const signupPasswordToggle = document.getElementById('signupPasswordToggle');
+        const confirmPasswordToggle = document.getElementById('confirmPasswordToggle');
+        const googleLoginBtn = document.getElementById('googleLoginBtn');
+        const googleSignupBtn = document.getElementById('googleSignupBtn');
+        const forgotPasswordLink = document.getElementById('forgotPassword');
+
+        // Tab Switching
+        loginTab.addEventListener('click', () => switchAuthTab('login'));
+        signupTab.addEventListener('click', () => switchAuthTab('signup'));
+        switchToSignup.addEventListener('click', (e) => {
+            e.preventDefault();
+            switchAuthTab('signup');
+        });
+        switchToLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            switchAuthTab('login');
+        });
+
+        function switchAuthTab(tab) {
+            if (tab === 'login') {
+                loginTab.classList.add('active');
+                signupTab.classList.remove('active');
+                loginForm.classList.add('active');
+                signupForm.classList.remove('active');
+            } else {
+                loginTab.classList.remove('active');
+                signupTab.classList.add('active');
+                loginForm.classList.remove('active');
+                signupForm.classList.add('active');
+            }
+            hideMessage();
+        }
+
+        // Password Toggle
+        function setupPasswordToggle(toggleBtn, passwordField) {
+            toggleBtn.addEventListener('click', () => {
+                const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordField.setAttribute('type', type);
+                toggleBtn.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+            });
+        }
+
+        setupPasswordToggle(loginPasswordToggle, document.getElementById('loginPassword'));
+        setupPasswordToggle(signupPasswordToggle, document.getElementById('signupPassword'));
+        setupPasswordToggle(confirmPasswordToggle, document.getElementById('confirmPassword'));
+
+        // Show Message
+        function showMessage(message, type) {
+            messageDiv.textContent = message;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+        }
+
+        function hideMessage() {
+            messageDiv.style.display = 'none';
+        }
+
+        // Show/Hide Loading
+        function showLoading() {
+            loadingDiv.style.display = 'block';
+        }
+
+        function hideLoading() {
+            loadingDiv.style.display = 'none';
+        }
+
+        // Form Validation
+        function validateSignupForm() {
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const phone = document.getElementById('signupPhone').value.trim();
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const agreeTerms = document.getElementById('agreeTerms').checked;
+
+            if (name.length < 2) {
+                showMessage('Please enter a valid name', 'error');
+                return false;
+            }
+
+            if (!isValidEmail(email)) {
+                showMessage('Please enter a valid email address', 'error');
+                return false;
+            }
+
+            if (!isValidPhone(phone)) {
+                showMessage('Please enter a valid phone number', 'error');
+                return false;
+            }
+
+            if (password.length < 6) {
+                showMessage('Password must be at least 6 characters', 'error');
+                return false;
+            }
+
+            if (password !== confirmPassword) {
+                showMessage('Passwords do not match', 'error');
+                return false;
+            }
+
+            if (!agreeTerms) {
+                showMessage('Please agree to the Terms of Service and Privacy Policy', 'error');
+                return false;
+            }
+
+            return true;
+        }
+
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        function isValidPhone(phone) {
+            const phoneRegex = /^\d{10}$/;
+            return phoneRegex.test(phone);
+        }
+
+        // Login with Email/Password
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                showMessage('Please fill in all fields', 'error');
+                return;
+            }
+
+            showLoading();
+            
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Signed in
+                    const user = userCredential.user;
+                    showMessage('Login successful!', 'success');
+                    
+                    // Update user data in Firestore if needed
+                    updateUserData(user);
+                    
+                    // Check if user is a seller
+                    checkUserRole(user.uid);
+                })
+                .catch((error) => {
+                    hideLoading();
+                    const errorCode = error.code;
+                    let errorMessage = 'An error occurred during login';
+                    
+                    if (errorCode === 'auth/user-not-found') {
+                        errorMessage = 'No account found with this email';
+                    } else if (errorCode === 'auth/wrong-password') {
+                        errorMessage = 'Incorrect password';
+                    } else if (errorCode === 'auth/invalid-email') {
+                        errorMessage = 'Invalid email address';
+                    } else if (errorCode === 'auth/too-many-requests') {
+                        errorMessage = 'Too many failed attempts. Please try again later';
+                    }
+                    
+                    showMessage(errorMessage, 'error');
+                });
+        });
+
+        // Signup with Email/Password
+        signupForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            if (!validateSignupForm()) {
+                return;
+            }
+
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const countryCode = document.getElementById('countryCode').value;
+            const phone = document.getElementById('signupPhone').value.trim();
+            const password = document.getElementById('signupPassword').value;
+
+            showLoading();
+
+            auth.createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Signed up
+                    const user = userCredential.user;
+                    
+                    // Save user data to Firestore
+                    return db.collection('users').doc(user.uid).set({
+                        name: name,
+                        email: email,
+                        phone: countryCode + phone,
+                        role: 'customer', // Default role
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                })
+                .then(() => {
+                    showMessage('Account created successfully!', 'success');
+                    hideLoading();
+                })
+                .catch((error) => {
+                    hideLoading();
+                    const errorCode = error.code;
+                    let errorMessage = 'An error occurred during signup';
+                    
+                    if (errorCode === 'auth/email-already-in-use') {
+                        errorMessage = 'An account with this email already exists';
+                    } else if (errorCode === 'auth/weak-password') {
+                        errorMessage = 'Password is too weak';
+                    } else if (errorCode === 'auth/invalid-email') {
+                        errorMessage = 'Invalid email address';
+                    }
+                    
+                    showMessage(errorMessage, 'error');
+                });
+        });
+
+        // Google Authentication
+        function signInWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            provider.addScope('profile');
+            provider.addScope('email');
+            
+            showLoading();
+            
+            auth.signInWithPopup(provider)
+                .then((result) => {
+                    // This gives you a Google Access Token
+                    const credential = result.credential;
+                    const token = credential.accessToken;
+                    
+                    // The signed-in user info
+                    const user = result.user;
+                    
+                    // Check if user exists in Firestore
+                    const userRef = db.collection('users').doc(user.uid);
+                    
+                    userRef.get().then((doc) => {
+                        if (doc.exists) {
+                            // User exists, update last login
+                            userRef.update({
+                                lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                            
+                            // Check user role
+                            checkUserRole(user.uid);
+                        } else {
+                            // User doesn't exist, create new document
+                            userRef.set({
+                                name: user.displayName,
+                                email: user.email,
+                                phone: user.phoneNumber || '',
+                                role: 'customer',
+                                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                                lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                            }).then(() => {
+                                checkUserRole(user.uid);
+                            });
+                        }
+                    });
+                })
+                .catch((error) => {
+                    hideLoading();
+                    const errorCode = error.code;
+                    let errorMessage = 'An error occurred during Google authentication';
+                    
+                    if (errorCode === 'auth/popup-closed-by-user') {
+                        errorMessage = 'Authentication cancelled';
+                    } else if (errorCode === 'auth/popup-blocked') {
+                        errorMessage = 'Popup was blocked by your browser. Please allow popups for this site';
+                    }
+                    
+                    showMessage(errorMessage, 'error');
+                });
+        }
+
+        googleLoginBtn.addEventListener('click', signInWithGoogle);
+        googleSignupBtn.addEventListener('click', signInWithGoogle);
+
+        // Forgot Password
+        forgotPasswordLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            
+            if (!email) {
+                showMessage('Please enter your email address to reset password', 'error');
+                return;
+            }
+            
+            if (!isValidEmail(email)) {
+                showMessage('Please enter a valid email address', 'error');
+                return;
+            }
+            
+            showLoading();
+            
+            auth.sendPasswordResetEmail(email)
+                .then(() => {
+                    hideLoading();
+                    showMessage('Password reset email sent! Check your inbox.', 'success');
+                })
+                .catch((error) => {
+                    hideLoading();
+                    const errorCode = error.code;
+                    let errorMessage = 'An error occurred while sending reset email';
+                    
+                    if (errorCode === 'auth/user-not-found') {
+                        errorMessage = 'No account found with this email';
+                    } else if (errorCode === 'auth/invalid-email') {
+                        errorMessage = 'Invalid email address';
+                    }
+                    
+                    showMessage(errorMessage, 'error');
+                });
+        });
+
+        // Update user data in Firestore
+        function updateUserData(user) {
+            const userRef = db.collection('users').doc(user.uid);
+            
+            userRef.get().then((doc) => {
+                if (doc.exists) {
+                    // Update last login
+                    userRef.update({
+                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+            });
+        }
+
+        // Check user role and redirect accordingly
+        function checkUserRole(uid) {
+            db.collection('users').doc(uid).get()
+                .then((doc) => {
+                    if (doc.exists) {
+                        const userData = doc.data();
+                        if (userData.role === 'seller') {
+                            showPage('seller-dashboard');
+                        } else {
+                            showPage('landing-page');
+                        }
+                    } else {
+                        showPage('landing-page');
+                    }
+                    hideLoading();
+                })
+                .catch((error) => {
+                    console.error('Error checking user role:', error);
+                    showPage('landing-page');
+                    hideLoading();
+                });
+        }
+
+        // Check if user is already logged in
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // User is signed in, check role and redirect
+                checkUserRole(user.uid);
+            }
+        });
+
+        // Booking Form Submission
+        const bookingForm = document.getElementById('bookingForm');
+        
+        bookingForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Get form data
+            const formData = {
+                product: {
+                    name: document.getElementById('booking-product-name').textContent,
+                    designer: document.getElementById('booking-designer').textContent,
+                    id: document.getElementById('booking-product-id').textContent,
+                    price: 285000
+                },
+                customer: {
+                    firstName: document.getElementById('firstName').value,
+                    lastName: document.getElementById('lastName').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value
+                },
+                address: {
+                    full: document.getElementById('address').value,
+                    city: document.getElementById('city').value,
+                    state: document.getElementById('state').value,
+                    pincode: document.getElementById('pincode').value,
+                    country: document.getElementById('country').value
+                },
+                courier: document.querySelector('input[name="courier"]:checked').value,
+                totalAmount: 341300,
+                bookingDate: new Date().toISOString(),
+                status: 'pending'
+            };
+            
+            // Save booking to Firestore
+            db.collection('bookings').add(formData)
+                .then((docRef) => {
+                    // Send WhatsApp notification to seller
+                    sendSellerNotification(formData);
+                    
+                    // Show success message
+                    alert('Booking confirmed! The seller has been notified and will contact you shortly.');
+                    
+                    // Redirect to home page
+                    showPage('landing-page');
+                })
+                .catch((error) => {
+                    console.error('Error saving booking:', error);
+                    alert('There was an error processing your booking. Please try again.');
+                });
+        });
+
+        // Send WhatsApp notification to seller
+        function sendSellerNotification(bookingData) {
+            const sellerPhone = '+919876543210'; // Seller's phone number
+            const message = `New Booking Alert!%0A%0AProduct: ${bookingData.product.name}%0ADesigner: ${bookingData.product.designer}%0APrice: ₹${bookingData.product.price.toLocaleString()}%0ACustomer: ${bookingData.customer.firstName} ${bookingData.customer.lastName}%0APhone: ${bookingData.customer.phone}%0AAddress: ${bookingData.address.full}, ${bookingData.address.city}%0APincode: ${bookingData.address.pincode}%0A%0APlease confirm this booking at your earliest.`;
+            
+            // Create WhatsApp URL
+            const whatsappUrl = `https://wa.me/${sellerPhone}?text=${message}`;
+            
+            // In a real application, you would use a server-side service to send the message
+            // For demo purposes, we'll open WhatsApp with the pre-filled message
+            window.open(whatsappUrl, '_blank');
+            
+            // Also log to console for demo
+            console.log('WhatsApp Notification:', {
+                phone: sellerPhone,
+                message: decodeURIComponent(message)
+            });
+        }
+
+        // Courier option selection
+        const courierOptions = document.querySelectorAll('.courier-option');
+        
+        courierOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                courierOptions.forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+                const radio = option.querySelector('input[type="radio"]');
+                radio.checked = true;
+            });
+        });
+
+        // Initialize Seller Location Map
+        function initSellerLocationMap() {
+            // Check if map is already initialized
+            if (window.sellerLocationMap) {
+                window.sellerLocationMap.remove();
+            }
+            
+            const map = L.map('sellerLocationMap').setView([19.0760, 72.8777], 12); // Mumbai coordinates
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            // Add seller location marker
+            const sellerMarker = L.marker([19.0760, 72.8777]).addTo(map);
+            
+            sellerMarker.bindPopup(`
+                <div style="text-align: center;">
+                    <h3>Diamond House</h3>
+                    <p>Premium Jewelry Seller</p>
+                    <p>⭐ 4.9/5 (128 reviews)</p>
+                    <button class="btn btn-primary" style="margin-top: 10px; padding: 5px 10px; font-size: 12px;">
+                        Contact Seller
+                    </button>
+                </div>
+            `).openPopup();
+            
+            // Store map reference
+            window.sellerLocationMap = map;
+        }
+
+        // Seller Dashboard - Confirm Booking
+        function confirmBooking(button) {
+            const bookingItem = button.closest('.booking-item');
+            const statusElement = bookingItem.querySelector('.booking-status');
+            
+            // Update status
+            statusElement.textContent = 'Confirmed';
+            statusElement.className = 'booking-status status-confirmed';
+            
+            // Update button
+            button.innerHTML = '<i class="fas fa-shipping-fast"></i> Ship';
+            
+            // In a real app, you would update the booking in Firestore
+            console.log('Booking confirmed');
+            
+            // Show confirmation message
+            alert('Booking confirmed! The customer has been notified.');
+        }
+
+        // Initialize maps when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // Add CSS animation for cart count
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes pulse {
+                    0% { transform: scale(1); }
+                    50% { transform: scale(1.3); }
+                    100% { transform: scale(1); }
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    </script>
+</body>
+</html>

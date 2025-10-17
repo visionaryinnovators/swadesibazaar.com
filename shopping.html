@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artisan Marketplace | Handcrafted Treasures</title>
+    <style>
+        /* Global Styles */
+        :root {
+            --primary: #8B4513;
+            --secondary: #D2691E;
+            --accent: #CD853F;
+            --light: #FAEBD7;
+            --dark: #5D4037;
+            --text: #333333;
+            --white: #FFFFFF;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        /* Header Styles */
+        header {
+            background-color: var(--primary);
+            color: var(--white);
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo i {
+            margin-right: 10px;
+            font-size: 2rem;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+        
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+        
+        nav ul li a {
+            font-weight: 500;
+            transition: color 0.3s;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+        
+        nav ul li a:hover {
+            color: var(--accent);
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--white);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://source.unsplash.com/random/1200x600/?handicraft') no-repeat center center/cover;
+            color: var(--white);
+            padding: 5rem 0;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--secondary);
+            color: var(--white);
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            background-color: var(--accent);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Categories Section */
+        .categories {
+            padding: 5rem 0;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+        
+        .section-title h2 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            display: inline-block;
+        }
+        
+        .section-title h2::after {
+            content: '';
+            display: block;
+            width: 70px;
+            height: 3px;
+            background-color: var(--secondary);
+            margin: 10px auto;
+        }
+        
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+        
+        .category-card {
+            background-color: var(--white);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        
+        .category-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .category-img {
+            height: 200px;
+            overflow: hidden;
+        }
+        
+        .category-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+        
+        .category-card:hover .category-img img {
+            transform: scale(1.1);
+        }
+        
+        .category-info {
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .category-info h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+        
+        /* Products Section */
+        .products {
+            padding: 5rem 0;
+            background-color: var(--white);
+        }
+        
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+        
+        .product-card {
+            background-color: var(--light);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .product-img {
+            height: 200px;
+            overflow: hidden;
+        }
+        
+        .product-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .product-info {
+            padding: 1.5rem;
+        }
+        
+        .product-info h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .product-price {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+        
+        /* Footer */
+        footer {
+            background-color: var(--dark);
+            color: var(--white);
+            padding: 3rem 0 1rem;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .footer-column h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 40px;
+            height: 2px;
+            background-color: var(--secondary);
+        }
+        
+        .footer-column ul {
+            list-style: none;
+        }
+        
+        .footer-column ul li {
+            margin-bottom: 0.8rem;
+        }
+        
+        .footer-column ul li a {
+            transition: color 0.3s;
+        }
+        
+        .footer-column ul li a:hover {
+            color: var(--accent);
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transition: background-color 0.3s;
+        }
+        
+        .social-links a:hover {
+            background-color: var(--secondary);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Page Content Styles */
+        .page-content {
+            padding: 3rem 0;
+        }
+        
+        .page-hero {
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://source.unsplash.com/random/1200x400/?craft') no-repeat center center/cover;
+            color: var(--white);
+            padding: 4rem 0;
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .page-hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .breadcrumb {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+        
+        .breadcrumb li {
+            margin: 0 5px;
+        }
+        
+        .breadcrumb li:not(:last-child)::after {
+            content: '>';
+            margin-left: 10px;
+        }
+        
+        .product-detail {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+        
+        .product-gallery {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .gallery-main {
+            grid-column: 1 / -1;
+        }
+        
+        .gallery-main img {
+            width: 100%;
+            border-radius: 10px;
+        }
+        
+        .gallery-thumbnails {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+        
+        .gallery-thumbnails img {
+            width: 100%;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+        
+        .gallery-thumbnails img:hover {
+            opacity: 0.8;
+        }
+        
+        .product-description h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+        
+        .product-price {
+            font-size: 1.8rem;
+            color: var(--secondary);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+        
+        .product-details {
+            margin-bottom: 2rem;
+        }
+        
+        .product-details ul {
+            list-style: none;
+            margin-left: 1rem;
+        }
+        
+        .product-details ul li {
+            margin-bottom: 0.5rem;
+            position: relative;
+            padding-left: 1.5rem;
+        }
+        
+        .product-details ul li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--secondary);
+            font-weight: bold;
+        }
+        
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .quantity-selector label {
+            margin-right: 1rem;
+            font-weight: 600;
+        }
+        
+        .quantity-selector input {
+            width: 60px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+        
+        /* Related Products */
+        .related-products {
+            margin-top: 5rem;
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .product-detail {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            nav {
+                position: fixed;
+                top: 70px;
+                left: -100%;
+                width: 80%;
+                height: calc(100vh - 70px);
+                background-color: var(--primary);
+                transition: left 0.3s;
+                padding: 2rem;
+            }
+            
+            nav.active {
+                left: 0;
+            }
+            
+            nav ul {
+                flex-direction: column;
+            }
+            
+            nav ul li {
+                margin: 1rem 0;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            .section-title h2 {
+                font-size: 2rem;
+            }
+            
+            .product-gallery {
+                grid-template-columns: 1fr;
+            }
+            
+            .gallery-thumbnails {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .hero {
+                padding: 3rem 0;
+            }
+            
+            .categories, .products {
+                padding: 3rem 0;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-content">
+            <a href="index.html" class="logo">
+                <i class="fas fa-hands"></i>
+                ArtisanHub
+            </a>
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="handicrafts.html">Handicrafts</a></li>
+                    <li><a href="home-decor.html">Home Decor</a></li>
+                    <li><a href="clothing-textiles.html">Clothing & Textiles</a></li>
+                    <li><a href="jewelry.html">Jewelry</a></li>
+                    <li><a href="pottery.html">Pottery</a></li>
+                    <li><a href="woodwork.html">Woodwork</a></li>
+                    <li><a href="metalwork.html">Metalwork</a></li>
+                    <li><a href="local-food.html">Local Food</a></li>
+                    <li><a href="organic-products.html">Organic Products</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Homepage Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>Discover Handcrafted Treasures</h1>
+            <p>Explore unique, artisanal products crafted with passion and tradition. Each piece tells a story of skill, heritage, and creativity.</p>
+            <a href="#categories" class="btn">Explore Collections</a>
+        </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="categories" id="categories">
+        <div class="container">
+            <div class="section-title">
+                <h2>Our Collections</h2>
+            </div>
+            <div class="categories-grid">
+                <!-- Handicrafts -->
+                <div class="category-card" onclick="location.href='handicrafts.html'">
+                    <div class="category-img">
+                        <img src="https://source.unsplash.com/random/600x400/?handicraft" alt="Handicrafts">
+                    </div>
+                    <div class="category-info">
+                        <h3>Handicrafts</h3>
+                        <p>Traditional crafts made by skilled artisans</p>
+                    </div>
+                </div>
+                
+                <!-- Home Decor -->
+                <div class="category-card" onclick="location.href='home-decor.html'">
+                    <div class="category-img">
+                        <img src="https://source.unsplash.com/random/600x400/?home-decor" alt="Home Decor">
+                    </div>
+                    <div class="category-info">
+                        <h3>Home Decor</h3>
+                        <p>Beautiful pieces to enhance your living space</p>
+                    </div>
+                </div>
+                
+                <!-- Clothing & Textiles -->
+                <div class="category-card" onclick="location.href='clothing-textiles.html'">
+                    <div class="category-img">
+                        <img src="https://source.unsplash.com/random/600x400/?textile" alt="Clothing & Textiles">
+                    </div>
+                    <div class="category-info">
+                        <h3>Clothing & Textiles</h3>
+                        <p>Handwoven fabrics and traditional garments</p>
+                    </div>
+                </div>
+                
+                <!-- Jewelry -->
+                <div class="category-card" onclick="location.href='jewelry.html'">
+                    <div class="category-img">
+                        <img src="https://source.unsplash.com/random/600x400/?jewelry" alt="Jewelry">
+                    </div>
+                    <div class="category-info">
+                        <h3>Jewelry</h3>
+                        <p>Unique pieces crafted with precision and care</p>
+                    </div>
+                </div>
+                
+                <!-- Pottery -->
+                <div class="category-card" onclick="location.href='pottery.html'">
+                    <div class="category-img">
+                        <img src="https://source.unsplash.com/random/600x400/?pottery" alt="Pottery">
+                    </div>
+                    <div class="category-info">
+                        <h3>Pottery</h3>
+                        <p>Earthenware and ceramic creations</p>
+                    </div>
+                </div>
+                
+                <!-- Woodwork -->
+                <div class="category-card" onclick="location.href='woodwork.html'">
+                    <div class="category-img">
+                        <img src="https://source.unsplash.com/random/600x400/?woodwork" alt="Woodwork">
+                    </div>
+                    <div class="category-info">
+                        <h3>Woodwork</h3>
+                        <p>Carved and crafted wooden items</p>
+                    </div>
+                </div>
+                
+                <!-- Metalwork -->
+                <div class="category-card" onclick="location.href='metalwork.html'">
+                    <div class="category-img">
+                        <img src="https://source.unsplash.com/random/600x400/?metalwork" alt="Metalwork">
+                    </div>
+                    <div class="category-info">
+                        <h3>Metalwork</h3>
+                        <p>Artistic creations in various metals</p>
+                    </div>
+                </div>
+                
+                <!-- Local Food -->
+                <div class="category-card" onclick="location.href='local-food.html'">
+                    <div class="category-img">
+                        <img src="https://source.unsplash.com/random/600x400/?local-food" alt="Local Food">
+                    </div>
+                    <div class="category-info">
+                        <h3>Local Food</h3>
+                        <p>Traditional recipes and local delicacies</p>
+                    </div>
+                </div>
+                
+                <!-- Organic Products -->
+                <div class="category-card" onclick="location.href='organic-products.html'">
+                    <div class="category-img">
+                        <img src="https://source.unsplash.com/random/600x400/?organic" alt="Organic Products">
+                    </div>
+                    <div class="category-info">
+                        <h3>Organic Products</h3>
+                        <p>Natural and sustainable goods</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Products -->
+    <section class="products">
+        <div class="container">
+            <div class="section-title">
+                <h2>Featured Products</h2>
+            </div>
+            <div class="products-grid">
+                <!-- Sample Product 1 -->
+                <div class="product-card">
+                    <div class="product-img">
+                        <img src="https://source.unsplash.com/random/600x400/?handmade-pot" alt="Handmade Pot">
+                    </div>
+                    <div class="product-info">
+                        <h3>Traditional Clay Pot</h3>
+                        <p class="product-price">$45.00</p>
+                        <a href="#" class="btn">View Details</a>
+                    </div>
+                </div>
+                
+                <!-- Sample Product 2 -->
+                <div class="product-card">
+                    <div class="product-img">
+                        <img src="https://source.unsplash.com/random/600x400/?handwoven-scarf" alt="Handwoven Scarf">
+                    </div>
+                    <div class="product-info">
+                        <h3>Handwoven Silk Scarf</h3>
+                        <p class="product-price">$68.00</p>
+                        <a href="#" class="btn">View Details</a>
+                    </div>
+                </div>
+                
+                <!-- Sample Product 3 -->
+                <div class="product-card">
+                    <div class="product-img">
+                        <img src="https://source.unsplash.com/random/600x400/?wooden-bowl" alt="Wooden Bowl">
+                    </div>
+                    <div class="product-info">
+                        <h3>Carved Wooden Bowl</h3>
+                        <p class="product-price">$32.00</p>
+                        <a href="#" class="btn">View Details</a>
+                    </div>
+                </div>
+                
+                <!-- Sample Product 4 -->
+                <div class="product-card">
+                    <div class="product-img">
+                        <img src="https://source.unsplash.com/random/600x400/?artisan-jewelry" alt="Artisan Jewelry">
+                    </div>
+                    <div class="product-info">
+                        <h3>Silver Tribal Necklace</h3>
+                        <p class="product-price">$85.00</p>
+                        <a href="#" class="btn">View Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>ArtisanHub</h3>
+                    <p>Connecting artisans with appreciative customers worldwide. Preserving traditional crafts while supporting sustainable livelihoods.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-pinterest-p"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="#categories">Collections</a></li>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">FAQs</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Customer Service</h3>
+                    <ul>
+                        <li><a href="#">Shipping Policy</a></li>
+                        <li><a href="#">Returns & Refunds</a></li>
+                        <li><a href="#">Payment Methods</a></li>
+                        <li><a href="#">Track Your Order</a></li>
+                        <li><a href="#">Size Guide</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contact Info</h3>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Artisan Street, Craftville</li>
+                        <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
+                        <li><i class="fas fa-envelope"></i> info@artisanhub.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 ArtisanHub. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        const nav = document.querySelector('nav');
+        
+        mobileMenuBtn.addEventListener('click', () => {
+            nav.classList.toggle('active');
+        });
+        
+        // Close mobile menu when clicking on a link
+        const navLinks = document.querySelectorAll('nav ul li a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                nav.classList.remove('active');
+            });
+        });
+        
+        // Simple image gallery functionality
+        const thumbnails = document.querySelectorAll('.gallery-thumbnails img');
+        const mainImage = document.querySelector('.gallery-main img');
+        
+        if (thumbnails.length > 0 && mainImage) {
+            thumbnails.forEach(thumb => {
+                thumb.addEventListener('click', () => {
+                    mainImage.src = thumb.src;
+                });
+            });
+        }
+    </script>
+</body>
+</html>

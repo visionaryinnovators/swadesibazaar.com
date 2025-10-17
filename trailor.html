@@ -1,0 +1,2842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LuxeThreads | Premium Luxury Clothing</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --gold-dark: #B8860B;
+            --navy: #1A1A2E;
+            --charcoal: #2D3047;
+            --cream: #F8F5F0;
+            --silver: #E8E8E8;
+            --white: #FFFFFF;
+            --error: #e74c3c;
+            --success: #2ecc71;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--charcoal);
+            background-color: var(--cream);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Page Container */
+        .page-container {
+            position: relative;
+            min-height: 100vh;
+        }
+
+        .page {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            min-height: 100vh;
+        }
+
+        .page.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Back Button */
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            color: var(--gold);
+            font-weight: 500;
+            cursor: pointer;
+            padding: 10px 0;
+            margin-bottom: 20px;
+            transition: var(--transition);
+        }
+
+        .back-button:hover {
+            color: var(--gold-dark);
+            transform: translateX(-5px);
+        }
+
+        /* Header Styles */
+        header {
+            background-color: var(--white);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .logo h1 {
+            font-size: 28px;
+            color: var(--gold);
+            letter-spacing: -0.5px;
+        }
+
+        .logo span {
+            color: var(--navy);
+        }
+
+        .search-bar {
+            flex: 1;
+            max-width: 600px;
+            margin: 0 30px;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 14px 20px;
+            border: 1px solid var(--silver);
+            border-radius: 50px;
+            font-size: 16px;
+            transition: var(--transition);
+            background-color: #f9f9f9;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+        }
+
+        .search-bar button {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            background: var(--gold);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 9px 20px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .search-bar button:hover {
+            background: var(--gold-dark);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .auth-buttons a {
+            text-decoration: none;
+            color: var(--charcoal);
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: var(--transition);
+        }
+
+        .auth-buttons a.login {
+            color: var(--charcoal);
+        }
+
+        .auth-buttons a.signup {
+            background: var(--gold);
+            color: white;
+        }
+
+        .auth-buttons a.signup:hover {
+            background: var(--gold-dark);
+        }
+
+        .cart-icon {
+            position: relative;
+            font-size: 22px;
+            color: var(--charcoal);
+            cursor: pointer;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--gold);
+            color: white;
+            font-size: 12px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Navigation */
+        nav {
+            background-color: var(--navy);
+            padding: 15px 0;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--gold);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--gold);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .luxury-hero {
+            position: relative;
+            height: 700px;
+            background: linear-gradient(135deg, rgba(26, 26, 46, 0.8) 0%, rgba(45, 48, 71, 0.7) 100%), url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80') no-repeat center center;
+            background-size: cover;
+            color: white;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            max-width: 700px;
+            z-index: 2;
+        }
+
+        .hero-content h2 {
+            font-size: 52px;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .hero-content p {
+            font-size: 18px;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: var(--gold);
+            color: white;
+            padding: 14px 30px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .cta-button:hover {
+            background: var(--gold-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Luxury Features */
+        .luxury-features {
+            padding: 80px 0;
+            background-color: var(--white);
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .section-title h2 {
+            font-size: 36px;
+            color: var(--navy);
+            margin-bottom: 15px;
+        }
+
+        .section-title p {
+            color: var(--charcoal);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            background: var(--white);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            text-align: center;
+            border: 1px solid var(--silver);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            width: 70px;
+            height: 70px;
+            background: rgba(212, 175, 55, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 28px;
+            color: var(--gold);
+        }
+
+        .feature-card h3 {
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+
+        .feature-card p {
+            color: var(--charcoal);
+        }
+
+        /* Designer Collections */
+        .designer-collections {
+            padding: 80px 0;
+            background-color: var(--cream);
+        }
+
+        .collections-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .collection-card {
+            position: relative;
+            height: 400px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .collection-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .collection-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .collection-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .collection-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+            color: white;
+            padding: 30px;
+        }
+
+        .collection-overlay h3 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .collection-overlay p {
+            opacity: 0.9;
+        }
+
+        /* Premium Products */
+        .premium-products {
+            padding: 80px 0;
+            background-color: var(--white);
+        }
+
+        .products-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .products-header h2 {
+            font-size: 32px;
+        }
+
+        .view-all {
+            color: var(--gold);
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: var(--transition);
+        }
+
+        .view-all:hover {
+            gap: 10px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .product-card {
+            background: var(--white);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-image {
+            height: 300px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.05);
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: var(--gold);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .product-info {
+            padding: 20px;
+        }
+
+        .product-info h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .product-designer {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: var(--charcoal);
+        }
+
+        .designer-avatar {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background-color: var(--silver);
+        }
+
+        .product-location {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            color: var(--charcoal);
+            margin-bottom: 15px;
+        }
+
+        .product-price {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .price {
+            font-weight: 700;
+            font-size: 20px;
+            color: var(--navy);
+        }
+
+        .add-to-cart {
+            background: var(--gold);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .add-to-cart:hover {
+            background: var(--gold-dark);
+            transform: scale(1.1);
+        }
+
+        /* Booking Section */
+        .booking-section {
+            padding: 80px 0;
+            background-color: var(--cream);
+        }
+
+        .booking-container {
+            display: flex;
+            gap: 50px;
+            align-items: flex-start;
+        }
+
+        .booking-form-container {
+            flex: 1;
+            background: var(--white);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .booking-map-container {
+            flex: 1;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .booking-map {
+            height: 500px;
+            width: 100%;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 15px;
+            border: 1px solid var(--silver);
+            border-radius: 5px;
+            font-size: 16px;
+            transition: var(--transition);
+            background-color: #f9f9f9;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .courier-options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .courier-option {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            border: 1px solid var(--silver);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .courier-option.selected {
+            border-color: var(--gold);
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        .courier-option i {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: var(--gold);
+        }
+
+        .courier-option h4 {
+            margin-bottom: 5px;
+        }
+
+        .courier-option p {
+            font-size: 14px;
+            color: var(--charcoal);
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: var(--gold);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: var(--gold-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* AI Assistant */
+        .ai-assistant {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+        }
+
+        .assistant-toggle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--gold);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: var(--transition);
+        }
+
+        .assistant-toggle:hover {
+            transform: scale(1.1);
+            background: var(--gold-dark);
+        }
+
+        .assistant-window {
+            position: absolute;
+            bottom: 70px;
+            right: 0;
+            width: 350px;
+            height: 450px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .assistant-header {
+            background: var(--navy);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .assistant-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .assistant-body {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .assistant-message {
+            max-width: 80%;
+            padding: 12px 15px;
+            border-radius: 18px;
+            font-size: 14px;
+        }
+
+        .assistant-message.bot {
+            background: #f0f0f0;
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+
+        .assistant-message.user {
+            background: var(--gold);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+
+        .assistant-input {
+            padding: 15px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            gap: 10px;
+        }
+
+        .assistant-input input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid var(--silver);
+            border-radius: 50px;
+            font-size: 14px;
+        }
+
+        .assistant-input button {
+            background: var(--gold);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .assistant-input button:hover {
+            background: var(--gold-dark);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--navy);
+            color: white;
+            padding: 60px 0 0;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: var(--gold);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: #CCCCCC;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--gold);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding: 30px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #999;
+            font-size: 14px;
+        }
+
+        /* Authentication Page Styles */
+        #auth-page {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .auth-container {
+            display: flex;
+            background: var(--white);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            min-height: 600px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .auth-left {
+            flex: 1;
+            background: linear-gradient(135deg, rgba(26, 26, 46, 0.9) 0%, rgba(45, 48, 71, 0.8) 100%), url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80') no-repeat center center;
+            background-size: cover;
+            color: white;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .auth-left h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .auth-left p {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+
+        .features-list {
+            list-style: none;
+            margin-top: 30px;
+        }
+
+        .features-list li {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .features-list i {
+            color: var(--gold);
+            font-size: 18px;
+        }
+
+        .auth-right {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--silver);
+        }
+
+        .auth-tab {
+            padding: 15px 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border-bottom: 3px solid transparent;
+        }
+
+        .auth-tab.active {
+            color: var(--gold);
+            border-bottom: 3px solid var(--gold);
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .password-input {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--charcoal);
+            cursor: pointer;
+        }
+
+        .phone-input {
+            display: flex;
+            gap: 10px;
+        }
+
+        .country-code {
+            width: 100px;
+            flex-shrink: 0;
+        }
+
+        .phone-number {
+            flex: 1;
+        }
+
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .forgot-password {
+            color: var(--gold);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .forgot-password:hover {
+            color: var(--gold-dark);
+        }
+
+        .btn-google {
+            background: white;
+            color: var(--charcoal);
+            border: 1px solid var(--silver);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-google:hover {
+            background: #f5f5f5;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 25px 0;
+            color: var(--charcoal);
+        }
+
+        .divider::before, .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: var(--silver);
+        }
+
+        .divider span {
+            padding: 0 15px;
+            font-size: 14px;
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 30px;
+            color: var(--charcoal);
+        }
+
+        .auth-footer a {
+            color: var(--gold);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .message {
+            padding: 12px 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .message.error {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--error);
+            border: 1px solid rgba(231, 76, 60, 0.2);
+            display: block;
+        }
+
+        .message.success {
+            background: rgba(46, 204, 113, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(46, 204, 113, 0.2);
+            display: block;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(212, 175, 55, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--gold);
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Marketplace Page Styles */
+        .marketplace-header {
+            background-color: var(--white);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .marketplace-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .nav-btn:hover {
+            background: #f5f5f5;
+        }
+
+        .nav-btn.active {
+            background: var(--gold);
+            color: white;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gold);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: none;
+            padding: 30px 0;
+            min-height: 70vh;
+        }
+
+        .main-content.active {
+            display: block;
+        }
+
+        /* Shopping Page */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .page-title {
+            font-size: 32px;
+            color: var(--navy);
+        }
+
+        .location-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+        }
+
+        .location-selector i {
+            color: var(--gold);
+        }
+
+        .categories-sidebar {
+            width: 250px;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            float: left;
+            margin-right: 30px;
+        }
+
+        .categories-sidebar h3 {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .category-list {
+            list-style: none;
+        }
+
+        .category-list li {
+            margin-bottom: 10px;
+        }
+
+        .category-list a {
+            text-decoration: none;
+            color: var(--charcoal);
+            transition: var(--transition);
+            display: block;
+            padding: 8px 5px;
+            border-radius: 5px;
+        }
+
+        .category-list a:hover {
+            background: #f9f9f9;
+            color: var(--gold);
+        }
+
+        /* Product Details Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 50px auto;
+            width: 90%;
+            max-width: 1000px;
+            border-radius: 10px;
+            overflow: hidden;
+            animation: modalFade 0.3s;
+        }
+
+        @keyframes modalFade {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--charcoal);
+        }
+
+        .modal-body {
+            padding: 20px;
+            display: flex;
+            gap: 30px;
+        }
+
+        .product-gallery {
+            flex: 1;
+        }
+
+        .main-image {
+            width: 100%;
+            height: 400px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .main-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-thumbnails {
+            display: flex;
+            gap: 10px;
+        }
+
+        .thumbnail {
+            width: 80px;
+            height: 80px;
+            border-radius: 5px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .thumbnail.active {
+            border-color: var(--gold);
+        }
+
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-details {
+            flex: 1;
+        }
+
+        .product-title {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .product-rating {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .stars {
+            color: var(--gold);
+        }
+
+        .rating-count {
+            color: var(--charcoal);
+        }
+
+        .product-price-large {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--navy);
+        }
+
+        .product-description {
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+
+        .seller-info {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .seller-info h4 {
+            margin-bottom: 10px;
+        }
+
+        .seller-details {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .seller-avatar-lg {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--gold);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn-outline {
+            background: white;
+            color: var(--charcoal);
+            border: 1px solid #ddd;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .hero-content h2 {
+                font-size: 40px;
+            }
+            
+            .search-bar {
+                max-width: 400px;
+            }
+            
+            .modal-body {
+                flex-direction: column;
+            }
+            
+            .booking-container {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-top, .marketplace-header-top {
+                flex-wrap: wrap;
+            }
+            
+            .search-bar {
+                order: 3;
+                margin: 15px 0 0;
+                max-width: 100%;
+            }
+            
+            .hero-content h2 {
+                font-size: 32px;
+            }
+            
+            .luxury-hero {
+                height: 500px;
+            }
+            
+            .section-title h2 {
+                font-size: 28px;
+            }
+            
+            .assistant-window {
+                width: 300px;
+            }
+            
+            .auth-container {
+                flex-direction: column;
+            }
+            
+            .auth-left {
+                padding: 30px 20px;
+            }
+            
+            .auth-right {
+                padding: 30px 20px;
+            }
+            
+            .categories-sidebar {
+                float: none;
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 30px;
+            }
+            
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-content h2 {
+                font-size: 28px;
+            }
+            
+            .hero-content p {
+                font-size: 16px;
+            }
+            
+            .features-grid, .collections-grid, .products-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .assistant-window {
+                width: 280px;
+                right: -20px;
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <!-- Landing Page -->
+        <div id="landing-page" class="page active">
+            <!-- Header -->
+            <header>
+                <div class="container">
+                    <div class="header-top">
+                        <div class="logo" id="logo">
+                            <h1>Luxe<span>Threads</span></h1>
+                        </div>
+                        <div class="search-bar">
+                            <input type="text" placeholder="Search for designer brands, fabrics, or styles...">
+                            <button><i class="fas fa-search"></i></button>
+                        </div>
+                        <div class="header-actions">
+                            <div class="auth-buttons">
+                                <a href="#" class="login" id="login-link">Login</a>
+                                <a href="#" class="signup" id="signup-link">Sign Up</a>
+                            </div>
+                            <div class="cart-icon">
+                                <i class="fas fa-shopping-bag"></i>
+                                <span class="cart-count">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <nav>
+                    <div class="container">
+                        <ul class="nav-links">
+                            <li><a href="#">Home</a></li>
+                            <li><a href="#">Designer Collections</a></li>
+                            <li><a href="#">Bespoke Tailoring</a></li>
+                            <li><a href="#">Luxury Fabrics</a></li>
+                            <li><a href="#">Accessories</a></li>
+                            <li><a href="#">Book Appointment</a></li>
+                        </ul>
+                    </div>
+                </nav>
+            </header>
+
+            <!-- Hero Section -->
+            <section class="luxury-hero">
+                <div class="container">
+                    <div class="hero-content">
+                        <h2>Crafting Elegance, Stitch by Stitch</h2>
+                        <p>Discover exclusive luxury clothing from master artisans and premium designers. Experience personalized service with real-time booking and complimentary delivery.</p>
+                        <a href="#" class="cta-button" id="explore-collections">Explore Collections</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Luxury Features Section -->
+            <section class="luxury-features">
+                <div class="container">
+                    <div class="section-title">
+                        <h2>The LuxeThreads Experience</h2>
+                        <p>Redefining luxury fashion with cutting-edge technology and timeless craftsmanship</p>
+                    </div>
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-crown"></i>
+                            </div>
+                            <h3>Premium Designers</h3>
+                            <p>Access exclusive collections from renowned designers and emerging talents in the fashion world.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-tshirt"></i>
+                            </div>
+                            <h3>Bespoke Tailoring</h3>
+                            <p>Custom-fit clothing crafted to your exact measurements by master tailors.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-shipping-fast"></i>
+                            </div>
+                            <h3>Complimentary Delivery</h3>
+                            <p>Free premium delivery service with real-time tracking and white-glove service.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <h3>Real-time Booking</h3>
+                            <p>Book appointments with designers and tailors with instant confirmation.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Designer Collections -->
+            <section class="designer-collections">
+                <div class="container">
+                    <div class="section-title">
+                        <h2>Designer Collections</h2>
+                        <p>Curated selections from the world's most prestigious fashion houses</p>
+                    </div>
+                    <div class="collections-grid">
+                        <div class="collection-card">
+                            <img src="https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Evening Wear">
+                            <div class="collection-overlay">
+                                <h3>Evening Couture</h3>
+                                <p>Stunning gowns and tuxedos for special occasions</p>
+                            </div>
+                        </div>
+                        <div class="collection-card">
+                            <img src="https://images.unsplash.com/photo-1485231183945-fffde7cb34e8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2082&q=80" alt="Business Attire">
+                            <div class="collection-overlay">
+                                <h3>Business Elegance</h3>
+                                <p>Sharp suits and professional wear for the modern executive</p>
+                            </div>
+                        </div>
+                        <div class="collection-card">
+                            <img src="https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2087&q=80" alt="Casual Luxury">
+                            <div class="collection-overlay">
+                                <h3>Casual Luxury</h3>
+                                <p>Premium everyday wear with impeccable style</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Premium Products -->
+            <section class="premium-products">
+                <div class="container">
+                    <div class="products-header">
+                        <h2>Featured Luxury Pieces</h2>
+                        <a href="#" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="products-grid">
+                        <div class="product-card" data-product="1">
+                            <div class="product-image">
+                                <img src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80" alt="Silk Evening Gown">
+                                <span class="product-badge">Bespoke</span>
+                            </div>
+                            <div class="product-info">
+                                <h3>Hand-Embroidered Silk Evening Gown</h3>
+                                <div class="product-designer">
+                                    <div class="designer-avatar"></div>
+                                    <span>Eleganza Atelier</span>
+                                </div>
+                                <div class="product-location">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>Milan, Italy • 5-star rated</span>
+                                </div>
+                                <div class="product-price">
+                                    <span class="price">₹85,000</span>
+                                    <button class="add-to-cart">
+                                        <i class="fas fa-shopping-bag"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="product-card" data-product="2">
+                            <div class="product-image">
+                                <img src="https://images.unsplash.com/photo-1621072156002-e2fccdc0b176?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80" alt="Wool Blend Suit">
+                                <span class="product-badge">Tailored</span>
+                            </div>
+                            <div class="product-info">
+                                <h3>Premium Wool Blend Bespoke Suit</h3>
+                                <div class="product-designer">
+                                    <div class="designer-avatar"></div>
+                                    <span>Savile Row Masters</span>
+                                </div>
+                                <div class="product-location">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>London, UK • 5-star rated</span>
+                                </div>
+                                <div class="product-price">
+                                    <span class="price">₹62,500</span>
+                                    <button class="add-to-cart">
+                                        <i class="fas fa-shopping-bag"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="product-card" data-product="3">
+                            <div class="product-image">
+                                <img src="https://images.unsplash.com/photo-1583496661160-fb5886a13d77?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2069&q=80" alt="Cashmere Coat">
+                                <span class="product-badge">Limited Edition</span>
+                            </div>
+                            <div class="product-info">
+                                <h3>Italian Cashmere Overcoat</h3>
+                                <div class="product-designer">
+                                    <div class="designer-avatar"></div>
+                                    <span>Firenze Couture</span>
+                                </div>
+                                <div class="product-location">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>Florence, Italy • 5-star rated</span>
+                                </div>
+                                <div class="product-price">
+                                    <span class="price">₹47,800</span>
+                                    <button class="add-to-cart">
+                                        <i class="fas fa-shopping-bag"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="product-card" data-product="4">
+                            <div class="product-image">
+                                <img src="https://images.unsplash.com/photo-1582418702059-97ebafb35d09?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2015&q=80" alt="Silk Saree">
+                                <span class="product-badge">Handwoven</span>
+                            </div>
+                            <div class="product-info">
+                                <h3>Banarasi Silk Saree with Gold Zari</h3>
+                                <div class="product-designer">
+                                    <div class="designer-avatar"></div>
+                                    <span>Varanasi Weaves</span>
+                                </div>
+                                <div class="product-location">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>Varanasi, India • 5-star rated</span>
+                                </div>
+                                <div class="product-price">
+                                    <span class="price">₹35,000</span>
+                                    <button class="add-to-cart">
+                                        <i class="fas fa-shopping-bag"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Booking Section -->
+            <section class="booking-section">
+                <div class="container">
+                    <div class="section-title">
+                        <h2>Book Your Luxury Experience</h2>
+                        <p>Schedule appointments with designers, tailors, or book our premium delivery service</p>
+                    </div>
+                    <div class="booking-container">
+                        <div class="booking-form-container">
+                            <h3>Book an Appointment</h3>
+                            <form id="bookingForm">
+                                <div class="form-group">
+                                    <label for="bookingType">Service Type</label>
+                                    <select id="bookingType" class="form-control" required>
+                                        <option value="">Select a service</option>
+                                        <option value="designer-consultation">Designer Consultation</option>
+                                        <option value="bespoke-tailoring">Bespoke Tailoring</option>
+                                        <option value="fitting-session">Fitting Session</option>
+                                        <option value="fabric-selection">Fabric Selection</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="bookingDate">Preferred Date</label>
+                                        <input type="date" id="bookingDate" class="form-control" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="bookingTime">Preferred Time</label>
+                                        <input type="time" id="bookingTime" class="form-control" required>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="bookingLocation">Location</label>
+                                    <select id="bookingLocation" class="form-control" required>
+                                        <option value="">Select location</option>
+                                        <option value="studio">Designer Studio</option>
+                                        <option value="home">At Home Service</option>
+                                        <option value="virtual">Virtual Consultation</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="specialRequests">Special Requests</label>
+                                    <textarea id="specialRequests" class="form-control" rows="3" placeholder="Any specific requirements or preferences..."></textarea>
+                                </div>
+
+                                <h4 style="margin: 20px 0 10px;">Select Delivery Option</h4>
+                                <div class="courier-options">
+                                    <div class="courier-option selected" data-courier="bluedart">
+                                        <i class="fas fa-shipping-fast"></i>
+                                        <h4>BlueDart Premium</h4>
+                                        <p>Free Delivery • 1-2 Days</p>
+                                    </div>
+                                    <div class="courier-option" data-courier="delhivery">
+                                        <i class="fas fa-truck"></i>
+                                        <h4>Delhivery Express</h4>
+                                        <p>Free Delivery • 2-3 Days</p>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn" id="submitBooking">Book Now</button>
+                            </form>
+                        </div>
+                        <div class="booking-map-container">
+                            <div id="bookingMap" class="booking-map"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AI Assistant -->
+            <div class="ai-assistant">
+                <div class="assistant-toggle" id="assistantToggle">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="assistant-window" id="assistantWindow">
+                    <div class="assistant-header">
+                        <h3><i class="fas fa-robot"></i> LuxeAssistant</h3>
+                        <button class="assistant-close" id="assistantClose">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="assistant-body">
+                        <div class="assistant-message bot">
+                            Hello! I'm your LuxeAssistant. I can help you find the perfect luxury clothing, book appointments with designers, or answer any questions about our services.
+                        </div>
+                        <div class="assistant-message user">
+                            I'm looking for a bespoke suit for a wedding.
+                        </div>
+                        <div class="assistant-message bot">
+                            Excellent choice! We have several master tailors specializing in bespoke suits. Would you like me to show you available designers or book a consultation?
+                        </div>
+                    </div>
+                    <div class="assistant-input">
+                        <input type="text" placeholder="Ask about our luxury services...">
+                        <button><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer>
+                <div class="container">
+                    <div class="footer-content">
+                        <div class="footer-column">
+                            <h3>LuxeThreads</h3>
+                            <p>Your gateway to luxury fashion, connecting you with master artisans and premium designers worldwide.</p>
+                        </div>
+                        <div class="footer-column">
+                            <h3>Quick Links</h3>
+                            <ul class="footer-links">
+                                <li><a href="#">Home</a></li>
+                                <li><a href="#">Designers</a></li>
+                                <li><a href="#">Bespoke Tailoring</a></li>
+                                <li><a href="#">Book Appointment</a></li>
+                                <li><a href="#">Contact Us</a></li>
+                            </ul>
+                        </div>
+                        <div class="footer-column">
+                            <h3>Customer Service</h3>
+                            <ul class="footer-links">
+                                <li><a href="#">Help Center</a></li>
+                                <li><a href="#">Shipping & Returns</a></li>
+                                <li><a href="#">Size Guide</a></li>
+                                <li><a href="#">Care Instructions</a></li>
+                                <li><a href="#">Privacy Policy</a></li>
+                            </ul>
+                        </div>
+                        <div class="footer-column">
+                            <h3>Contact Info</h3>
+                            <ul class="footer-links">
+                                <li><i class="fas fa-map-marker-alt"></i> 1 Luxury Avenue, Mumbai, India</li>
+                                <li><i class="fas fa-phone"></i> +91 98765 43210</li>
+                                <li><i class="fas fa-envelope"></i> concierge@luxethreads.com</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="footer-bottom">
+                        <p>&copy; 2023 LuxeThreads. All rights reserved.</p>
+                    </div>
+                </div>
+            </footer>
+        </div>
+
+        <!-- Authentication Page -->
+        <div id="auth-page" class="page">
+            <div class="auth-container">
+                <div class="auth-left">
+                    <h2>Experience Luxury Fashion</h2>
+                    <p>Join our exclusive community of fashion connoisseurs. Access premium designers, bespoke tailoring, and personalized service.</p>
+                    
+                    <ul class="features-list">
+                        <li><i class="fas fa-check-circle"></i> Premium designer collections</li>
+                        <li><i class="fas fa-check-circle"></i> Bespoke tailoring services</li>
+                        <li><i class="fas fa-check-circle"></i> Real-time booking system</li>
+                        <li><i class="fas fa-check-circle"></i> Complimentary premium delivery</li>
+                        <li><i class="fas fa-check-circle"></i> Personal style consultation</li>
+                    </ul>
+                </div>
+                
+                <div class="auth-right">
+                    <div class="logo" id="auth-logo">
+                        <h1>Luxe<span>Threads</span></h1>
+                    </div>
+                    
+                    <button class="back-button" id="auth-back-button">
+                        <i class="fas fa-arrow-left"></i> Back to Home
+                    </button>
+                    
+                    <div class="auth-tabs">
+                        <div class="auth-tab active" data-tab="login">Login</div>
+                        <div class="auth-tab" data-tab="signup">Sign Up</div>
+                    </div>
+                    
+                    <div id="message" class="message"></div>
+                    
+                    <div class="loading" id="loading">
+                        <div class="loading-spinner"></div>
+                        <p>Processing your request...</p>
+                    </div>
+                    
+                    <!-- Login Form -->
+                    <form id="loginForm" class="auth-form active">
+                        <div class="form-group">
+                            <label for="loginEmail">Email Address</label>
+                            <input type="email" id="loginEmail" class="form-control" placeholder="Enter your email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="loginPassword">Password</label>
+                            <div class="password-input">
+                                <input type="password" id="loginPassword" class="form-control" placeholder="Enter your password" required>
+                                <button type="button" class="password-toggle" id="loginPasswordToggle">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-options">
+                            <div class="remember-me">
+                                <input type="checkbox" id="rememberMe">
+                                <label for="rememberMe">Remember me</label>
+                            </div>
+                            <a href="#" class="forgot-password" id="forgotPassword">Forgot Password?</a>
+                        </div>
+                        
+                        <button type="submit" class="btn" id="loginBtn">Login</button>
+                        
+                        <div class="divider">
+                            <span>or continue with</span>
+                        </div>
+                        
+                        <button type="button" class="btn btn-google" id="googleLoginBtn">
+                            <i class="fab fa-google"></i> Google
+                        </button>
+                        
+                        <div class="auth-footer">
+                            Don't have an account? <a href="#" id="switchToSignup">Sign up</a>
+                        </div>
+                    </form>
+                    
+                    <!-- Signup Form -->
+                    <form id="signupForm" class="auth-form">
+                        <div class="form-group">
+                            <label for="signupName">Full Name</label>
+                            <input type="text" id="signupName" class="form-control" placeholder="Enter your full name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="signupEmail">Email Address</label>
+                            <input type="email" id="signupEmail" class="form-control" placeholder="Enter your email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="signupPhone">Phone Number</label>
+                            <div class="phone-input">
+                                <select id="countryCode" class="form-control country-code">
+                                    <option value="+91">+91 (IN)</option>
+                                    <option value="+1">+1 (US)</option>
+                                    <option value="+44">+44 (UK)</option>
+                                    <option value="+61">+61 (AU)</option>
+                                </select>
+                                <input type="tel" id="signupPhone" class="form-control phone-number" placeholder="Phone number" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="signupPassword">Password</label>
+                            <div class="password-input">
+                                <input type="password" id="signupPassword" class="form-control" placeholder="Create a password" required>
+                                <button type="button" class="password-toggle" id="signupPasswordToggle">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <small style="color: var(--charcoal); margin-top: 5px; display: block;">Password must be at least 6 characters</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="confirmPassword">Confirm Password</label>
+                            <div class="password-input">
+                                <input type="password" id="confirmPassword" class="form-control" placeholder="Confirm your password" required>
+                                <button type="button" class="password-toggle" id="confirmPasswordToggle">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="remember-me">
+                                <input type="checkbox" id="agreeTerms" required>
+                                <label for="agreeTerms">I agree to the <a href="#" style="color: var(--gold);">Terms of Service</a> and <a href="#" style="color: var(--gold);">Privacy Policy</a></label>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn" id="signupBtn">Create Account</button>
+                        
+                        <div class="divider">
+                            <span>or continue with</span>
+                        </div>
+                        
+                        <button type="button" class="btn btn-google" id="googleSignupBtn">
+                            <i class="fab fa-google"></i> Google
+                        </button>
+                        
+                        <div class="auth-footer">
+                            Already have an account? <a href="#" id="switchToLogin">Login</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Details Modal -->
+        <div class="modal" id="productModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Product Details</h2>
+                    <button class="modal-close" id="modalClose">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="product-gallery">
+                        <div class="main-image">
+                            <img src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80" alt="Product Image" id="mainProductImage">
+                        </div>
+                        <div class="image-thumbnails">
+                            <div class="thumbnail active">
+                                <img src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80" alt="Thumbnail 1">
+                            </div>
+                            <div class="thumbnail">
+                                <img src="https://images.unsplash.com/photo-1583496661160-fb5886a13d77?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2069&q=80" alt="Thumbnail 2">
+                            </div>
+                            <div class="thumbnail">
+                                <img src="https://images.unsplash.com/photo-1582418702059-97ebafb35d09?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2015&q=80" alt="Thumbnail 3">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="product-details">
+                        <h1 class="product-title" id="modalProductTitle">Hand-Embroidered Silk Evening Gown</h1>
+                        <div class="product-rating">
+                            <div class="stars">
+                                ★★★★★
+                            </div>
+                            <span class="rating-count">47 ratings</span>
+                        </div>
+                        <div class="product-price-large">₹85,000</div>
+                        <div class="product-description">
+                            <p>This exquisite evening gown is crafted from the finest Italian silk and features intricate hand-embroidery with gold thread. Each piece is individually created by master artisans, ensuring a unique and luxurious garment.</p>
+                            <p><strong>Fabric:</strong> 100% Italian Silk</p>
+                            <p><strong>Embellishment:</strong> Hand-embroidery with 24k gold thread</p>
+                            <p><strong>Care Instructions:</strong> Dry clean only</p>
+                            <p><strong>Production Time:</strong> 4-6 weeks for bespoke orders</p>
+                        </div>
+
+                        <div class="seller-info">
+                            <h4>Designer Information</h4>
+                            <div class="seller-details">
+                                <div class="seller-avatar-lg">EA</div>
+                                <div>
+                                    <h5>Eleganza Atelier</h5>
+                                    <p>Milan, Italy</p>
+                                    <p>⭐ 4.9 (47 reviews)</p>
+                                    <p><i class="fas fa-phone"></i> +39 123 456 7890</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn btn-primary" id="bookAppointmentBtn">
+                                <i class="fas fa-calendar-check"></i> Book Appointment
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-heart"></i> Add to Wishlist
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-share-alt"></i> Share
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC4wGDrRHs4gQN6p8Q9X7VqY9t8d4Jk8Xw",
+            authDomain: "luxethreads.firebaseapp.com",
+            projectId: "luxethreads",
+            storageBucket: "luxethreads.appspot.com",
+            messagingSenderId: "123456789012",
+            appId: "1:123456789012:web:abcdef1234567890"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Page Navigation
+        const pages = document.querySelectorAll('.page');
+        const logo = document.getElementById('logo');
+        const authLogo = document.getElementById('auth-logo');
+        const loginLink = document.getElementById('login-link');
+        const signupLink = document.getElementById('signup-link');
+        const exploreCollections = document.getElementById('explore-collections');
+        const authBackButton = document.getElementById('auth-back-button');
+        const bookAppointmentBtn = document.getElementById('bookAppointmentBtn');
+
+        function showPage(pageId) {
+            pages.forEach(page => {
+                page.classList.remove('active');
+            });
+            const targetPage = document.getElementById(pageId);
+            targetPage.classList.add('active');
+            
+            // Initialize maps when landing page is shown
+            if (pageId === 'landing-page') {
+                setTimeout(() => {
+                    initBookingMap();
+                }, 100);
+            }
+        }
+
+        logo.addEventListener('click', () => showPage('landing-page'));
+        authLogo.addEventListener('click', () => showPage('landing-page'));
+        loginLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage('auth-page');
+        });
+        signupLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage('auth-page');
+        });
+        exploreCollections.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.querySelector('.premium-products').scrollIntoView({ behavior: 'smooth' });
+        });
+        authBackButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage('landing-page');
+        });
+
+        // Product Details Modal
+        const productCards = document.querySelectorAll('.product-card');
+        const productModal = document.getElementById('productModal');
+        const modalClose = document.getElementById('modalClose');
+
+        productCards.forEach(card => {
+            card.addEventListener('click', () => {
+                productModal.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            });
+        });
+
+        modalClose.addEventListener('click', () => {
+            productModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        });
+
+        bookAppointmentBtn.addEventListener('click', () => {
+            productModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            document.querySelector('.booking-section').scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // Thumbnail Navigation in Modal
+        const thumbnails = document.querySelectorAll('.thumbnail');
+        const mainProductImage = document.getElementById('mainProductImage');
+
+        thumbnails.forEach(thumbnail => {
+            thumbnail.addEventListener('click', () => {
+                thumbnails.forEach(t => t.classList.remove('active'));
+                thumbnail.classList.add('active');
+                mainProductImage.src = thumbnail.querySelector('img').src;
+            });
+        });
+
+        // Courier Selection
+        const courierOptions = document.querySelectorAll('.courier-option');
+        
+        courierOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                courierOptions.forEach(o => o.classList.remove('selected'));
+                option.classList.add('selected');
+            });
+        });
+
+        // Initialize Booking Map
+        function initBookingMap() {
+            // Check if map is already initialized
+            if (window.bookingMap) {
+                window.bookingMap.remove();
+            }
+            
+            const map = L.map('bookingMap').setView([19.0760, 72.8777], 12); // Mumbai coordinates
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            // Add designer and tailor locations
+            const locations = [
+                { name: 'Eleganza Atelier', lat: 19.0760, lng: 72.8777, type: 'designer' },
+                { name: 'Savile Row Masters', lat: 19.0750, lng: 72.8700, type: 'tailor' },
+                { name: 'Firenze Couture', lat: 19.0800, lng: 72.8850, type: 'designer' },
+                { name: 'Varanasi Weaves', lat: 19.0700, lng: 72.8650, type: 'artisan' }
+            ];
+            
+            locations.forEach(location => {
+                const iconColor = getLocationColor(location.type);
+                
+                const marker = L.marker([location.lat, location.lng])
+                    .addTo(map)
+                    .bindPopup(`
+                        <div style="text-align: center;">
+                            <h3>${location.name}</h3>
+                            <p>${getLocationType(location.type)}</p>
+                            <button class="btn btn-primary" style="margin-top: 10px; padding: 5px 10px; font-size: 12px;">
+                                Book Appointment
+                            </button>
+                        </div>
+                    `);
+            });
+            
+            // Add user location marker if available
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    const userLat = position.coords.latitude;
+                    const userLng = position.coords.longitude;
+                    
+                    L.marker([userLat, userLng])
+                        .addTo(map)
+                        .bindPopup('Your Location')
+                        .openPopup();
+                });
+            }
+            
+            // Store map reference
+            window.bookingMap = map;
+        }
+
+        function getLocationColor(type) {
+            const colors = {
+                designer: 'gold',
+                tailor: 'blue',
+                artisan: 'green'
+            };
+            return colors[type] || 'gray';
+        }
+
+        function getLocationType(type) {
+            const types = {
+                designer: 'Premium Designer',
+                tailor: 'Master Tailor',
+                artisan: 'Textile Artisan'
+            };
+            return types[type] || 'Luxury Partner';
+        }
+
+        // Booking Form Submission
+        const bookingForm = document.getElementById('bookingForm');
+        
+        bookingForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Get form data
+            const bookingType = document.getElementById('bookingType').value;
+            const bookingDate = document.getElementById('bookingDate').value;
+            const bookingTime = document.getElementById('bookingTime').value;
+            const bookingLocation = document.getElementById('bookingLocation').value;
+            const specialRequests = document.getElementById('specialRequests').value;
+            const selectedCourier = document.querySelector('.courier-option.selected').getAttribute('data-courier');
+            
+            if (!bookingType || !bookingDate || !bookingTime || !bookingLocation) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            // Create booking data
+            const bookingData = {
+                type: bookingType,
+                date: bookingDate,
+                time: bookingTime,
+                location: bookingLocation,
+                requests: specialRequests,
+                courier: selectedCourier,
+                status: 'pending',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
+            // Save to Firestore
+            db.collection('bookings').add(bookingData)
+                .then((docRef) => {
+                    // Send WhatsApp notification to seller
+                    sendWhatsAppNotification(bookingData, docRef.id);
+                    
+                    // Show success message
+                    alert('Your booking has been submitted successfully! The designer/tailor will contact you shortly to confirm.');
+                    
+                    // Reset form
+                    bookingForm.reset();
+                    document.querySelector('.courier-option').click();
+                    
+                    // In a real app, you would integrate with courier API here
+                    scheduleCourierPickup(bookingData, docRef.id);
+                })
+                .catch((error) => {
+                    console.error('Error adding booking: ', error);
+                    alert('There was an error submitting your booking. Please try again.');
+                });
+        });
+
+        // Send WhatsApp Notification to Seller
+        function sendWhatsAppNotification(bookingData, bookingId) {
+            // In a real implementation, you would use the WhatsApp Business API
+            // For demo purposes, we'll create a WhatsApp message link
+            
+            const sellerPhone = "+919876543210"; // This would come from the seller's profile in a real app
+            const message = `New booking received! 
+Booking ID: ${bookingId}
+Service: ${getBookingTypeText(bookingData.type)}
+Date: ${bookingData.date} at ${bookingData.time}
+Location: ${getLocationText(bookingData.location)}
+Special Requests: ${bookingData.requests || 'None'}
+
+Please confirm this booking at your earliest convenience.`;
+
+            // Create WhatsApp URL
+            const whatsappUrl = `https://wa.me/${sellerPhone}?text=${encodeURIComponent(message)}`;
+            
+            // In a real app, you would send this via the WhatsApp Business API
+            // For demo, we'll just log it
+            console.log('WhatsApp Notification URL:', whatsappUrl);
+            
+            // For demo purposes, we'll open a new tab with the message
+            // In production, this would be handled server-side
+            window.open(whatappUrl, '_blank');
+        }
+
+        function getBookingTypeText(type) {
+            const types = {
+                'designer-consultation': 'Designer Consultation',
+                'bespoke-tailoring': 'Bespoke Tailoring',
+                'fitting-session': 'Fitting Session',
+                'fabric-selection': 'Fabric Selection'
+            };
+            return types[type] || type;
+        }
+
+        function getLocationText(location) {
+            const locations = {
+                'studio': 'Designer Studio',
+                'home': 'At Home Service',
+                'virtual': 'Virtual Consultation'
+            };
+            return locations[location] || location;
+        }
+
+        // Schedule Courier Pickup (Mock Integration)
+        function scheduleCourierPickup(bookingData, bookingId) {
+            // This would integrate with actual courier APIs like BlueDart or Delhivery
+            // For demo purposes, we'll simulate the API call
+            
+            const courierData = {
+                bookingId: bookingId,
+                service: bookingData.courier,
+                pickupDate: bookingData.date,
+                priority: 'express',
+                type: 'luxury_fashion'
+            };
+            
+            // Mock API call
+            setTimeout(() => {
+                console.log(`Courier ${bookingData.courier} scheduled for pickup`);
+                
+                // Update booking status in Firestore
+                db.collection('bookings').doc(bookingId).update({
+                    courierScheduled: true,
+                    courierService: bookingData.courier,
+                    estimatedDelivery: calculateDeliveryDate(bookingData.date, bookingData.courier)
+                });
+            }, 1000);
+        }
+
+        function calculateDeliveryDate(bookingDate, courier) {
+            const date = new Date(bookingDate);
+            const deliveryDays = courier === 'bluedart' ? 2 : 3;
+            date.setDate(date.getDate() + deliveryDays);
+            return date.toISOString().split('T')[0];
+        }
+
+        // Authentication Functionality
+        const loginForm = document.getElementById('loginForm');
+        const signupForm = document.getElementById('signupForm');
+        const loginTab = document.querySelector('[data-tab="login"]');
+        const signupTab = document.querySelector('[data-tab="signup"]');
+        const switchToSignup = document.getElementById('switchToSignup');
+        const switchToLogin = document.getElementById('switchToLogin');
+        const messageDiv = document.getElementById('message');
+        const loadingDiv = document.getElementById('loading');
+        const loginPasswordToggle = document.getElementById('loginPasswordToggle');
+        const signupPasswordToggle = document.getElementById('signupPasswordToggle');
+        const confirmPasswordToggle = document.getElementById('confirmPasswordToggle');
+        const googleLoginBtn = document.getElementById('googleLoginBtn');
+        const googleSignupBtn = document.getElementById('googleSignupBtn');
+        const forgotPasswordLink = document.getElementById('forgotPassword');
+
+        // Tab Switching
+        loginTab.addEventListener('click', () => switchAuthTab('login'));
+        signupTab.addEventListener('click', () => switchAuthTab('signup'));
+        switchToSignup.addEventListener('click', (e) => {
+            e.preventDefault();
+            switchAuthTab('signup');
+        });
+        switchToLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            switchAuthTab('login');
+        });
+
+        function switchAuthTab(tab) {
+            if (tab === 'login') {
+                loginTab.classList.add('active');
+                signupTab.classList.remove('active');
+                loginForm.classList.add('active');
+                signupForm.classList.remove('active');
+            } else {
+                loginTab.classList.remove('active');
+                signupTab.classList.add('active');
+                loginForm.classList.remove('active');
+                signupForm.classList.add('active');
+            }
+            hideMessage();
+        }
+
+        // Password Toggle
+        function setupPasswordToggle(toggleBtn, passwordField) {
+            toggleBtn.addEventListener('click', () => {
+                const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordField.setAttribute('type', type);
+                toggleBtn.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+            });
+        }
+
+        setupPasswordToggle(loginPasswordToggle, document.getElementById('loginPassword'));
+        setupPasswordToggle(signupPasswordToggle, document.getElementById('signupPassword'));
+        setupPasswordToggle(confirmPasswordToggle, document.getElementById('confirmPassword'));
+
+        // Show Message
+        function showMessage(message, type) {
+            messageDiv.textContent = message;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+        }
+
+        function hideMessage() {
+            messageDiv.style.display = 'none';
+        }
+
+        // Show/Hide Loading
+        function showLoading() {
+            loadingDiv.style.display = 'block';
+        }
+
+        function hideLoading() {
+            loadingDiv.style.display = 'none';
+        }
+
+        // Form Validation
+        function validateSignupForm() {
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const phone = document.getElementById('signupPhone').value.trim();
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const agreeTerms = document.getElementById('agreeTerms').checked;
+
+            if (name.length < 2) {
+                showMessage('Please enter a valid name', 'error');
+                return false;
+            }
+
+            if (!isValidEmail(email)) {
+                showMessage('Please enter a valid email address', 'error');
+                return false;
+            }
+
+            if (!isValidPhone(phone)) {
+                showMessage('Please enter a valid phone number', 'error');
+                return false;
+            }
+
+            if (password.length < 6) {
+                showMessage('Password must be at least 6 characters', 'error');
+                return false;
+            }
+
+            if (password !== confirmPassword) {
+                showMessage('Passwords do not match', 'error');
+                return false;
+            }
+
+            if (!agreeTerms) {
+                showMessage('Please agree to the Terms of Service and Privacy Policy', 'error');
+                return false;
+            }
+
+            return true;
+        }
+
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        function isValidPhone(phone) {
+            const phoneRegex = /^\d{10}$/;
+            return phoneRegex.test(phone);
+        }
+
+        // Login with Email/Password
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                showMessage('Please fill in all fields', 'error');
+                return;
+            }
+
+            showLoading();
+            
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Signed in
+                    const user = userCredential.user;
+                    showMessage('Login successful!', 'success');
+                    
+                    // Update user data in Firestore if needed
+                    updateUserData(user);
+                    
+                    // Redirect to landing page after a short delay
+                    setTimeout(() => {
+                        showPage('landing-page');
+                    }, 1500);
+                })
+                .catch((error) => {
+                    hideLoading();
+                    const errorCode = error.code;
+                    let errorMessage = 'An error occurred during login';
+                    
+                    if (errorCode === 'auth/user-not-found') {
+                        errorMessage = 'No account found with this email';
+                    } else if (errorCode === 'auth/wrong-password') {
+                        errorMessage = 'Incorrect password';
+                    } else if (errorCode === 'auth/invalid-email') {
+                        errorMessage = 'Invalid email address';
+                    } else if (errorCode === 'auth/too-many-requests') {
+                        errorMessage = 'Too many failed attempts. Please try again later';
+                    }
+                    
+                    showMessage(errorMessage, 'error');
+                });
+        });
+
+        // Signup with Email/Password
+        signupForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            if (!validateSignupForm()) {
+                return;
+            }
+
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const countryCode = document.getElementById('countryCode').value;
+            const phone = document.getElementById('signupPhone').value.trim();
+            const password = document.getElementById('signupPassword').value;
+
+            showLoading();
+
+            auth.createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Signed up
+                    const user = userCredential.user;
+                    
+                    // Save user data to Firestore
+                    return db.collection('users').doc(user.uid).set({
+                        name: name,
+                        email: email,
+                        phone: countryCode + phone,
+                        userType: 'customer',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                })
+                .then(() => {
+                    showMessage('Account created successfully!', 'success');
+                    
+                    // Redirect to landing page after a short delay
+                    setTimeout(() => {
+                        showPage('landing-page');
+                    }, 1500);
+                })
+                .catch((error) => {
+                    hideLoading();
+                    const errorCode = error.code;
+                    let errorMessage = 'An error occurred during signup';
+                    
+                    if (errorCode === 'auth/email-already-in-use') {
+                        errorMessage = 'An account with this email already exists';
+                    } else if (errorCode === 'auth/weak-password') {
+                        errorMessage = 'Password is too weak';
+                    } else if (errorCode === 'auth/invalid-email') {
+                        errorMessage = 'Invalid email address';
+                    }
+                    
+                    showMessage(errorMessage, 'error');
+                });
+        });
+
+        // Google Authentication
+        function signInWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            provider.addScope('profile');
+            provider.addScope('email');
+            
+            showLoading();
+            
+            auth.signInWithPopup(provider)
+                .then((result) => {
+                    // This gives you a Google Access Token
+                    const credential = result.credential;
+                    const token = credential.accessToken;
+                    
+                    // The signed-in user info
+                    const user = result.user;
+                    
+                    // Check if user exists in Firestore
+                    const userRef = db.collection('users').doc(user.uid);
+                    
+                    userRef.get().then((doc) => {
+                        if (doc.exists) {
+                            // User exists, update last login
+                            userRef.update({
+                                lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                        } else {
+                            // User doesn't exist, create new document
+                            userRef.set({
+                                name: user.displayName,
+                                email: user.email,
+                                phone: user.phoneNumber || '',
+                                userType: 'customer',
+                                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                                lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                        }
+                        
+                        showMessage('Login successful!', 'success');
+                        
+                        // Redirect to landing page after a short delay
+                        setTimeout(() => {
+                            showPage('landing-page');
+                        }, 1500);
+                    });
+                })
+                .catch((error) => {
+                    hideLoading();
+                    const errorCode = error.code;
+                    let errorMessage = 'An error occurred during Google authentication';
+                    
+                    if (errorCode === 'auth/popup-closed-by-user') {
+                        errorMessage = 'Authentication cancelled';
+                    } else if (errorCode === 'auth/popup-blocked') {
+                        errorMessage = 'Popup was blocked by your browser. Please allow popups for this site';
+                    }
+                    
+                    showMessage(errorMessage, 'error');
+                });
+        }
+
+        googleLoginBtn.addEventListener('click', signInWithGoogle);
+        googleSignupBtn.addEventListener('click', signInWithGoogle);
+
+        // Forgot Password
+        forgotPasswordLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            
+            if (!email) {
+                showMessage('Please enter your email address to reset password', 'error');
+                return;
+            }
+            
+            if (!isValidEmail(email)) {
+                showMessage('Please enter a valid email address', 'error');
+                return;
+            }
+            
+            showLoading();
+            
+            auth.sendPasswordResetEmail(email)
+                .then(() => {
+                    hideLoading();
+                    showMessage('Password reset email sent! Check your inbox.', 'success');
+                })
+                .catch((error) => {
+                    hideLoading();
+                    const errorCode = error.code;
+                    let errorMessage = 'An error occurred while sending reset email';
+                    
+                    if (errorCode === 'auth/user-not-found') {
+                        errorMessage = 'No account found with this email';
+                    } else if (errorCode === 'auth/invalid-email') {
+                        errorMessage = 'Invalid email address';
+                    }
+                    
+                    showMessage(errorMessage, 'error');
+                });
+        });
+
+        // Update user data in Firestore
+        function updateUserData(user) {
+            const userRef = db.collection('users').doc(user.uid);
+            
+            userRef.get().then((doc) => {
+                if (doc.exists) {
+                    // Update last login
+                    userRef.update({
+                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+            });
+        }
+
+        // Check if user is already logged in
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // User is signed in
+                console.log('User is signed in:', user.email);
+            }
+        });
+
+        // Add to Cart Functionality
+        const addToCartButtons = document.querySelectorAll('.add-to-cart');
+        const cartCount = document.querySelector('.cart-count');
+        
+        addToCartButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent opening product modal
+                
+                // Animation
+                button.style.transform = 'scale(1.3)';
+                setTimeout(() => {
+                    button.style.transform = 'scale(1)';
+                }, 300);
+                
+                // Update cart count
+                let currentCount = parseInt(cartCount.textContent);
+                cartCount.textContent = currentCount + 1;
+                
+                // Visual feedback
+                cartCount.style.animation = 'none';
+                setTimeout(() => {
+                    cartCount.style.animation = 'pulse 0.5s';
+                }, 10);
+                
+                // Show confirmation
+                alert('Product added to your luxury selection!');
+            });
+        });
+
+        // AI Assistant Toggle
+        const assistantToggle = document.getElementById('assistantToggle');
+        const assistantWindow = document.getElementById('assistantWindow');
+        const assistantClose = document.getElementById('assistantClose');
+
+        assistantToggle.addEventListener('click', () => {
+            assistantWindow.style.display = 'flex';
+        });
+
+        assistantClose.addEventListener('click', () => {
+            assistantWindow.style.display = 'none';
+        });
+
+        // Initialize maps when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // Add CSS animation for cart count
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes pulse {
+                    0% { transform: scale(1); }
+                    50% { transform: scale(1.3); }
+                    100% { transform: scale(1); }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Initialize booking map
+            initBookingMap();
+        });
+    </script>
+</body>
+</html>

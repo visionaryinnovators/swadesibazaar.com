@@ -1,0 +1,2525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketplace | SwaDesi Bazaar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    
+    <style>
+        :root {
+            --primary: #D4AF37;
+            --primary-dark: #B8860B;
+            --secondary: #1A1A1A;
+            --accent: #8B4513;
+            --light: #F8F5F0;
+            --gray: #6C757D;
+            --white: #FFFFFF;
+            --error: #e74c3c;
+            --success: #2ecc71;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--secondary);
+            background-color: var(--light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: var(--white);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .logo h1 {
+            font-size: 28px;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+        }
+
+        .logo span {
+            color: var(--secondary);
+        }
+
+        .search-bar {
+            flex: 1;
+            max-width: 600px;
+            margin: 0 30px;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 14px 20px;
+            border: 1px solid #E5E5E5;
+            border-radius: 50px;
+            font-size: 16px;
+            transition: var(--transition);
+            background-color: #f9f9f9;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+        }
+
+        .search-bar button {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 9px 20px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .search-bar button:hover {
+            background: var(--primary-dark);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .language-selector select {
+            padding: 8px 15px;
+            border: 1px solid #E5E5E5;
+            border-radius: 5px;
+            background-color: white;
+            font-size: 14px;
+        }
+
+        .auth-buttons a {
+            text-decoration: none;
+            color: var(--secondary);
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: var(--transition);
+        }
+
+        .auth-buttons a.login {
+            color: var(--gray);
+        }
+
+        .auth-buttons a.signup {
+            background: var(--primary);
+            color: white;
+        }
+
+        .auth-buttons a.signup:hover {
+            background: var(--primary-dark);
+        }
+
+        .cart-icon {
+            position: relative;
+            font-size: 22px;
+            color: var(--secondary);
+            cursor: pointer;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--primary);
+            color: white;
+            font-size: 12px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 0.5s ease;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--secondary);
+            cursor: pointer;
+        }
+
+        /* Navigation */
+        nav {
+            background-color: var(--secondary);
+            padding: 15px 0;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--primary);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Mobile Navigation */
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--white);
+            z-index: 2000;
+            overflow-y: auto;
+            padding: 20px;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .mobile-nav.active {
+            transform: translateX(0);
+        }
+
+        .mobile-nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .mobile-nav-links {
+            list-style: none;
+        }
+
+        .mobile-nav-links li {
+            margin-bottom: 15px;
+        }
+
+        .mobile-nav-links a {
+            display: block;
+            padding: 12px 15px;
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 500;
+            border-radius: 5px;
+            transition: var(--transition);
+        }
+
+        .mobile-nav-links a:hover {
+            background: #f5f5f5;
+            color: var(--primary);
+        }
+
+        .mobile-nav-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--secondary);
+            cursor: pointer;
+        }
+
+        /* Back Button */
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--white);
+            border: 1px solid #E5E5E5;
+            color: var(--secondary);
+            font-weight: 500;
+            cursor: pointer;
+            padding: 10px 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            text-decoration: none;
+        }
+
+        .back-button:hover {
+            color: var(--primary);
+            transform: translateX(-5px);
+            border-color: var(--primary);
+        }
+
+        /* Marketplace Navigation */
+        .marketplace-nav {
+            background: var(--white);
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .nav-btn:hover {
+            background: #f5f5f5;
+        }
+
+        .nav-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: none;
+            padding: 30px 0;
+            min-height: 70vh;
+        }
+
+        .main-content.active {
+            display: block;
+        }
+
+        /* Shopping Page */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .page-title {
+            font-size: 32px;
+            color: var(--secondary);
+        }
+
+        .location-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+        }
+
+        .location-selector i {
+            color: var(--primary);
+        }
+
+        .categories-sidebar {
+            width: 250px;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            float: left;
+            margin-right: 30px;
+        }
+
+        .categories-sidebar h3 {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .category-list {
+            list-style: none;
+        }
+
+        .category-list li {
+            margin-bottom: 10px;
+        }
+
+        .category-list a {
+            text-decoration: none;
+            color: var(--secondary);
+            transition: var(--transition);
+            display: block;
+            padding: 8px 5px;
+            border-radius: 5px;
+        }
+
+        .category-list a:hover {
+            background: #f9f9f9;
+            color: var(--primary);
+        }
+
+        .filter-group {
+            margin-bottom: 20px;
+        }
+
+        .filter-group h4 {
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .price-range {
+            margin-bottom: 10px;
+        }
+
+        .price-values {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        .location-filter {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Products Grid */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .product-card {
+            background: var(--white);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-image {
+            height: 220px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.05);
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: var(--primary);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .product-info {
+            padding: 20px;
+        }
+
+        .product-info h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .product-seller {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        .seller-avatar {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background-color: #E5E5E5;
+        }
+
+        .product-location {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            color: var(--gray);
+            margin-bottom: 15px;
+        }
+
+        .product-price {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .price {
+            font-weight: 700;
+            font-size: 20px;
+            color: var(--secondary);
+        }
+
+        .add-to-cart {
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .add-to-cart:hover {
+            background: var(--primary-dark);
+            transform: scale(1.1);
+        }
+
+        /* Nearby Sellers Map */
+        .map-section {
+            margin-top: 50px;
+            clear: both;
+        }
+
+        .map-container {
+            height: 400px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        #nearbySellersMap {
+            height: 100%;
+            width: 100%;
+        }
+
+        /* Reviews Section */
+        .reviews-section {
+            margin-top: 50px;
+        }
+
+        .reviews-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .review-form {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .rating-input {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .rating-star {
+            font-size: 24px;
+            color: #ddd;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .rating-star.active {
+            color: var(--primary);
+        }
+
+        .review-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .review-item {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .reviewer-name {
+            font-weight: 600;
+        }
+
+        .review-date {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .review-rating {
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        /* Selling Page */
+        .selling-form {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .form-section h3 {
+            margin-bottom: 20px;
+            color: var(--secondary);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 15px;
+            border: 1px solid #E5E5E5;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: var(--transition);
+            background-color: #f9f9f9;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+        }
+
+        .image-upload {
+            border: 2px dashed #ddd;
+            border-radius: 5px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .image-upload:hover {
+            border-color: var(--primary);
+        }
+
+        .image-preview {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .preview-item {
+            width: 100px;
+            height: 100px;
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .remove-image {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .location-map {
+            height: 300px;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        #sellerLocationMap {
+            height: 100%;
+            width: 100%;
+        }
+
+        .submit-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: block;
+            width: 100%;
+        }
+
+        .submit-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-outline {
+            background: white;
+            color: var(--secondary);
+            border: 1px solid #ddd;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Product Details Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 50px auto;
+            width: 90%;
+            max-width: 1000px;
+            border-radius: 10px;
+            overflow: hidden;
+            animation: modalFade 0.3s;
+        }
+
+        @keyframes modalFade {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        .modal-body {
+            padding: 20px;
+            display: flex;
+            gap: 30px;
+        }
+
+        .product-gallery {
+            flex: 1;
+        }
+
+        .main-image {
+            width: 100%;
+            height: 400px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .main-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-thumbnails {
+            display: flex;
+            gap: 10px;
+        }
+
+        .thumbnail {
+            width: 80px;
+            height: 80px;
+            border-radius: 5px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .thumbnail.active {
+            border-color: var(--primary);
+        }
+
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-details {
+            flex: 1;
+        }
+
+        .product-title {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .product-rating {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .stars {
+            color: var(--primary);
+        }
+
+        .rating-count {
+            color: var(--gray);
+        }
+
+        .product-price-large {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--secondary);
+        }
+
+        .product-description {
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+
+        .seller-info {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .seller-info h4 {
+            margin-bottom: 10px;
+        }
+
+        .seller-details {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .seller-avatar-lg {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        /* Cart Sidebar */
+        .cart-sidebar {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 100%;
+            max-width: 400px;
+            height: 100%;
+            background: white;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+            z-index: 2000;
+            transition: right 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cart-sidebar.active {
+            right: 0;
+        }
+
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .cart-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        .cart-body {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .cart-item {
+            display: flex;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .cart-item-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 5px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .cart-item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .cart-item-details {
+            flex: 1;
+        }
+
+        .cart-item-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .cart-item-seller {
+            font-size: 14px;
+            color: var(--gray);
+            margin-bottom: 10px;
+        }
+
+        .cart-item-price {
+            font-weight: 700;
+            color: var(--secondary);
+        }
+
+        .cart-item-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quantity-btn {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .quantity-btn:hover {
+            background: #f5f5f5;
+        }
+
+        .quantity {
+            font-weight: 600;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .remove-item {
+            background: none;
+            border: none;
+            color: var(--error);
+            cursor: pointer;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .remove-item:hover {
+            color: #c0392b;
+        }
+
+        .cart-footer {
+            padding: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 700;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .checkout-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .checkout-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray);
+        }
+
+        .empty-cart i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 3000;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateX(-50%) translateY(100px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        /* Footer */
+        footer {
+            background: var(--secondary);
+            color: white;
+            padding: 60px 0 0;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: #CCCCCC;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding: 30px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #999;
+            font-size: 14px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .search-bar {
+                max-width: 400px;
+            }
+            
+            .modal-body {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-top {
+                flex-wrap: wrap;
+            }
+            
+            .search-bar {
+                order: 3;
+                margin: 15px 0 0;
+                max-width: 100%;
+            }
+            
+            .section-title h2 {
+                font-size: 28px;
+            }
+            
+            .categories-sidebar {
+                float: none;
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 30px;
+            }
+            
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+            
+            /* Mobile Menu Button */
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            /* Hide desktop navigation on mobile */
+            nav {
+                display: none;
+            }
+            
+            /* Show mobile navigation */
+            .mobile-nav {
+                display: block;
+            }
+            
+            .header-actions .auth-buttons {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .features-grid, .categories-grid, .products-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            .cart-sidebar {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-top">
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="logo">
+                    <a href="index.html" style="text-decoration: none;">
+                        <h1>Swa<span>Desi</span> Bazaar</h1>
+                    </a>
+                </div>
+                <div class="search-bar">
+                    <input type="text" placeholder="Search for products, artisans, or categories...">
+                    <button><i class="fas fa-search"></i></button>
+                </div>
+                <div class="header-actions">
+                    <div class="language-selector">
+                        <select>
+                            <option>English</option>
+                            <option>हिन्दी</option>
+                            <option>தமிழ்</option>
+                            <option>বাংলা</option>
+                            <option>తెలుగు</option>
+                        </select>
+                    </div>
+                    <div class="auth-buttons">
+                        <a href="login.html" class="login">Login</a>
+                        <a href="login.html" class="signup">Sign Up</a>
+                    </div>
+                    <div class="cart-icon" id="cartIcon">
+                        <i class="fas fa-shopping-bag"></i>
+                        <span class="cart-count">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <nav>
+            <div class="container">
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="marketplace.html" class="active">Marketplace</a></li>
+                    <li><a href="handicrafts.html">Handicrafts</a></li>
+                    <li><a href="home-decor.html">Home Decor</a></li>
+                    <li><a href="clothing.html">Clothing</a></li>
+                    <li><a href="jewelry.html">Jewelry</a></li>
+                    <li><a href="groceries.html">Groceries</a></li>
+                    <li><a href="local-markets.html">Local Markets</a></li>
+                    <li><a href="artisans.html">Artisans</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Mobile Navigation -->
+    <div class="mobile-nav" id="mobileNav">
+        <div class="mobile-nav-header">
+            <div class="logo">
+                <h1>Swa<span>Desi</span> Bazaar</h1>
+            </div>
+            <button class="mobile-nav-close" id="mobileNavClose">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <ul class="mobile-nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="marketplace.html">Marketplace</a></li>
+            <li><a href="handicrafts.html">Handicrafts</a></li>
+            <li><a href="home-decor.html">Home Decor</a></li>
+            <li><a href="clothing.html">Clothing</a></li>
+            <li><a href="jewelry.html">Jewelry</a></li>
+            <li><a href="groceries.html">Groceries</a></li>
+            <li><a href="local-markets.html">Local Markets</a></li>
+            <li><a href="artisans.html">Artisans</a></li>
+            <li><a href="login.html">Login</a></li>
+            <li><a href="login.html">Sign Up</a></li>
+        </ul>
+    </div>
+
+    <!-- Marketplace Navigation -->
+    <div class="marketplace-nav">
+        <div class="container">
+            <div class="header-actions">
+                <button class="nav-btn active" data-page="shopping">
+                    <i class="fas fa-shopping-bag"></i> Shopping
+                </button>
+                <button class="nav-btn" data-page="selling">
+                    <i class="fas fa-store"></i> Selling
+                </button>
+                <div class="user-menu">
+                    <div class="user-avatar">RS</div>
+                    <span>Rahul Sharma</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shopping Page -->
+    <section id="shopping-page" class="main-content active">
+        <div class="container">
+            <a href="index.html" class="back-button">
+                <i class="fas fa-arrow-left"></i> Back to Home
+            </a>
+            
+            <div class="page-header">
+                <h2 class="page-title">Discover Local Products</h2>
+                <div class="location-selector" id="locationSelector">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Delivering to: New Delhi 110001</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+
+            <div class="categories-sidebar">
+                <h3>Categories</h3>
+                <ul class="category-list">
+                    <li><a>All Categories</a></li>
+                    <li><a href="artisans.html">Artisans</a></li>
+                    <li><a href="handicraft.html">Handicrafts</a></li>
+                    <li><a href="homedecor.html">Home Decor</a></li>
+                    <li><a href="clothing.html">Clothing</a></li>
+                    <li><a href="jewelry.html">Jewelry</a></li>
+                    <li><a href="pottery.html">Pottery</a></li>
+                    <li><a href="woodwork.html">Woodwork</a></li>
+                    <li><a href="metalwork.html">Metalwork</a></li>
+                    <li><a href="localfod.html">Local Food</a></li>
+                    <li><a href="localmarket.html">Local Market</a></li>
+                    <li><a href="organicproduct.html">Organic Products</a></li>
+                    <li><a href="trailor.html">Trailor</a></li>
+                    <li><a href="groceries.html">Groceries</a></li>
+                    <li><a href="saloons.html">Saloons</a></li>
+                    <li><a href="parlors.html">Parlors</a></li>
+                    <li><a href="weather.html">Weather</a></li>
+                    <li><a href="agrisphareai.html">AgriSphare AI</a></li>
+                    <li><a href="digittwin.html">Digit Twin AI</a></li>
+                </ul>
+
+                <h3 style="margin-top: 30px;">Filter by</h3>
+                <div class="filter-group">
+                    <h4>Price</h4>
+                    <div class="price-range">
+                        <input type="range" min="0" max="10000" value="5000" class="slider">
+                        <div class="price-values">
+                            <span>₹0</span>
+                            <span>₹10,000</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <h4>Seller Location</h4>
+                    <div class="location-filter">
+                        <input type="checkbox" id="nearby">
+                        <label for="nearby">Within 5 km</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="products-grid" id="productsContainer">
+                <!-- Products will be dynamically loaded here -->
+            </div>
+
+            <!-- Nearby Sellers Map -->
+            <div class="map-section">
+                <h2>Nearby Sellers</h2>
+                <p>Discover artisans and sellers in your area</p>
+                <div class="map-container">
+                    <div id="nearbySellersMap"></div>
+                </div>
+            </div>
+
+            <!-- Reviews Section -->
+            <div class="reviews-section">
+                <div class="reviews-header">
+                    <h2>Customer Reviews</h2>
+                    <button class="btn" id="writeReviewBtn">
+                        <i class="fas fa-pen"></i> Write a Review
+                    </button>
+                </div>
+
+                <div class="review-form" id="reviewForm" style="display: none;">
+                    <h3>Write a Review</h3>
+                    <div class="rating-input">
+                        <span class="rating-star" data-rating="1">★</span>
+                        <span class="rating-star" data-rating="2">★</span>
+                        <span class="rating-star" data-rating="3">★</span>
+                        <span class="rating-star" data-rating="4">★</span>
+                        <span class="rating-star active" data-rating="5">★</span>
+                    </div>
+                    <div class="form-group">
+                        <textarea class="form-control" placeholder="Share your experience with this product..." rows="4"></textarea>
+                    </div>
+                    <button class="btn">Submit Review</button>
+                </div>
+
+                <div class="review-list">
+                    <div class="review-item">
+                        <div class="review-header">
+                            <span class="reviewer-name">Priya Sharma</span>
+                            <span class="review-date">2 days ago</span>
+                        </div>
+                        <div class="review-rating">
+                            ★★★★★
+                        </div>
+                        <p>Absolutely love this terracotta pot! The craftsmanship is exceptional and it adds such a traditional touch to my home. The seller was very helpful and delivered quickly.</p>
+                    </div>
+
+                    <div class="review-item">
+                        <div class="review-header">
+                            <span class="reviewer-name">Rajiv Mehta</span>
+                            <span class="review-date">1 week ago</span>
+                        </div>
+                        <div class="review-rating">
+                            ★★★★☆
+                        </div>
+                        <p>Good quality product, but the delivery took longer than expected. The pot itself is beautiful and well-made. Would recommend this seller.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Selling Page -->
+    <section id="selling-page" class="main-content">
+        <div class="container">
+            <a href="index.html" class="back-button">
+                <i class="fas fa-arrow-left"></i> Back to Home
+            </a>
+            
+            <div class="page-header">
+                <h2 class="page-title">Sell Your Products</h2>
+                <p>Reach customers in your area and grow your business</p>
+            </div>
+
+            <form class="selling-form" id="sellingForm">
+                <div class="form-section">
+                    <h3>Product Information</h3>
+                    <div class="form-group">
+                        <label for="productName">Product Name</label>
+                        <input type="text" id="productName" class="form-control" placeholder="Enter product name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="productCategory">Category</label>
+                        <select id="productCategory" class="form-control" required>
+                            <option value="">Select a category</option>
+                            <option value="handicrafts">Handicrafts</option>
+                            <option value="home-decor">Home Decor</option>
+                            <option value="clothing">Clothing & Textiles</option>
+                            <option value="jewelry">Jewelry</option>
+                            <option value="pottery">Pottery</option>
+                            <option value="woodwork">Woodwork</option>
+                            <option value="metalwork">Metalwork</option>
+                            <option value="food">Local Food</option>
+                            <option value="organic">Organic Products</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="productDescription">Product Description</label>
+                        <textarea id="productDescription" class="form-control" rows="5" placeholder="Describe your product in detail" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="productPrice">Price (₹)</label>
+                        <input type="number" id="productPrice" class="form-control" placeholder="Enter price in INR" min="1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="productStock">Stock Quantity</label>
+                        <input type="number" id="productStock" class="form-control" placeholder="How many items do you have?" min="1" required>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Product Images</h3>
+                    <div class="image-upload" id="imageUpload">
+                        <i class="fas fa-cloud-upload-alt" style="font-size: 48px; color: var(--gray); margin-bottom: 15px;"></i>
+                        <p>Click to upload product images or drag and drop</p>
+                        <p style="font-size: 14px; color: var(--gray);">PNG, JPG, JPEG up to 5MB each</p>
+                    </div>
+                    <div class="image-preview" id="imagePreview"></div>
+                    <input type="file" id="fileInput" multiple accept="image/*" style="display: none;">
+                </div>
+
+                <div class="form-section">
+                    <h3>Your Location</h3>
+                    <div class="form-group">
+                        <label for="sellerAddress">Business Address</label>
+                        <input type="text" id="sellerAddress" class="form-control" placeholder="Enter your business address" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sellerCity">City</label>
+                        <input type="text" id="sellerCity" class="form-control" placeholder="Enter your city" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sellerState">State</label>
+                        <input type="text" id="sellerState" class="form-control" placeholder="Enter your state" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sellerPincode">Pincode</label>
+                        <input type="text" id="sellerPincode" class="form-control" placeholder="Enter your pincode" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Set Your Location on Map</label>
+                        <div class="location-map">
+                            <div id="sellerLocationMap"></div>
+                        </div>
+                        <button type="button" class="btn btn-outline" id="detectLocationBtn" style="margin-top: 10px;">
+                            <i class="fas fa-location-arrow"></i> Detect My Location
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Delivery Options</h3>
+                    <div class="form-group">
+                        <div class="remember-me">
+                            <input type="checkbox" id="localDelivery" checked>
+                            <label for="localDelivery">Offer local delivery (within 10 km)</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="remember-me">
+                            <input type="checkbox" id="pickupOption" checked>
+                            <label for="pickupOption">Allow customers to pick up from my location</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="deliveryTime">Estimated Delivery Time</label>
+                        <select id="deliveryTime" class="form-control">
+                            <option value="same-day">Same Day</option>
+                            <option value="1-2" selected>1-2 Days</option>
+                            <option value="3-5">3-5 Days</option>
+                            <option value="1-week">1 Week</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">List My Product</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Product Details Modal -->
+    <div class="modal" id="productModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Product Details</h2>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="product-gallery">
+                    <div class="main-image">
+                        <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Product Image" id="mainProductImage">
+                    </div>
+                    <div class="image-thumbnails">
+                        <div class="thumbnail active">
+                            <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Thumbnail 1">
+                        </div>
+                        <div class="thumbnail">
+                            <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Thumbnail 2">
+                        </div>
+                        <div class="thumbnail">
+                            <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Thumbnail 3">
+                        </div>
+                    </div>
+                </div>
+                <div class="product-details">
+                    <h1 class="product-title" id="modalProductTitle">Handmade Terracotta Pot with Traditional Artwork</h1>
+                    <div class="product-rating">
+                        <div class="stars">
+                            ★★★★★
+                        </div>
+                        <span class="rating-count">124 ratings</span>
+                    </div>
+                    <div class="product-price-large">₹1,250</div>
+                    <div class="product-description">
+                        <p>This beautifully crafted terracotta pot features traditional Indian artwork hand-painted by skilled artisans from Varanasi. Made from locally sourced clay and using age-old techniques, each piece is unique and carries the heritage of Indian craftsmanship.</p>
+                        <p><strong>Dimensions:</strong> 12" height, 8" diameter</p>
+                        <p><strong>Material:</strong> Terracotta clay, natural pigments</p>
+                        <p><strong>Care Instructions:</strong> Keep away from direct sunlight and water</p>
+                    </div>
+
+                    <div class="seller-info">
+                        <h4>Seller Information</h4>
+                        <div class="seller-details">
+                            <div class="seller-avatar-lg">SH</div>
+                            <div>
+                                <h5>Suresh Handmade Pots</h5>
+                                <p>Varanasi, Uttar Pradesh</p>
+                                <p>⭐ 4.8 (124 reviews)</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn" id="modalAddToCart">
+                            <i class="fas fa-shopping-bag"></i> Add to Cart
+                        </button>
+                        <button class="btn btn-outline">
+                            <i class="fas fa-heart"></i> Add to Wishlist
+                        </button>
+                        <button class="btn btn-outline">
+                            <i class="fas fa-share-alt"></i> Share
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Sidebar -->
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h2>Your Cart</h2>
+            <button class="cart-close" id="cartClose">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="cart-body" id="cartBody">
+            <!-- Cart items will be dynamically added here -->
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span id="cartTotal">₹0</span>
+            </div>
+            <button class="checkout-btn" id="checkoutBtn">Proceed to Checkout</button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>SwaDesi Bazaar</h3>
+                    <p>Your Local Market, Powered by AI. Connecting you with authentic local sellers and artisans in your community.</p>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="marketplace.html">Marketplace</a></li>
+                        <li><a href="#">Sell on SwaDesi</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Customer Service</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Returns & Refunds</a></li>
+                        <li><a href="#">Shipping Info</a></li>
+                        <li><a href="#">Track Your Order</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contact Info</h3>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Local Market, New Delhi, India</li>
+                        <li><i class="fas fa-phone"></i> +91 98765 43210</li>
+                        <li><i class="fas fa-envelope"></i> support@swadesibazaar.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 SwaDesi Bazaar. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC4wGDrRHs4gQN6p8Q9X7VqY9t8d4Jk8Xw",
+            authDomain: "swadesi-bazaar.firebaseapp.com",
+            projectId: "swadesi-bazaar",
+            storageBucket: "swadesi-bazaar.appspot.com",
+            messagingSenderId: "123456789012",
+            appId: "1:123456789012:web:abcdef1234567890"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Cart functionality
+        let cart = [];
+        const cartIcon = document.getElementById('cartIcon');
+        const cartSidebar = document.getElementById('cartSidebar');
+        const cartClose = document.getElementById('cartClose');
+        const cartBody = document.getElementById('cartBody');
+        const cartTotal = document.getElementById('cartTotal');
+        const checkoutBtn = document.getElementById('checkoutBtn');
+
+        // Mobile Navigation
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileNav = document.getElementById('mobileNav');
+        const mobileNavClose = document.getElementById('mobileNavClose');
+
+        function openMobileNav() {
+            mobileNav.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeMobileNav() {
+            mobileNav.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        mobileMenuBtn.addEventListener('click', openMobileNav);
+        mobileNavClose.addEventListener('click', closeMobileNav);
+
+        // Cart functionality
+        function updateCartCount() {
+            const count = cart.reduce((total, item) => total + item.quantity, 0);
+            document.querySelectorAll('.cart-count').forEach(el => {
+                el.textContent = count;
+            });
+        }
+
+        function updateCartTotal() {
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            cartTotal.textContent = `₹${total.toLocaleString()}`;
+        }
+
+        function renderCartItems() {
+            cartBody.innerHTML = '';
+            
+            if (cart.length === 0) {
+                cartBody.innerHTML = `
+                    <div class="empty-cart">
+                        <i class="fas fa-shopping-bag"></i>
+                        <p>Your cart is empty</p>
+                        <p>Add some products to get started</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            cart.forEach(item => {
+                const cartItem = document.createElement('div');
+                cartItem.className = 'cart-item';
+                cartItem.innerHTML = `
+                    <div class="cart-item-image">
+                        <img src="${item.image}" alt="${item.name}">
+                    </div>
+                    <div class="cart-item-details">
+                        <div class="cart-item-title">${item.name}</div>
+                        <div class="cart-item-seller">${item.seller}</div>
+                        <div class="cart-item-price">₹${item.price.toLocaleString()}</div>
+                        <div class="cart-item-actions">
+                            <div class="quantity-control">
+                                <button class="quantity-btn decrease" data-id="${item.id}">-</button>
+                                <span class="quantity">${item.quantity}</span>
+                                <button class="quantity-btn increase" data-id="${item.id}">+</button>
+                            </div>
+                            <button class="remove-item" data-id="${item.id}">Remove</button>
+                        </div>
+                    </div>
+                `;
+                cartBody.appendChild(cartItem);
+            });
+            
+            // Add event listeners to cart buttons
+            document.querySelectorAll('.quantity-btn.increase').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = e.target.getAttribute('data-id');
+                    increaseQuantity(id);
+                });
+            });
+            
+            document.querySelectorAll('.quantity-btn.decrease').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = e.target.getAttribute('data-id');
+                    decreaseQuantity(id);
+                });
+            });
+            
+            document.querySelectorAll('.remove-item').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = e.target.getAttribute('data-id');
+                    removeFromCart(id);
+                });
+            });
+            
+            updateCartTotal();
+        }
+
+        function addToCart(product) {
+            const existingItem = cart.find(item => item.id === product.id);
+            
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({
+                    ...product,
+                    quantity: 1
+                });
+            }
+            
+            updateCartCount();
+            renderCartItems();
+            
+            // Show success message
+            showToast(`${product.name} added to cart!`);
+        }
+
+        function increaseQuantity(productId) {
+            const item = cart.find(item => item.id === productId);
+            if (item) {
+                item.quantity += 1;
+                updateCartCount();
+                updateCartTotal();
+                renderCartItems();
+            }
+        }
+
+        function decreaseQuantity(productId) {
+            const item = cart.find(item => item.id === productId);
+            if (item) {
+                if (item.quantity > 1) {
+                    item.quantity -= 1;
+                } else {
+                    removeFromCart(productId);
+                    return;
+                }
+                updateCartCount();
+                updateCartTotal();
+                renderCartItems();
+            }
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            updateCartCount();
+            renderCartItems();
+        }
+
+        function showToast(message) {
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            
+            document.body.appendChild(toast);
+            
+            // Remove toast after 3 seconds
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Cart sidebar toggle
+        cartIcon.addEventListener('click', () => {
+            cartSidebar.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+
+        cartClose.addEventListener('click', () => {
+            cartSidebar.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        });
+
+        checkoutBtn.addEventListener('click', () => {
+            if (cart.length === 0) {
+                showToast('Your cart is empty!');
+                return;
+            }
+            showToast('Proceeding to checkout!');
+        });
+
+        // Marketplace Navigation
+        const navButtons = document.querySelectorAll('.nav-btn');
+        const mainContents = document.querySelectorAll('.main-content');
+
+        navButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const targetPage = button.getAttribute('data-page');
+                
+                // Update active button
+                navButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                
+                // Show target page
+                mainContents.forEach(content => {
+                    content.classList.remove('active');
+                    if (content.id === `${targetPage}-page`) {
+                        content.classList.add('active');
+                    }
+                });
+                
+                // Initialize map when switching to shopping page
+                if (targetPage === 'shopping') {
+                    setTimeout(() => {
+                        initNearbySellersMap();
+                        loadProducts();
+                    }, 100);
+                }
+                
+                // Close mobile nav
+                closeMobileNav();
+            });
+        });
+
+        // Product Details Modal
+        const productModal = document.getElementById('productModal');
+        const modalClose = document.getElementById('modalClose');
+        const modalAddToCart = document.getElementById('modalAddToCart');
+
+        modalClose.addEventListener('click', () => {
+            productModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        });
+
+        // Thumbnail Navigation in Modal
+        const thumbnails = document.querySelectorAll('.thumbnail');
+        const mainProductImage = document.getElementById('mainProductImage');
+
+        thumbnails.forEach(thumbnail => {
+            thumbnail.addEventListener('click', () => {
+                thumbnails.forEach(t => t.classList.remove('active'));
+                thumbnail.classList.add('active');
+                mainProductImage.src = thumbnail.querySelector('img').src;
+            });
+        });
+
+        // Image Upload for Selling Page
+        const imageUpload = document.getElementById('imageUpload');
+        const fileInput = document.getElementById('fileInput');
+        const imagePreview = document.getElementById('imagePreview');
+
+        imageUpload.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const files = e.target.files;
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = (e) => {
+                        const previewItem = document.createElement('div');
+                        previewItem.className = 'preview-item';
+                        
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        
+                        const removeBtn = document.createElement('div');
+                        removeBtn.className = 'remove-image';
+                        removeBtn.innerHTML = '×';
+                        removeBtn.addEventListener('click', () => {
+                            previewItem.remove();
+                        });
+                        
+                        previewItem.appendChild(img);
+                        previewItem.appendChild(removeBtn);
+                        imagePreview.appendChild(previewItem);
+                    };
+                    
+                    reader.readAsDataURL(file);
+                }
+            }
+        });
+
+        // Review System
+        const writeReviewBtn = document.getElementById('writeReviewBtn');
+        const reviewForm = document.getElementById('reviewForm');
+        const ratingStars = document.querySelectorAll('.rating-star');
+
+        writeReviewBtn.addEventListener('click', () => {
+            reviewForm.style.display = reviewForm.style.display === 'none' ? 'block' : 'none';
+        });
+
+        ratingStars.forEach(star => {
+            star.addEventListener('click', () => {
+                const rating = star.getAttribute('data-rating');
+                
+                ratingStars.forEach(s => {
+                    if (s.getAttribute('data-rating') <= rating) {
+                        s.classList.add('active');
+                    } else {
+                        s.classList.remove('active');
+                    }
+                });
+            });
+        });
+
+        // Location Detection
+        const detectLocationBtn = document.getElementById('detectLocationBtn');
+        
+        detectLocationBtn.addEventListener('click', () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        
+                        showToast(`Location detected: ${lat.toFixed(4)}, ${lng.toFixed(4)}`);
+                        
+                        // Update the map with the detected location
+                        updateSellerLocationMap(lat, lng);
+                    },
+                    (error) => {
+                        showToast('Unable to detect your location. Please enter it manually.');
+                    }
+                );
+            } else {
+                showToast('Geolocation is not supported by this browser.');
+            }
+        });
+
+        // Initialize Nearby Sellers Map
+        function initNearbySellersMap() {
+            // Check if map is already initialized
+            if (window.nearbySellersMap) {
+                window.nearbySellersMap.remove();
+            }
+            
+            const map = L.map('nearbySellersMap').setView([28.6139, 77.2090], 12); // Delhi coordinates
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            // Add sample seller markers
+            const sellers = [
+                { name: 'Suresh Handmade Pots', lat: 28.6139, lng: 77.2090, type: 'pottery' },
+                { name: 'Weaves of Varanasi', lat: 28.6200, lng: 77.2150, type: 'textiles' },
+                { name: 'Saharanpur Woodcraft', lat: 28.6050, lng: 77.2000, type: 'woodwork' },
+                { name: 'Moradabad Metal Art', lat: 28.6250, lng: 77.1950, type: 'metalwork' }
+            ];
+            
+            sellers.forEach(seller => {
+                const marker = L.marker([seller.lat, seller.lng])
+                    .addTo(map)
+                    .bindPopup(`
+                        <div style="text-align: center;">
+                            <h3>${seller.name}</h3>
+                            <p>${getSellerType(seller.type)}</p>
+                            <button class="btn" style="margin-top: 10px; padding: 5px 10px; font-size: 12px;">
+                                View Products
+                            </button>
+                        </div>
+                    `);
+            });
+            
+            // Add user location marker
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    const userLat = position.coords.latitude;
+                    const userLng = position.coords.longitude;
+                    
+                    L.marker([userLat, userLng])
+                        .addTo(map)
+                        .bindPopup('Your Location')
+                        .openPopup();
+                        
+                    map.setView([userLat, userLng], 13);
+                });
+            }
+            
+            // Store map reference
+            window.nearbySellersMap = map;
+        }
+
+        // Initialize Seller Location Map
+        function initSellerLocationMap() {
+            // Check if map is already initialized
+            if (window.sellerLocationMap) {
+                window.sellerLocationMap.remove();
+            }
+            
+            const map = L.map('sellerLocationMap').setView([28.6139, 77.2090], 12);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            // Add a draggable marker
+            const marker = L.marker([28.6139, 77.2090], { draggable: true }).addTo(map);
+            
+            marker.bindPopup('Drag to set your business location').openPopup();
+            
+            marker.on('dragend', function(event) {
+                const marker = event.target;
+                const position = marker.getLatLng();
+                console.log('Marker position:', position);
+            });
+            
+            // Store references
+            window.sellerLocationMap = map;
+            window.sellerLocationMarker = marker;
+            
+            return { map, marker };
+        }
+
+        function updateSellerLocationMap(lat, lng) {
+            if (window.sellerLocationMap && window.sellerLocationMarker) {
+                window.sellerLocationMap.setView([lat, lng], 15);
+                window.sellerLocationMarker.setLatLng([lat, lng]);
+            }
+        }
+
+        function getSellerType(type) {
+            const types = {
+                pottery: 'Pottery & Ceramics',
+                textiles: 'Textiles & Clothing',
+                woodwork: 'Woodwork',
+                metalwork: 'Metal Art'
+            };
+            return types[type] || 'Local Artisan';
+        }
+
+        // Add to Cart Functionality
+        function setupAddToCartButtons() {
+            const addToCartButtons = document.querySelectorAll('.add-to-cart');
+            
+            addToCartButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Prevent opening product modal
+                    
+                    const productCard = button.closest('.product-card');
+                    const productId = productCard.getAttribute('data-product-id');
+                    const productName = productCard.querySelector('h3').textContent;
+                    const productPrice = parseInt(productCard.querySelector('.price').textContent.replace('₹', '').replace(',', ''));
+                    const productSeller = productCard.querySelector('.product-seller span').textContent;
+                    const productImage = productCard.querySelector('img').src;
+                    
+                    const product = {
+                        id: productId,
+                        name: productName,
+                        price: productPrice,
+                        seller: productSeller,
+                        image: productImage
+                    };
+                    
+                    addToCart(product);
+                    
+                    // Animation
+                    button.style.transform = 'scale(1.3)';
+                    setTimeout(() => {
+                        button.style.transform = 'scale(1)';
+                    }, 300);
+                });
+            });
+        }
+
+        // Modal Add to Cart
+        modalAddToCart.addEventListener('click', () => {
+            const productName = document.getElementById('modalProductTitle').textContent;
+            const productPrice = parseInt(document.querySelector('.product-price-large').textContent.replace('₹', '').replace(',', ''));
+            
+            const product = {
+                id: 'modal-product',
+                name: productName,
+                price: productPrice,
+                seller: 'Suresh Handmade Pots',
+                image: document.getElementById('mainProductImage').src
+            };
+            
+            addToCart(product);
+            
+            // Close modal
+            productModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        });
+
+        // Form Submission for Selling
+        const sellingForm = document.getElementById('sellingForm');
+        
+        sellingForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Basic validation
+            const productName = document.getElementById('productName').value;
+            const productPrice = document.getElementById('productPrice').value;
+            
+            if (!productName || !productPrice) {
+                showToast('Please fill in all required fields');
+                return;
+            }
+            
+            // Get form data
+            const productData = {
+                name: productName,
+                category: document.getElementById('productCategory').value,
+                description: document.getElementById('productDescription').value,
+                price: parseFloat(productPrice),
+                stock: parseInt(document.getElementById('productStock').value),
+                sellerName: 'Rahul Sharma', // In a real app, get from user profile
+                sellerLocation: document.getElementById('sellerCity').value,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
+            // In a real app, you would send this data to your backend
+            db.collection('products').add(productData)
+                .then((docRef) => {
+                    showToast('Product listing submitted successfully! It will be reviewed and published soon.');
+                    sellingForm.reset();
+                    imagePreview.innerHTML = '';
+                    
+                    // Reload products to show the new one
+                    loadProducts();
+                })
+                .catch((error) => {
+                    console.error('Error adding product: ', error);
+                    showToast('There was an error submitting your product. Please try again.');
+                });
+        });
+
+        // Load Products from Firestore
+        function loadProducts() {
+            const productsContainer = document.getElementById('productsContainer');
+            productsContainer.innerHTML = '';
+            
+            db.collection('products').get()
+                .then((querySnapshot) => {
+                    if (querySnapshot.empty) {
+                        // If no products, show sample products
+                        loadSampleProducts();
+                        return;
+                    }
+                    
+                    querySnapshot.forEach((doc) => {
+                        const product = doc.data();
+                        const productId = doc.id;
+                        
+                        const productCard = createProductCard(product, productId);
+                        productsContainer.appendChild(productCard);
+                    });
+                    
+                    setupAddToCartButtons();
+                    setupProductCardClick();
+                })
+                .catch((error) => {
+                    console.error('Error loading products: ', error);
+                    loadSampleProducts();
+                });
+        }
+
+        // Create Product Card
+        function createProductCard(product, productId) {
+            const productCard = document.createElement('div');
+            productCard.className = 'product-card';
+            productCard.setAttribute('data-product-id', productId);
+            
+            productCard.innerHTML = `
+                <div class="product-image">
+                    <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="${product.name}">
+                    <span class="product-badge">${getProductBadge(product.category)}</span>
+                </div>
+                <div class="product-info">
+                    <h3>${product.name}</h3>
+                    <div class="product-seller">
+                        <div class="seller-avatar"></div>
+                        <span>${product.sellerName || 'Local Seller'}</span>
+                    </div>
+                    <div class="product-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>${product.sellerLocation || 'New Delhi'} • ${getRandomDistance()} km away</span>
+                    </div>
+                    <div class="product-price">
+                        <span class="price">₹${product.price}</span>
+                        <button class="add-to-cart">
+                            <i class="fas fa-shopping-bag"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            return productCard;
+        }
+
+        function getProductBadge(category) {
+            const badges = {
+                'handicrafts': 'Local Favorite',
+                'home-decor': 'Best Seller',
+                'clothing': 'Limited Stock',
+                'jewelry': 'New Arrival',
+                'pottery': 'Handmade',
+                'woodwork': 'Artisanal',
+                'metalwork': 'Traditional',
+                'food': 'Fresh',
+                'organic': 'Organic'
+            };
+            
+            return badges[category] || 'Local Favorite';
+        }
+
+        function getRandomDistance() {
+            return (Math.random() * 20 + 1).toFixed(1);
+        }
+
+        // Load Sample Products if no products in database
+        function loadSampleProducts() {
+            const productsContainer = document.getElementById('productsContainer');
+            
+            const sampleProducts = [
+                {
+                    id: 1,
+                    name: 'Handmade Terracotta Pot with Traditional Artwork',
+                    price: 1250,
+                    sellerName: 'Suresh Handmade Pots',
+                    sellerLocation: 'Varanasi, UP',
+                    category: 'pottery',
+                    distance: 2.5
+                },
+                {
+                    id: 2,
+                    name: 'Banarasi Silk Saree with Zari Work',
+                    price: 8499,
+                    sellerName: 'Weaves of Varanasi',
+                    sellerLocation: 'Varanasi, UP',
+                    category: 'clothing',
+                    distance: 3.2
+                },
+                {
+                    id: 3,
+                    name: 'Handcarved Wooden Elephant Sculpture',
+                    price: 3200,
+                    sellerName: 'Saharanpur Woodcraft',
+                    sellerLocation: 'Saharanpur, UP',
+                    category: 'woodwork',
+                    distance: 15
+                },
+                {
+                    id: 4,
+                    name: 'Traditional Brass Diya Set for Festivals',
+                    price: 1850,
+                    sellerName: 'Moradabad Metal Art',
+                    sellerLocation: 'Moradabad, UP',
+                    category: 'metalwork',
+                    distance: 25
+                }
+            ];
+            
+            sampleProducts.forEach(product => {
+                const productCard = createProductCard(product, product.id);
+                productsContainer.appendChild(productCard);
+            });
+            
+            setupAddToCartButtons();
+            setupProductCardClick();
+        }
+
+        // Setup Product Card Click
+        function setupProductCardClick() {
+            const productCards = document.querySelectorAll('.product-card');
+            
+            productCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    productModal.style.display = 'block';
+                    document.body.style.overflow = 'hidden';
+                });
+            });
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load products
+            loadProducts();
+            
+            // Initialize cart
+            updateCartCount();
+            renderCartItems();
+            
+            // Initialize maps
+            initNearbySellersMap();
+            initSellerLocationMap();
+        });
+    </script>
+</body>
+</html>

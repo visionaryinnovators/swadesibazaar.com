@@ -1,0 +1,1709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LuxeDecor | Premium Home Decor & Artisanal Crafts</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    
+    <style>
+        :root {
+            --primary: #D4AF37;
+            --primary-dark: #B8860B;
+            --secondary: #1A1A1A;
+            --accent: #8B4513;
+            --light: #F8F5F0;
+            --gray: #6C757D;
+            --white: #FFFFFF;
+            --error: #e74c3c;
+            --success: #2ecc71;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+            --luxury-gold: #C9A96E;
+            --luxury-dark: #2C2C2C;
+            --luxury-light: #F9F7F4;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--secondary);
+            background-color: var(--luxury-light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Page Container */
+        .page-container {
+            position: relative;
+            min-height: 100vh;
+        }
+
+        .page {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            min-height: 100vh;
+        }
+
+        .page.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Luxury Header */
+        .luxury-header {
+            background: linear-gradient(135deg, var(--luxury-dark) 0%, #000 100%);
+            color: var(--white);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .logo h1 {
+            font-size: 32px;
+            color: var(--luxury-gold);
+            letter-spacing: -0.5px;
+        }
+
+        .logo span {
+            color: var(--white);
+        }
+
+        .luxury-nav {
+            display: flex;
+            gap: 30px;
+        }
+
+        .luxury-nav a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .luxury-nav a:hover {
+            color: var(--luxury-gold);
+        }
+
+        .luxury-nav a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--luxury-gold);
+            transition: var(--transition);
+        }
+
+        .luxury-nav a:hover::after {
+            width: 100%;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .auth-buttons a {
+            text-decoration: none;
+            color: var(--white);
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: var(--transition);
+        }
+
+        .auth-buttons a.login {
+            color: var(--gray);
+        }
+
+        .auth-buttons a.signup {
+            background: var(--luxury-gold);
+            color: var(--luxury-dark);
+        }
+
+        .auth-buttons a.signup:hover {
+            background: var(--primary-dark);
+        }
+
+        .cart-icon {
+            position: relative;
+            font-size: 22px;
+            color: var(--white);
+            cursor: pointer;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--luxury-gold);
+            color: var(--luxury-dark);
+            font-size: 12px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        /* Luxury Hero */
+        .luxury-hero {
+            position: relative;
+            height: 80vh;
+            background: linear-gradient(135deg, rgba(44, 44, 44, 0.8) 0%, rgba(0, 0, 0, 0.7) 100%), url('https://images.unsplash.com/photo-1618220179428-22790b461013?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1927&q=80') no-repeat center center;
+            background-size: cover;
+            color: white;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            max-width: 700px;
+            z-index: 2;
+        }
+
+        .hero-content h2 {
+            font-size: 52px;
+            margin-bottom: 20px;
+            line-height: 1.2;
+            color: var(--luxury-gold);
+        }
+
+        .hero-content p {
+            font-size: 18px;
+            margin-bottom: 30px;
+            opacity: 0.9;
+            max-width: 600px;
+        }
+
+        .luxury-cta {
+            display: inline-block;
+            background: var(--luxury-gold);
+            color: var(--luxury-dark);
+            padding: 16px 35px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            letter-spacing: 1px;
+        }
+
+        .luxury-cta:hover {
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Luxury Collections */
+        .luxury-collections {
+            padding: 100px 0;
+            background-color: var(--luxury-light);
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-title h2 {
+            font-size: 42px;
+            color: var(--luxury-dark);
+            margin-bottom: 15px;
+        }
+
+        .section-title p {
+            color: var(--gray);
+            max-width: 600px;
+            margin: 0 auto;
+            font-size: 18px;
+        }
+
+        .collections-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .collection-card {
+            background: var(--white);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .collection-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .collection-image {
+            height: 300px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .collection-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .collection-card:hover .collection-image img {
+            transform: scale(1.05);
+        }
+
+        .collection-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+            color: white;
+            padding: 25px;
+        }
+
+        .collection-overlay h3 {
+            font-size: 24px;
+            margin-bottom: 5px;
+            color: var(--luxury-gold);
+        }
+
+        .collection-overlay p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        /* Premium Products */
+        .premium-products {
+            padding: 100px 0;
+            background-color: var(--white);
+        }
+
+        .products-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .products-header h2 {
+            font-size: 36px;
+            color: var(--luxury-dark);
+        }
+
+        .view-all {
+            color: var(--luxury-gold);
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: var(--transition);
+        }
+
+        .view-all:hover {
+            gap: 10px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .product-card {
+            background: var(--white);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-image {
+            height: 250px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.05);
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: var(--luxury-gold);
+            color: var(--luxury-dark);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .product-info {
+            padding: 25px;
+        }
+
+        .product-info h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: var(--luxury-dark);
+        }
+
+        .product-seller {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        .seller-avatar {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background-color: var(--luxury-gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--luxury-dark);
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .product-location {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            color: var(--gray);
+            margin-bottom: 15px;
+        }
+
+        .product-price {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .price {
+            font-weight: 700;
+            font-size: 22px;
+            color: var(--luxury-dark);
+        }
+
+        .book-now {
+            background: var(--luxury-gold);
+            color: var(--luxury-dark);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+        }
+
+        .book-now:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
+        }
+
+        /* Booking Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 50px auto;
+            width: 90%;
+            max-width: 800px;
+            border-radius: 15px;
+            overflow: hidden;
+            animation: modalFade 0.3s;
+        }
+
+        @keyframes modalFade {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px;
+            border-bottom: 1px solid #eee;
+            background: var(--luxury-dark);
+            color: white;
+        }
+
+        .modal-header h2 {
+            color: var(--luxury-gold);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--white);
+        }
+
+        .modal-body {
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .booking-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+
+        .step {
+            text-align: center;
+            flex: 1;
+            position: relative;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--luxury-light);
+            color: var(--luxury-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-weight: 600;
+        }
+
+        .step.active .step-number {
+            background: var(--luxury-gold);
+            color: var(--luxury-dark);
+        }
+
+        .step-line {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            width: 100%;
+            height: 2px;
+            background: var(--luxury-light);
+            z-index: -1;
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 15px;
+            border: 1px solid #E5E5E5;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: var(--transition);
+            background-color: #f9f9f9;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--luxury-gold);
+            box-shadow: 0 0 0 3px rgba(201, 169, 110, 0.2);
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: var(--luxury-gold);
+            color: var(--luxury-dark);
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-outline {
+            background: white;
+            color: var(--luxury-dark);
+            border: 1px solid #ddd;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--luxury-gold);
+            color: var(--luxury-gold);
+        }
+
+        .booking-summary {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .summary-total {
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+            margin-top: 10px;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        /* Courier Options */
+        .courier-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .courier-option {
+            border: 2px solid #eee;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .courier-option:hover {
+            border-color: var(--luxury-gold);
+        }
+
+        .courier-option.selected {
+            border-color: var(--luxury-gold);
+            background: rgba(201, 169, 110, 0.1);
+        }
+
+        .courier-logo {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: var(--luxury-gold);
+        }
+
+        /* Seller Location Map */
+        .location-map {
+            height: 300px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        #sellerLocationMap {
+            height: 100%;
+            width: 100%;
+        }
+
+        /* Luxury Footer */
+        .luxury-footer {
+            background: var(--luxury-dark);
+            color: white;
+            padding: 60px 0 0;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: var(--luxury-gold);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: #CCCCCC;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--luxury-gold);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding: 30px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #999;
+            font-size: 14px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .hero-content h2 {
+                font-size: 42px;
+            }
+            
+            .luxury-nav {
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-top {
+                flex-wrap: wrap;
+            }
+            
+            .luxury-nav {
+                order: 3;
+                margin-top: 15px;
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .hero-content h2 {
+                font-size: 32px;
+            }
+            
+            .luxury-hero {
+                height: 70vh;
+            }
+            
+            .section-title h2 {
+                font-size: 32px;
+            }
+            
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-content h2 {
+                font-size: 28px;
+            }
+            
+            .hero-content p {
+                font-size: 16px;
+            }
+            
+            .collections-grid, .products-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .booking-steps {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .step-line {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <!-- Luxury Home Decor Page -->
+        <div id="luxury-page" class="page active">
+            <!-- Header -->
+            <header class="luxury-header">
+                <div class="container">
+                    <div class="header-top">
+                        <div class="logo" id="logo">
+                            <h1>Luxe<span>Decor</span></h1>
+                        </div>
+                        <nav class="luxury-nav">
+                            <a href="#">Home</a>
+                            <a href="#">Collections</a>
+                            <a href="#">Furniture</a>
+                            <a href="#">Lighting</a>
+                            <a href="#">Textiles</a>
+                            <a href="#">Art & Decor</a>
+                            <a href="#">Custom Orders</a>
+                        </nav>
+                        <div class="header-actions">
+                            <div class="auth-buttons">
+                                <a href="#" class="login" id="login-link">Login</a>
+                                <a href="#" class="signup" id="signup-link">Become a Seller</a>
+                            </div>
+                            <div class="cart-icon">
+                                <i class="fas fa-shopping-bag"></i>
+                                <span class="cart-count">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Hero Section -->
+            <section class="luxury-hero">
+                <div class="container">
+                    <div class="hero-content">
+                        <h2>Elevate Your Space with Artisanal Luxury</h2>
+                        <p>Discover exclusive, handcrafted home decor pieces from master artisans worldwide. Each piece tells a story of craftsmanship, heritage, and unparalleled quality.</p>
+                        <a href="#" class="luxury-cta" id="explore-collections">Explore Collections</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Luxury Collections -->
+            <section class="luxury-collections">
+                <div class="container">
+                    <div class="section-title">
+                        <h2>Curated Collections</h2>
+                        <p>Handpicked luxury pieces that transform spaces into sanctuaries of style and comfort</p>
+                    </div>
+                    <div class="collections-grid">
+                        <div class="collection-card">
+                            <div class="collection-image">
+                                <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Handcrafted Furniture">
+                            </div>
+                            <div class="collection-overlay">
+                                <h3>Artisanal Furniture</h3>
+                                <p>Timeless pieces crafted by master woodworkers</p>
+                            </div>
+                        </div>
+                        <div class="collection-card">
+                            <div class="collection-image">
+                                <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Lighting Collection">
+                            </div>
+                            <div class="collection-overlay">
+                                <h3>Statement Lighting</h3>
+                                <p>Illuminate your space with artistic light fixtures</p>
+                            </div>
+                        </div>
+                        <div class="collection-card">
+                            <div class="collection-image">
+                                <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Textile Collection">
+                            </div>
+                            <div class="collection-overlay">
+                                <h3>Luxury Textiles</h3>
+                                <p>Premium fabrics and handwoven textiles</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Premium Products -->
+            <section class="premium-products">
+                <div class="container">
+                    <div class="products-header">
+                        <h2>Featured Artisan Pieces</h2>
+                        <a href="#" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="products-grid" id="productsGrid">
+                        <!-- Products will be loaded dynamically -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Booking Modal -->
+            <div class="modal" id="bookingModal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Book This Luxury Piece</h2>
+                        <button class="modal-close" id="modalClose">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="booking-steps">
+                            <div class="step active" data-step="1">
+                                <div class="step-number">1</div>
+                                <div>Product Details</div>
+                            </div>
+                            <div class="step" data-step="2">
+                                <div class="step-number">2</div>
+                                <div>Delivery Options</div>
+                            </div>
+                            <div class="step" data-step="3">
+                                <div class="step-number">3</div>
+                                <div>Confirm Booking</div>
+                            </div>
+                            <div class="step-line"></div>
+                        </div>
+
+                        <!-- Step 1: Product Details -->
+                        <div class="form-section active" id="step1">
+                            <div class="booking-summary">
+                                <h3>Product Summary</h3>
+                                <div class="summary-item">
+                                    <span id="summaryProductName">Handcrafted Terracotta Vase</span>
+                                    <span id="summaryProductPrice">₹12,500</span>
+                                </div>
+                                <div class="summary-item">
+                                    <span>Artisan</span>
+                                    <span id="summarySellerName">Suresh Pottery</span>
+                                </div>
+                                <div class="summary-item">
+                                    <span>Location</span>
+                                    <span id="summarySellerLocation">Jaipur, Rajasthan</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="customerName">Full Name</label>
+                                <input type="text" id="customerName" class="form-control" placeholder="Enter your full name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="customerEmail">Email Address</label>
+                                <input type="email" id="customerEmail" class="form-control" placeholder="Enter your email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="customerPhone">Phone Number</label>
+                                <input type="tel" id="customerPhone" class="form-control" placeholder="Enter your phone number" required>
+                            </div>
+                            <button class="btn" id="nextToStep2">Continue to Delivery</button>
+                        </div>
+
+                        <!-- Step 2: Delivery Options -->
+                        <div class="form-section" id="step2">
+                            <h3>Choose Delivery Method</h3>
+                            <div class="courier-options">
+                                <div class="courier-option" data-courier="bluedart">
+                                    <div class="courier-logo">
+                                        <i class="fas fa-shipping-fast"></i>
+                                    </div>
+                                    <h4>BlueDart Premium</h4>
+                                    <p>Free Delivery</p>
+                                    <p>2-3 Business Days</p>
+                                </div>
+                                <div class="courier-option" data-courier="delhivery">
+                                    <div class="courier-logo">
+                                        <i class="fas fa-truck"></i>
+                                    </div>
+                                    <h4>Delhivery Express</h4>
+                                    <p>Free Delivery</p>
+                                    <p>3-4 Business Days</p>
+                                </div>
+                                <div class="courier-option" data-courier="seller">
+                                    <div class="courier-logo">
+                                        <i class="fas fa-store"></i>
+                                    </div>
+                                    <h4>Seller Direct</h4>
+                                    <p>Contact for Pricing</p>
+                                    <p>Varies by Location</p>
+                                </div>
+                            </div>
+                            <div class="location-map">
+                                <div id="sellerLocationMap"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="deliveryAddress">Delivery Address</label>
+                                <textarea id="deliveryAddress" class="form-control" rows="3" placeholder="Enter complete delivery address" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="deliveryInstructions">Special Instructions (Optional)</label>
+                                <textarea id="deliveryInstructions" class="form-control" rows="2" placeholder="Any special delivery instructions"></textarea>
+                            </div>
+                            <div class="button-group" style="display: flex; gap: 10px;">
+                                <button class="btn btn-outline" id="backToStep1">Back</button>
+                                <button class="btn" id="nextToStep3">Continue to Confirmation</button>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Confirm Booking -->
+                        <div class="form-section" id="step3">
+                            <h3>Confirm Your Booking</h3>
+                            <div class="booking-summary">
+                                <h4>Order Summary</h4>
+                                <div class="summary-item">
+                                    <span>Product</span>
+                                    <span id="confirmProductName">-</span>
+                                </div>
+                                <div class="summary-item">
+                                    <span>Price</span>
+                                    <span id="confirmProductPrice">-</span>
+                                </div>
+                                <div class="summary-item">
+                                    <span>Delivery Method</span>
+                                    <span id="confirmDeliveryMethod">-</span>
+                                </div>
+                                <div class="summary-item">
+                                    <span>Estimated Delivery</span>
+                                    <span id="confirmDeliveryTime">-</span>
+                                </div>
+                                <div class="summary-item summary-total">
+                                    <span>Total Amount</span>
+                                    <span id="confirmTotalAmount">-</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="bookingNotes">Additional Notes (Optional)</label>
+                                <textarea id="bookingNotes" class="form-control" rows="3" placeholder="Any additional requests or notes for the artisan"></textarea>
+                            </div>
+                            <div class="button-group" style="display: flex; gap: 10px;">
+                                <button class="btn btn-outline" id="backToStep2">Back</button>
+                                <button class="btn" id="confirmBooking">Confirm Booking</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="luxury-footer">
+                <div class="container">
+                    <div class="footer-content">
+                        <div class="footer-column">
+                            <h3>LuxeDecor</h3>
+                            <p>Your premier destination for luxury home decor and artisanal crafts. Connecting discerning buyers with master artisans worldwide.</p>
+                        </div>
+                        <div class="footer-column">
+                            <h3>Shop</h3>
+                            <ul class="footer-links">
+                                <li><a href="#">Furniture</a></li>
+                                <li><a href="#">Lighting</a></li>
+                                <li><a href="#">Textiles</a></li>
+                                <li><a href="#">Wall Decor</a></li>
+                                <li><a href="#">Tabletop</a></li>
+                            </ul>
+                        </div>
+                        <div class="footer-column">
+                            <h3>Services</h3>
+                            <ul class="footer-links">
+                                <li><a href="#">Custom Orders</a></li>
+                                <li><a href="#">Interior Consultation</a></li>
+                                <li><a href="#">White Glove Delivery</a></li>
+                                <li><a href="#">Artisan Spotlight</a></li>
+                                <li><a href="#">Trade Program</a></li>
+                            </ul>
+                        </div>
+                        <div class="footer-column">
+                            <h3>Contact</h3>
+                            <ul class="footer-links">
+                                <li><i class="fas fa-map-marker-alt"></i> 123 Luxury Lane, Mumbai, India</li>
+                                <li><i class="fas fa-phone"></i> +91 98765 43210</li>
+                                <li><i class="fas fa-envelope"></i> concierge@luxedecor.com</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="footer-bottom">
+                        <p>&copy; 2023 LuxeDecor. All rights reserved. Crafted with excellence.</p>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC4wGDrRHs4gQN6p8Q9X7VqY9t8d4Jk8Xw",
+            authDomain: "luxedecor-premium.firebaseapp.com",
+            projectId: "luxedecor-premium",
+            storageBucket: "luxedecor-premium.appspot.com",
+            messagingSenderId: "123456789012",
+            appId: "1:123456789012:web:abcdef1234567890"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Sample Luxury Products Data
+        const luxuryProducts = [
+            {
+                id: 1,
+                name: "Handcrafted Terracotta Vase",
+                price: 12500,
+                sellerName: "Suresh Pottery",
+                sellerLocation: "Jaipur, Rajasthan",
+                sellerPhone: "+919876543210",
+                category: "pottery",
+                description: "Exquisite hand-thrown terracotta vase with traditional Rajasthani motifs. Each piece is unique and fired using ancient techniques.",
+                image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80",
+                coordinates: [26.9124, 75.7873] // Jaipur coordinates
+            },
+            {
+                id: 2,
+                name: "Solid Teak Wood Coffee Table",
+                price: 45000,
+                sellerName: "Heritage Woodcraft",
+                sellerLocation: "Udaipur, Rajasthan",
+                sellerPhone: "+919876543211",
+                category: "furniture",
+                description: "Master-crafted solid teak wood coffee table with intricate carvings. Sustainable sourced wood with natural oil finish.",
+                image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80",
+                coordinates: [24.5854, 73.7125] // Udaipur coordinates
+            },
+            {
+                id: 3,
+                name: "Handwoven Silk Persian Rug",
+                price: 78000,
+                sellerName: "Royal Weaves",
+                sellerLocation: "Varanasi, Uttar Pradesh",
+                sellerPhone: "+919876543212",
+                category: "textiles",
+                description: "Luxurious handwoven silk Persian rug with intricate patterns. Made with pure silk threads and natural dyes.",
+                image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80",
+                coordinates: [25.3176, 82.9739] // Varanasi coordinates
+            },
+            {
+                id: 4,
+                name: "Brass Chandelier with Crystal",
+                price: 65000,
+                sellerName: "Metalsmith Artisans",
+                sellerLocation: "Moradabad, Uttar Pradesh",
+                sellerPhone: "+919876543213",
+                category: "lighting",
+                description: "Elegant brass chandelier with Swarovski crystals. Handcrafted by fourth-generation metal artisans.",
+                image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80",
+                coordinates: [28.8389, 78.7738] // Moradabad coordinates
+            }
+        ];
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProducts();
+            setupBookingModal();
+            setupEventListeners();
+        });
+
+        // Load products into the grid
+        function loadProducts() {
+            const productsGrid = document.getElementById('productsGrid');
+            productsGrid.innerHTML = '';
+
+            luxuryProducts.forEach(product => {
+                const productCard = createProductCard(product);
+                productsGrid.appendChild(productCard);
+            });
+        }
+
+        // Create product card HTML
+        function createProductCard(product) {
+            const productCard = document.createElement('div');
+            productCard.className = 'product-card';
+            productCard.setAttribute('data-product', product.id);
+
+            productCard.innerHTML = `
+                <div class="product-image">
+                    <img src="${product.image}" alt="${product.name}">
+                    <span class="product-badge">Premium</span>
+                </div>
+                <div class="product-info">
+                    <h3>${product.name}</h3>
+                    <div class="product-seller">
+                        <div class="seller-avatar">${product.sellerName.charAt(0)}</div>
+                        <span>${product.sellerName}</span>
+                    </div>
+                    <div class="product-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>${product.sellerLocation}</span>
+                    </div>
+                    <div class="product-price">
+                        <span class="price">₹${product.price.toLocaleString()}</span>
+                        <button class="book-now" data-product='${JSON.stringify(product).replace(/'/g, "&#39;")}'>
+                            Book Now
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            return productCard;
+        }
+
+        // Setup booking modal functionality
+        function setupBookingModal() {
+            const bookingModal = document.getElementById('bookingModal');
+            const modalClose = document.getElementById('modalClose');
+            const bookNowButtons = document.querySelectorAll('.book-now');
+            const steps = document.querySelectorAll('.step');
+            const formSections = document.querySelectorAll('.form-section');
+            const courierOptions = document.querySelectorAll('.courier-option');
+
+            let currentStep = 1;
+            let selectedProduct = null;
+            let selectedCourier = null;
+
+            // Open modal when Book Now is clicked
+            bookNowButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    selectedProduct = JSON.parse(this.getAttribute('data-product').replace(/&#39;/g, "'"));
+                    updateBookingSummary(selectedProduct);
+                    bookingModal.style.display = 'block';
+                    document.body.style.overflow = 'hidden';
+                    initSellerLocationMap(selectedProduct.coordinates);
+                });
+            });
+
+            // Close modal
+            modalClose.addEventListener('click', function() {
+                bookingModal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+                resetBookingForm();
+            });
+
+            // Step navigation
+            document.getElementById('nextToStep2').addEventListener('click', function() {
+                if (validateStep1()) {
+                    navigateToStep(2);
+                }
+            });
+
+            document.getElementById('backToStep1').addEventListener('click', function() {
+                navigateToStep(1);
+            });
+
+            document.getElementById('nextToStep3').addEventListener('click', function() {
+                if (validateStep2()) {
+                    updateConfirmationSummary();
+                    navigateToStep(3);
+                }
+            });
+
+            document.getElementById('backToStep2').addEventListener('click', function() {
+                navigateToStep(2);
+            });
+
+            // Courier selection
+            courierOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    courierOptions.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedCourier = this.getAttribute('data-courier');
+                });
+            });
+
+            // Final booking confirmation
+            document.getElementById('confirmBooking').addEventListener('click', function() {
+                if (validateStep3()) {
+                    processBooking();
+                }
+            });
+
+            function navigateToStep(step) {
+                // Update steps
+                steps.forEach(s => {
+                    if (parseInt(s.getAttribute('data-step')) <= step) {
+                        s.classList.add('active');
+                    } else {
+                        s.classList.remove('active');
+                    }
+                });
+
+                // Show/hide form sections
+                formSections.forEach(section => {
+                    section.classList.remove('active');
+                    if (section.id === `step${step}`) {
+                        section.classList.add('active');
+                    }
+                });
+
+                currentStep = step;
+            }
+
+            function validateStep1() {
+                const name = document.getElementById('customerName').value;
+                const email = document.getElementById('customerEmail').value;
+                const phone = document.getElementById('customerPhone').value;
+
+                if (!name || !email || !phone) {
+                    alert('Please fill in all required fields');
+                    return false;
+                }
+
+                if (!isValidEmail(email)) {
+                    alert('Please enter a valid email address');
+                    return false;
+                }
+
+                if (!isValidPhone(phone)) {
+                    alert('Please enter a valid phone number');
+                    return false;
+                }
+
+                return true;
+            }
+
+            function validateStep2() {
+                if (!selectedCourier) {
+                    alert('Please select a delivery method');
+                    return false;
+                }
+
+                const address = document.getElementById('deliveryAddress').value;
+                if (!address) {
+                    alert('Please enter your delivery address');
+                    return false;
+                }
+
+                return true;
+            }
+
+            function validateStep3() {
+                // Additional validation if needed
+                return true;
+            }
+
+            function updateBookingSummary(product) {
+                document.getElementById('summaryProductName').textContent = product.name;
+                document.getElementById('summaryProductPrice').textContent = `₹${product.price.toLocaleString()}`;
+                document.getElementById('summarySellerName').textContent = product.sellerName;
+                document.getElementById('summarySellerLocation').textContent = product.sellerLocation;
+            }
+
+            function updateConfirmationSummary() {
+                document.getElementById('confirmProductName').textContent = selectedProduct.name;
+                document.getElementById('confirmProductPrice').textContent = `₹${selectedProduct.price.toLocaleString()}`;
+                document.getElementById('confirmDeliveryMethod').textContent = getCourierName(selectedCourier);
+                document.getElementById('confirmDeliveryTime').textContent = getDeliveryTime(selectedCourier);
+                document.getElementById('confirmTotalAmount').textContent = `₹${selectedProduct.price.toLocaleString()}`;
+            }
+
+            function getCourierName(courier) {
+                const courierNames = {
+                    'bluedart': 'BlueDart Premium',
+                    'delhivery': 'Delhivery Express',
+                    'seller': 'Seller Direct'
+                };
+                return courierNames[courier] || 'Standard Delivery';
+            }
+
+            function getDeliveryTime(courier) {
+                const deliveryTimes = {
+                    'bluedart': '2-3 Business Days',
+                    'delhivery': '3-4 Business Days',
+                    'seller': 'Contact for Estimate'
+                };
+                return deliveryTimes[courier] || '5-7 Business Days';
+            }
+
+            function resetBookingForm() {
+                currentStep = 1;
+                selectedProduct = null;
+                selectedCourier = null;
+                
+                // Reset form fields
+                document.getElementById('customerName').value = '';
+                document.getElementById('customerEmail').value = '';
+                document.getElementById('customerPhone').value = '';
+                document.getElementById('deliveryAddress').value = '';
+                document.getElementById('deliveryInstructions').value = '';
+                document.getElementById('bookingNotes').value = '';
+                
+                // Reset UI
+                courierOptions.forEach(opt => opt.classList.remove('selected'));
+                navigateToStep(1);
+            }
+
+            function isValidEmail(email) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return emailRegex.test(email);
+            }
+
+            function isValidPhone(phone) {
+                const phoneRegex = /^\d{10}$/;
+                return phoneRegex.test(phone);
+            }
+        }
+
+        // Initialize seller location map
+        function initSellerLocationMap(coordinates) {
+            // Check if map is already initialized
+            if (window.sellerLocationMap) {
+                window.sellerLocationMap.remove();
+            }
+            
+            const map = L.map('sellerLocationMap').setView(coordinates, 12);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            // Add seller location marker
+            L.marker(coordinates)
+                .addTo(map)
+                .bindPopup('Artisan Location')
+                .openPopup();
+            
+            // Store map reference
+            window.sellerLocationMap = map;
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Explore collections button
+            document.getElementById('explore-collections').addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelector('.luxury-collections').scrollIntoView({ behavior: 'smooth' });
+            });
+
+            // Login/Signup buttons
+            document.getElementById('login-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('Login functionality would be implemented here');
+            });
+
+            document.getElementById('signup-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('Seller registration would be implemented here');
+            });
+        }
+
+        // Process booking and send WhatsApp notification
+        function processBooking() {
+            const bookingData = {
+                product: selectedProduct,
+                customer: {
+                    name: document.getElementById('customerName').value,
+                    email: document.getElementById('customerEmail').value,
+                    phone: document.getElementById('customerPhone').value
+                },
+                delivery: {
+                    method: selectedCourier,
+                    address: document.getElementById('deliveryAddress').value,
+                    instructions: document.getElementById('deliveryInstructions').value
+                },
+                notes: document.getElementById('bookingNotes').value,
+                timestamp: new Date().toISOString(),
+                status: 'pending'
+            };
+
+            // Save booking to Firebase
+            db.collection('bookings').add(bookingData)
+                .then((docRef) => {
+                    console.log('Booking saved with ID: ', docRef.id);
+                    
+                    // Send WhatsApp notification to seller
+                    sendWhatsAppNotification(bookingData);
+                    
+                    // Show success message
+                    alert('Booking confirmed! The artisan has been notified and will contact you shortly.');
+                    
+                    // Close modal
+                    document.getElementById('bookingModal').style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                    
+                    // Reset form
+                    resetBookingForm();
+                })
+                .catch((error) => {
+                    console.error('Error saving booking: ', error);
+                    alert('There was an error processing your booking. Please try again.');
+                });
+        }
+
+        // Send WhatsApp notification to seller
+        function sendWhatsAppNotification(bookingData) {
+            const sellerPhone = bookingData.product.sellerPhone;
+            const customerName = bookingData.customer.name;
+            const productName = bookingData.product.name;
+            const productPrice = bookingData.product.price;
+            
+            // Create WhatsApp message
+            const message = `🎉 *New Booking Alert!*
+
+*Product:* ${productName}
+*Price:* ₹${productPrice.toLocaleString()}
+*Customer:* ${customerName}
+*Phone:* ${bookingData.customer.phone}
+*Email:* ${bookingData.customer.email}
+*Delivery Address:* ${bookingData.delivery.address}
+*Delivery Method:* ${getCourierName(bookingData.delivery.method)}
+
+Please contact the customer within 24 hours to confirm the order and discuss delivery details.
+
+Thank you for being part of LuxeDecor!`;
+
+            // Encode message for URL
+            const encodedMessage = encodeURIComponent(message);
+            
+            // Create WhatsApp URL
+            const whatsappURL = `https://wa.me/${sellerPhone.replace('+', '')}?text=${encodedMessage}`;
+            
+            // In a real implementation, this would be handled by a backend service
+            // For demo purposes, we'll log the URL and show an alert
+            console.log('WhatsApp Notification URL:', whatsappURL);
+            
+            // In a real implementation, you would use a backend service to send the message
+            // For now, we'll simulate it by opening a new window
+            window.open(whatsappURL, '_blank');
+            
+            // Also simulate backend API call
+            simulateBackendNotification(bookingData);
+        }
+
+        // Simulate backend notification (would be replaced with actual Python backend)
+        function simulateBackendNotification(bookingData) {
+            // This would be replaced with a fetch call to your Python backend
+            console.log('Sending notification to backend API...', bookingData);
+            
+            // Example of what the backend API call would look like
+            /*
+            fetch('/api/send-notification', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(bookingData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Backend notification sent:', data);
+            })
+            .catch(error => {
+                console.error('Error sending backend notification:', error);
+            });
+            */
+        }
+    </script>
+
+    <!-- Python Backend Simulation (This would be in a separate file in production) -->
+    <script>
+        // This section simulates what the Python backend would do
+        // In production, this would be a separate Flask/FastAPI application
+
+        /*
+        # Python Backend Code (Flask Example)
+        
+        from flask import Flask, request, jsonify
+        from twilio.rest import Client
+        import requests
+        import os
+        
+        app = Flask(__name__)
+        
+        # WhatsApp Business API Configuration
+        TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID')
+        TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN')
+        TWILIO_WHATSAPP_NUMBER = os.getenv('TWILIO_WHATSAPP_NUMBER')
+        
+        # Courier API Configuration
+        BLUEDART_API_KEY = os.getenv('BLUEDART_API_KEY')
+        DELHIVERY_API_KEY = os.getenv('DELHIVERY_API_KEY')
+        
+        # Initialize Twilio client
+        client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+        
+        @app.route('/api/send-notification', methods=['POST'])
+        def send_whatsapp_notification():
+            try:
+                data = request.json
+                
+                # Extract booking information
+                seller_phone = data['product']['sellerPhone']
+                customer_name = data['customer']['name']
+                product_name = data['product']['name']
+                product_price = data['product']['price']
+                delivery_address = data['delivery']['address']
+                delivery_method = data['delivery']['method']
+                
+                # Create message template
+                message = f"""🎉 *New Booking Alert!*
+        
+        *Product:* {product_name}
+        *Price:* ₹{product_price:,}
+        *Customer:* {customer_name}
+        *Phone:* {data['customer']['phone']}
+        *Email:* {data['customer']['email']}
+        *Delivery Address:* {delivery_address}
+        *Delivery Method:* {delivery_method}
+        
+        Please contact the customer within 24 hours to confirm the order and discuss delivery details.
+        
+        Thank you for being part of LuxeDecor!"""
+                
+                # Send WhatsApp message using Twilio
+                message = client.messages.create(
+                    body=message,
+                    from_=f'whatsapp:{TWILIO_WHATSAPP_NUMBER}',
+                    to=f'whatsapp:{seller_phone}'
+                )
+                
+                # Create courier shipment
+                create_courier_shipment(data)
+                
+                return jsonify({
+                    'success': True,
+                    'message_id': message.sid,
+                    'status': 'Notification sent successfully'
+                })
+                
+            except Exception as e:
+                return jsonify({
+                    'success': False,
+                    'error': str(e)
+                }), 500
+        
+        def create_courier_shipment(booking_data):
+            # BlueDart API Integration
+            if booking_data['delivery']['method'] == 'bluedart':
+                bluedart_data = {
+                    'customer_name': booking_data['customer']['name'],
+                    'customer_phone': booking_data['customer']['phone'],
+                    'customer_address': booking_data['delivery']['address'],
+                    'seller_name': booking_data['product']['sellerName'],
+                    'seller_address': booking_data['product']['sellerLocation'],
+                    'product_name': booking_data['product']['name'],
+                    'product_value': booking_data['product']['price'],
+                    'special_instructions': booking_data['delivery']['instructions']
+                }
+                
+                # BlueDart API call would go here
+                # response = requests.post(
+                #     'https://bluedart-api.com/shipment/create',
+                #     headers={'Authorization': f'Bearer {BLUEDART_API_KEY}'},
+                #     json=bluedart_data
+                # )
+                
+                print(f"BlueDart shipment created for {booking_data['product']['name']}")
+            
+            # Delhivery API Integration
+            elif booking_data['delivery']['method'] == 'delhivery':
+                delhivery_data = {
+                    'name': booking_data['customer']['name'],
+                    'phone': booking_data['customer']['phone'],
+                    'add': booking_data['delivery']['address'],
+                    'pin': extract_pincode(booking_data['delivery']['address']),
+                    'order': f"LUXE-{booking_data['timestamp']}",
+                    'products_desc': booking_data['product']['name'],
+                    'cod_amount': '0',  # Free delivery
+                    'weight': '2.5'  # Estimated weight in kg
+                }
+                
+                # Delhivery API call would go here
+                # response = requests.post(
+                #     'https://delhivery.com/api/create_order',
+                #     headers={'Authorization': f'Bearer {DELHIVERY_API_KEY}'},
+                #     json=delhivery_data
+                # )
+                
+                print(f"Delhivery shipment created for {booking_data['product']['name']}")
+        
+        def extract_pincode(address):
+            # Simple pincode extraction (would be more robust in production)
+            import re
+            pincode_match = re.search(r'\b\d{6}\b', address)
+            return pincode_match.group() if pincode_match else '110001'
+        
+        if __name__ == '__main__':
+            app.run(debug=True, port=5000)
+        */
+    </script>
+</body>
+</html>

@@ -1,0 +1,1664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Nearby Barbers | SwaDesi Bazaar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        :root {
+            --primary: #D4AF37;
+            --primary-dark: #B8860B;
+            --secondary: #1A1A1A;
+            --accent: #8B4513;
+            --light: #F8F5F0;
+            --gray: #6C757D;
+            --white: #FFFFFF;
+            --error: #e74c3c;
+            --success: #2ecc71;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--secondary);
+            background-color: var(--light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: var(--white);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .logo h1 {
+            font-size: 28px;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+        }
+
+        .logo span {
+            color: var(--secondary);
+        }
+
+        .search-bar {
+            flex: 1;
+            max-width: 600px;
+            margin: 0 30px;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 14px 20px;
+            border: 1px solid #E5E5E5;
+            border-radius: 50px;
+            font-size: 16px;
+            transition: var(--transition);
+            background-color: #f9f9f9;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+        }
+
+        .search-bar button {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 9px 20px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .search-bar button:hover {
+            background: var(--primary-dark);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .language-selector select {
+            padding: 8px 15px;
+            border: 1px solid #E5E5E5;
+            border-radius: 5px;
+            background-color: white;
+            font-size: 14px;
+        }
+
+        .auth-buttons a {
+            text-decoration: none;
+            color: var(--secondary);
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: var(--transition);
+        }
+
+        .auth-buttons a.login {
+            color: var(--gray);
+        }
+
+        .auth-buttons a.signup {
+            background: var(--primary);
+            color: white;
+        }
+
+        .auth-buttons a.signup:hover {
+            background: var(--primary-dark);
+        }
+
+        .cart-icon {
+            position: relative;
+            font-size: 22px;
+            color: var(--secondary);
+            cursor: pointer;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--primary);
+            color: white;
+            font-size: 12px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--secondary);
+            cursor: pointer;
+        }
+
+        /* Navigation */
+        nav {
+            background-color: var(--secondary);
+            padding: 15px 0;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--primary);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Mobile Navigation */
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--white);
+            z-index: 2000;
+            overflow-y: auto;
+            padding: 20px;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .mobile-nav.active {
+            transform: translateX(0);
+        }
+
+        .mobile-nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .mobile-nav-links {
+            list-style: none;
+        }
+
+        .mobile-nav-links li {
+            margin-bottom: 15px;
+        }
+
+        .mobile-nav-links a {
+            display: block;
+            padding: 12px 15px;
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 500;
+            border-radius: 5px;
+            transition: var(--transition);
+        }
+
+        .mobile-nav-links a:hover {
+            background: #f5f5f5;
+            color: var(--primary);
+        }
+
+        .mobile-nav-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--secondary);
+            cursor: pointer;
+        }
+
+        /* Back Button */
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--white);
+            border: 1px solid #E5E5E5;
+            color: var(--secondary);
+            font-weight: 500;
+            cursor: pointer;
+            padding: 10px 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            text-decoration: none;
+        }
+
+        .back-button:hover {
+            color: var(--primary);
+            transform: translateX(-5px);
+            border-color: var(--primary);
+        }
+
+        /* Page Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+        }
+
+        .page-title {
+            font-size: 32px;
+            color: var(--secondary);
+        }
+
+        /* Location Section */
+        .location-section {
+            background: var(--white);
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .location-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .location-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .location-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(212, 175, 55, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--primary);
+        }
+
+        .location-details h3 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .location-details p {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .location-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: white;
+            color: var(--secondary);
+            border: 1px solid #E5E5E5;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Map Section */
+        .map-section {
+            margin-bottom: 30px;
+        }
+
+        .map-container {
+            height: 400px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        #barberMap {
+            height: 100%;
+            width: 100%;
+        }
+
+        /* Barbers List */
+        .barbers-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: var(--secondary);
+        }
+
+        .barbers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .barber-card {
+            background: var(--white);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .barber-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .barber-header {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .barber-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .barber-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .barber-info h3 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .barber-specialty {
+            color: var(--primary);
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .barber-rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .barber-details {
+            padding: 20px;
+        }
+
+        .barber-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .feature-tag {
+            background: #f8f9fa;
+            color: var(--gray);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .barber-location {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--gray);
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .barber-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-sm {
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+
+        /* Booking Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 50px auto;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 10px;
+            overflow: hidden;
+            animation: modalFade 0.3s;
+        }
+
+        @keyframes modalFade {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .booking-barber-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .booking-barber-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+
+        .booking-barber-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .form-section {
+            margin-bottom: 25px;
+        }
+
+        .form-section h3 {
+            margin-bottom: 15px;
+            color: var(--secondary);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #E5E5E5;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: var(--transition);
+            background-color: #f9f9f9;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+        }
+
+        .time-slots {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .time-slot {
+            padding: 10px;
+            border: 1px solid #E5E5E5;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .time-slot:hover {
+            border-color: var(--primary);
+        }
+
+        .time-slot.selected {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .service-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .service-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid #E5E5E5;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .service-option:hover {
+            border-color: var(--primary);
+        }
+
+        .service-option.selected {
+            border-color: var(--primary);
+            background: rgba(212, 175, 55, 0.05);
+        }
+
+        .service-info h4 {
+            margin-bottom: 5px;
+        }
+
+        .service-price {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .submit-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: block;
+            width: 100%;
+        }
+
+        .submit-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 3000;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateX(-50%) translateY(100px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        /* Footer */
+        footer {
+            background: var(--secondary);
+            color: white;
+            padding: 60px 0 0;
+            margin-top: 50px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: #CCCCCC;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding: 30px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #999;
+            font-size: 14px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .search-bar {
+                max-width: 400px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-top {
+                flex-wrap: wrap;
+            }
+            
+            .search-bar {
+                order: 3;
+                margin: 15px 0 0;
+                max-width: 100%;
+            }
+            
+            .section-title h2 {
+                font-size: 28px;
+            }
+            
+            .barbers-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            /* Mobile Menu Button */
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            /* Hide desktop navigation on mobile */
+            nav {
+                display: none;
+            }
+            
+            /* Show mobile navigation */
+            .mobile-nav {
+                display: block;
+            }
+            
+            .header-actions .auth-buttons {
+                display: none;
+            }
+
+            .location-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .location-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .barbers-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 20px auto;
+            }
+
+            .time-slots {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-top">
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="logo">
+                    <a href="index.html" style="text-decoration: none;">
+                        <h1>Swa<span>Desi</span> Bazaar</h1>
+                    </a>
+                </div>
+                <div class="search-bar">
+                    <input type="text" placeholder="Search for barbers, services, or locations...">
+                    <button><i class="fas fa-search"></i></button>
+                </div>
+                <div class="header-actions">
+                    <div class="language-selector">
+                        <select>
+                            <option>English</option>
+                            <option>हिन्दी</option>
+                            <option>தமிழ்</option>
+                            <option>বাংলা</option>
+                            <option>తెలుగు</option>
+                        </select>
+                    </div>
+                    <div class="auth-buttons">
+                        <a href="auth.html" class="login">Login</a>
+                        <a href="auth.html" class="signup">Sign Up</a>
+                    </div>
+                    <div class="cart-icon" id="cartIcon">
+                        <i class="fas fa-shopping-bag"></i>
+                        <span class="cart-count">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <nav>
+            <div class="container">
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="marketplace.html">Marketplace</a></li>
+                    <li><a href="barbers.html" class="active">Barbers</a></li>
+                    <li><a href="handicrafts.html">Handicrafts</a></li>
+                    <li><a href="home-decor.html">Home Decor</a></li>
+                    <li><a href="clothing.html">Clothing</a></li>
+                    <li><a href="local-services.html">Local Services</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Mobile Navigation -->
+    <div class="mobile-nav" id="mobileNav">
+        <div class="mobile-nav-header">
+            <div class="logo">
+                <h1>Swa<span>Desi</span> Bazaar</h1>
+            </div>
+            <button class="mobile-nav-close" id="mobileNavClose">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <ul class="mobile-nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="marketplace.html">Marketplace</a></li>
+            <li><a href="barbers.html">Barbers</a></li>
+            <li><a href="handicrafts.html">Handicrafts</a></li>
+            <li><a href="home-decor.html">Home Decor</a></li>
+            <li><a href="clothing.html">Clothing</a></li>
+            <li><a href="local-services.html">Local Services</a></li>
+            <li><a href="auth.html">Login</a></li>
+            <li><a href="auth.html">Sign Up</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <a href="index.html" class="back-button">
+            <i class="fas fa-arrow-left"></i> Back to Home
+        </a>
+        
+        <div class="page-header">
+            <h1 class="page-title">Find Nearby Barbers</h1>
+            <div class="location-selector" id="locationSelector">
+                <i class="fas fa-map-marker-alt"></i>
+                <span id="currentLocation">Detecting your location...</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+        </div>
+
+        <!-- Location Section -->
+        <section class="location-section">
+            <div class="location-header">
+                <div class="location-info">
+                    <div class="location-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="location-details">
+                        <h3>Your Current Location</h3>
+                        <p id="locationDetails">We're finding barbers near you</p>
+                    </div>
+                </div>
+                <div class="location-actions">
+                    <button class="btn" id="refreshLocation">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                    <button class="btn btn-outline" id="manualLocation">
+                        <i class="fas fa-edit"></i> Change Location
+                    </button>
+                </div>
+            </div>
+            <div class="location-status" id="locationStatus">
+                <div class="loading-spinner" style="text-align: center; padding: 20px;">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 24px; color: var(--primary);"></i>
+                    <p style="margin-top: 10px;">Finding barbers in your area...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Map Section -->
+        <section class="map-section">
+            <h2 class="section-title">Barbers Near You</h2>
+            <div class="map-container">
+                <div id="barberMap"></div>
+            </div>
+        </section>
+
+        <!-- Barbers List -->
+        <section class="barbers-section">
+            <h2 class="section-title">Available Barbers</h2>
+            <div class="barbers-grid" id="barbersGrid">
+                <!-- Barbers will be dynamically loaded here -->
+            </div>
+        </section>
+    </div>
+
+    <!-- Booking Modal -->
+    <div class="modal" id="bookingModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Book Appointment</h2>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="booking-barber-info" id="bookingBarberInfo">
+                    <!-- Barber info will be dynamically loaded here -->
+                </div>
+                
+                <form id="bookingForm">
+                    <div class="form-section">
+                        <h3>Select Date & Time</h3>
+                        <div class="form-group">
+                            <label for="appointmentDate">Date</label>
+                            <input type="date" id="appointmentDate" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Available Time Slots</label>
+                            <div class="time-slots" id="timeSlots">
+                                <!-- Time slots will be dynamically loaded here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Select Services</h3>
+                        <div class="service-options" id="serviceOptions">
+                            <!-- Service options will be dynamically loaded here -->
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Your Information</h3>
+                        <div class="form-group">
+                            <label for="customerName">Full Name</label>
+                            <input type="text" id="customerName" class="form-control" placeholder="Enter your full name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="customerPhone">Phone Number</label>
+                            <input type="tel" id="customerPhone" class="form-control" placeholder="Enter your phone number" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="specialInstructions">Special Instructions (Optional)</label>
+                            <textarea id="specialInstructions" class="form-control" rows="3" placeholder="Any special requirements or notes..."></textarea>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-btn">Confirm Booking</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>SwaDesi Bazaar</h3>
+                    <p>Your Local Market, Powered by AI. Connecting you with authentic local sellers and artisans in your community.</p>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="marketplace.html">Marketplace</a></li>
+                        <li><a href="barbers.html">Barbers</a></li>
+                        <li><a href="#">Sell on SwaDesi</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Customer Service</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Booking Policy</a></li>
+                        <li><a href="#">Cancellations</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contact Info</h3>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Local Market, New Delhi, India</li>
+                        <li><i class="fas fa-phone"></i> +91 98765 43210</li>
+                        <li><i class="fas fa-envelope"></i> support@swadesibazaar.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 SwaDesi Bazaar. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // Barber Booking Application
+        class BarberBookingApp {
+            constructor() {
+                this.userLocation = null;
+                this.barbers = [];
+                this.selectedBarber = null;
+                this.map = null;
+                this.userMarker = null;
+                this.barberMarkers = [];
+                
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.detectUserLocation();
+                this.loadSampleBarbers();
+            }
+
+            setupEventListeners() {
+                // Mobile Navigation
+                const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+                const mobileNav = document.getElementById('mobileNav');
+                const mobileNavClose = document.getElementById('mobileNavClose');
+
+                mobileMenuBtn.addEventListener('click', () => {
+                    mobileNav.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                });
+
+                mobileNavClose.addEventListener('click', () => {
+                    mobileNav.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                });
+
+                // Location Actions
+                document.getElementById('refreshLocation').addEventListener('click', () => {
+                    this.detectUserLocation();
+                });
+
+                document.getElementById('manualLocation').addEventListener('click', () => {
+                    this.showManualLocationInput();
+                });
+
+                // Modal
+                document.getElementById('modalClose').addEventListener('click', () => {
+                    this.closeBookingModal();
+                });
+
+                // Booking Form
+                document.getElementById('bookingForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.submitBooking();
+                });
+
+                // Close modal when clicking outside
+                document.getElementById('bookingModal').addEventListener('click', (e) => {
+                    if (e.target.id === 'bookingModal') {
+                        this.closeBookingModal();
+                    }
+                });
+            }
+
+            detectUserLocation() {
+                const locationStatus = document.getElementById('locationStatus');
+                const currentLocation = document.getElementById('currentLocation');
+                const locationDetails = document.getElementById('locationDetails');
+
+                locationStatus.innerHTML = `
+                    <div class="loading-spinner" style="text-align: center; padding: 20px;">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 24px; color: var(--primary);"></i>
+                        <p style="margin-top: 10px;">Detecting your location...</p>
+                    </div>
+                `;
+
+                currentLocation.textContent = 'Detecting your location...';
+                locationDetails.textContent = 'We\'re finding barbers near you';
+
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            this.userLocation = {
+                                lat: position.coords.latitude,
+                                lng: position.coords.longitude
+                            };
+                            
+                            this.updateLocationDisplay();
+                            this.initMap();
+                            this.findNearbyBarbers();
+                        },
+                        (error) => {
+                            this.handleLocationError(error);
+                        },
+                        {
+                            enableHighAccuracy: true,
+                            timeout: 10000,
+                            maximumAge: 60000
+                        }
+                    );
+                } else {
+                    this.handleLocationError(new Error('Geolocation is not supported by this browser.'));
+                }
+            }
+
+            handleLocationError(error) {
+                console.error('Location detection failed:', error);
+                
+                const locationStatus = document.getElementById('locationStatus');
+                const currentLocation = document.getElementById('currentLocation');
+                const locationDetails = document.getElementById('locationDetails');
+
+                // Fallback to default location (New Delhi)
+                this.userLocation = { lat: 28.6139, lng: 77.2090 };
+                
+                locationStatus.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: var(--error);">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 24px; margin-bottom: 10px;"></i>
+                        <p>Unable to detect your location. Showing barbers in New Delhi.</p>
+                        <button class="btn" onclick="app.detectUserLocation()" style="margin-top: 10px;">
+                            <i class="fas fa-redo"></i> Try Again
+                        </button>
+                    </div>
+                `;
+
+                currentLocation.textContent = 'New Delhi, India';
+                locationDetails.textContent = 'Using default location';
+
+                this.initMap();
+                this.findNearbyBarbers();
+            }
+
+            updateLocationDisplay() {
+                const currentLocation = document.getElementById('currentLocation');
+                const locationDetails = document.getElementById('locationDetails');
+                const locationStatus = document.getElementById('locationStatus');
+
+                // In a real app, you would reverse geocode to get the address
+                currentLocation.textContent = 'Your Current Location';
+                locationDetails.textContent = `Lat: ${this.userLocation.lat.toFixed(4)}, Lng: ${this.userLocation.lng.toFixed(4)}`;
+                
+                locationStatus.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: var(--success);">
+                        <i class="fas fa-check-circle" style="font-size: 24px; margin-bottom: 10px;"></i>
+                        <p>Location detected successfully!</p>
+                    </div>
+                `;
+            }
+
+            initMap() {
+                if (this.map) {
+                    this.map.remove();
+                }
+
+                this.map = L.map('barberMap').setView([this.userLocation.lat, this.userLocation.lng], 13);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(this.map);
+
+                // Add user location marker
+                this.userMarker = L.marker([this.userLocation.lat, this.userLocation.lng])
+                    .addTo(this.map)
+                    .bindPopup('Your Location')
+                    .openPopup();
+
+                // Add circle around user location
+                L.circle([this.userLocation.lat, this.userLocation.lng], {
+                    color: 'var(--primary)',
+                    fillColor: 'var(--primary)',
+                    fillOpacity: 0.1,
+                    radius: 2000 // 2km radius
+                }).addTo(this.map);
+            }
+
+            loadSampleBarbers() {
+                // Sample barber data - in a real app, this would come from an API
+                this.barbers = [
+                    {
+                        id: 1,
+                        name: 'Rajesh Hair Studio',
+                        specialty: 'Traditional Barber & Modern Styles',
+                        rating: 4.8,
+                        reviewCount: 124,
+                        distance: 0.8,
+                        location: { lat: 28.6150, lng: 77.2100 },
+                        features: ['Haircut', 'Beard Trim', 'Head Massage', 'Hair Color'],
+                        services: [
+                            { name: 'Classic Haircut', price: 250, duration: 30 },
+                            { name: 'Beard Trim & Shape', price: 150, duration: 20 },
+                            { name: 'Head Massage', price: 200, duration: 15 },
+                            { name: 'Hair Color', price: 800, duration: 60 }
+                        ],
+                        image: 'https://images.unsplash.com/photo-1562322140-8baeececf3df?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'
+                    },
+                    {
+                        id: 2,
+                        name: 'Modern Men Salon',
+                        specialty: 'Premium Grooming Services',
+                        rating: 4.9,
+                        reviewCount: 89,
+                        distance: 1.2,
+                        location: { lat: 28.6120, lng: 77.2080 },
+                        features: ['Hair Styling', 'Facial', 'Spa', 'Hair Treatment'],
+                        services: [
+                            { name: 'Premium Haircut', price: 400, duration: 45 },
+                            { name: 'Beard Styling', price: 250, duration: 25 },
+                            { name: 'Detan Facial', price: 500, duration: 40 },
+                            { name: 'Hair Spa', price: 600, duration: 45 }
+                        ],
+                        image: 'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'
+                    },
+                    {
+                        id: 3,
+                        name: 'Classic Barber Shop',
+                        specialty: 'Traditional Services',
+                        rating: 4.7,
+                        reviewCount: 156,
+                        distance: 1.8,
+                        location: { lat: 28.6100, lng: 77.2120 },
+                        features: ['Straight Razor Shave', 'Haircut', 'Mustache Trim', 'Hot Towel'],
+                        services: [
+                            { name: 'Traditional Haircut', price: 200, duration: 25 },
+                            { name: 'Straight Razor Shave', price: 300, duration: 30 },
+                            { name: 'Mustache Trim', price: 100, duration: 15 },
+                            { name: 'Hot Towel Treatment', price: 150, duration: 20 }
+                        ],
+                        image: 'https://images.unsplash.com/photo-1503951914875-452c0c6d7cfc?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'
+                    },
+                    {
+                        id: 4,
+                        name: 'Elite Grooming Lounge',
+                        specialty: 'Luxury Barber Experience',
+                        rating: 4.9,
+                        reviewCount: 67,
+                        distance: 2.5,
+                        location: { lat: 28.6180, lng: 77.2050 },
+                        features: ['Luxury Haircut', 'Beard Care', 'Skin Care', 'Relaxation'],
+                        services: [
+                            { name: 'Luxury Haircut', price: 600, duration: 60 },
+                            { name: 'Beard Grooming', price: 400, duration: 40 },
+                            { name: 'Skin Care Treatment', price: 800, duration: 50 },
+                            { name: 'Complete Grooming Package', price: 1200, duration: 90 }
+                        ],
+                        image: 'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'
+                    }
+                ];
+            }
+
+            findNearbyBarbers() {
+                // Clear existing markers
+                this.barberMarkers.forEach(marker => this.map.removeLayer(marker));
+                this.barberMarkers = [];
+
+                // Filter barbers by distance (in a real app, this would be done server-side)
+                const nearbyBarbers = this.barbers.filter(barber => 
+                    this.calculateDistance(this.userLocation, barber.location) <= 5 // Within 5km
+                );
+
+                // Sort by distance
+                nearbyBarbers.sort((a, b) => a.distance - b.distance);
+
+                // Display barbers
+                this.displayBarbers(nearbyBarbers);
+
+                // Add markers to map
+                nearbyBarbers.forEach(barber => {
+                    const marker = L.marker([barber.location.lat, barber.location.lng])
+                        .addTo(this.map)
+                        .bindPopup(`
+                            <div style="text-align: center;">
+                                <h3>${barber.name}</h3>
+                                <p>${barber.specialty}</p>
+                                <p>⭐ ${barber.rating} (${barber.reviewCount} reviews)</p>
+                                <p>📏 ${barber.distance} km away</p>
+                                <button class="btn" onclick="app.openBookingModal(${barber.id})" style="margin-top: 10px; padding: 5px 10px; font-size: 12px;">
+                                    Book Now
+                                </button>
+                            </div>
+                        `);
+                    
+                    this.barberMarkers.push(marker);
+                });
+
+                // Adjust map bounds to show all markers
+                if (nearbyBarbers.length > 0) {
+                    const group = new L.featureGroup([this.userMarker, ...this.barberMarkers]);
+                    this.map.fitBounds(group.getBounds().pad(0.1));
+                }
+            }
+
+            calculateDistance(location1, location2) {
+                const R = 6371; // Earth's radius in km
+                const dLat = (location2.lat - location1.lat) * Math.PI / 180;
+                const dLng = (location2.lng - location1.lng) * Math.PI / 180;
+                const a = 
+                    Math.sin(dLat/2) * Math.sin(dLat/2) +
+                    Math.cos(location1.lat * Math.PI / 180) * Math.cos(location2.lat * Math.PI / 180) * 
+                    Math.sin(dLng/2) * Math.sin(dLng/2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                return R * c;
+            }
+
+            displayBarbers(barbers) {
+                const barbersGrid = document.getElementById('barbersGrid');
+                
+                if (barbers.length === 0) {
+                    barbersGrid.innerHTML = `
+                        <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+                            <i class="fas fa-search" style="font-size: 48px; color: var(--gray); margin-bottom: 15px;"></i>
+                            <h3>No barbers found nearby</h3>
+                            <p>Try expanding your search area or check back later.</p>
+                            <button class="btn" onclick="app.detectUserLocation()" style="margin-top: 15px;">
+                                <i class="fas fa-redo"></i> Search Again
+                            </button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                barbersGrid.innerHTML = barbers.map(barber => `
+                    <div class="barber-card">
+                        <div class="barber-header">
+                            <div class="barber-avatar">
+                                <img src="${barber.image}" alt="${barber.name}">
+                            </div>
+                            <div class="barber-info">
+                                <h3>${barber.name}</h3>
+                                <div class="barber-specialty">${barber.specialty}</div>
+                                <div class="barber-rating">
+                                    <i class="fas fa-star" style="color: var(--primary);"></i>
+                                    <span>${barber.rating} (${barber.reviewCount} reviews)</span>
+                                    <span>• ${barber.distance} km away</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="barber-details">
+                            <div class="barber-features">
+                                ${barber.features.map(feature => `
+                                    <span class="feature-tag">${feature}</span>
+                                `).join('')}
+                            </div>
+                            <div class="barber-location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>${barber.distance} km from your location</span>
+                            </div>
+                            <div class="barber-actions">
+                                <button class="btn btn-sm" onclick="app.openBookingModal(${barber.id})">
+                                    <i class="fas fa-calendar-alt"></i> Book Now
+                                </button>
+                                <button class="btn btn-sm btn-outline" onclick="app.viewBarberDetails(${barber.id})">
+                                    <i class="fas fa-info-circle"></i> Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            openBookingModal(barberId) {
+                this.selectedBarber = this.barbers.find(b => b.id === barberId);
+                
+                if (!this.selectedBarber) return;
+
+                // Update modal content
+                document.getElementById('bookingBarberInfo').innerHTML = `
+                    <div class="booking-barber-avatar">
+                        <img src="${this.selectedBarber.image}" alt="${this.selectedBarber.name}">
+                    </div>
+                    <div>
+                        <h3>${this.selectedBarber.name}</h3>
+                        <p>${this.selectedBarber.specialty}</p>
+                        <div class="barber-rating">
+                            <i class="fas fa-star" style="color: var(--primary);"></i>
+                            <span>${this.selectedBarber.rating} (${this.selectedBarber.reviewCount} reviews)</span>
+                        </div>
+                    </div>
+                `;
+
+                // Generate time slots
+                this.generateTimeSlots();
+
+                // Generate service options
+                this.generateServiceOptions();
+
+                // Set minimum date to today
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('appointmentDate').min = today;
+
+                // Show modal
+                document.getElementById('bookingModal').style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            }
+
+            generateTimeSlots() {
+                const timeSlotsContainer = document.getElementById('timeSlots');
+                const slots = [];
+                
+                // Generate time slots from 9 AM to 8 PM
+                for (let hour = 9; hour <= 20; hour++) {
+                    for (let minute = 0; minute < 60; minute += 30) {
+                        const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+                        slots.push(`
+                            <div class="time-slot" data-time="${timeString}">
+                                ${timeString}
+                            </div>
+                        `);
+                    }
+                }
+
+                timeSlotsContainer.innerHTML = slots.join('');
+
+                // Add click event listeners
+                timeSlotsContainer.querySelectorAll('.time-slot').forEach(slot => {
+                    slot.addEventListener('click', () => {
+                        timeSlotsContainer.querySelectorAll('.time-slot').forEach(s => 
+                            s.classList.remove('selected')
+                        );
+                        slot.classList.add('selected');
+                    });
+                });
+            }
+
+            generateServiceOptions() {
+                const serviceOptionsContainer = document.getElementById('serviceOptions');
+                
+                serviceOptionsContainer.innerHTML = this.selectedBarber.services.map(service => `
+                    <div class="service-option" data-service="${service.name}">
+                        <div class="service-info">
+                            <h4>${service.name}</h4>
+                            <p>${service.duration} minutes</p>
+                        </div>
+                        <div class="service-price">₹${service.price}</div>
+                    </div>
+                `).join('');
+
+                // Add click event listeners
+                serviceOptionsContainer.querySelectorAll('.service-option').forEach(option => {
+                    option.addEventListener('click', () => {
+                        option.classList.toggle('selected');
+                    });
+                });
+            }
+
+            closeBookingModal() {
+                document.getElementById('bookingModal').style.display = 'none';
+                document.body.style.overflow = 'auto';
+                this.selectedBarber = null;
+                
+                // Reset form
+                document.getElementById('bookingForm').reset();
+                document.getElementById('timeSlots').querySelectorAll('.time-slot').forEach(slot => 
+                    slot.classList.remove('selected')
+                );
+                document.getElementById('serviceOptions').querySelectorAll('.service-option').forEach(option => 
+                    option.classList.remove('selected')
+                );
+            }
+
+            submitBooking() {
+                const formData = new FormData(document.getElementById('bookingForm'));
+                const selectedTime = document.querySelector('.time-slot.selected');
+                const selectedServices = document.querySelectorAll('.service-option.selected');
+                
+                if (!selectedTime) {
+                    this.showToast('Please select a time slot', 'error');
+                    return;
+                }
+
+                if (selectedServices.length === 0) {
+                    this.showToast('Please select at least one service', 'error');
+                    return;
+                }
+
+                // Collect booking data
+                const bookingData = {
+                    barber: this.selectedBarber,
+                    date: formData.get('appointmentDate'),
+                    time: selectedTime.dataset.time,
+                    services: Array.from(selectedServices).map(service => service.dataset.service),
+                    customerName: formData.get('customerName'),
+                    customerPhone: formData.get('customerPhone'),
+                    specialInstructions: formData.get('specialInstructions')
+                };
+
+                // In a real app, you would send this to your backend
+                console.log('Booking data:', bookingData);
+
+                // Show success message
+                this.showToast('Booking confirmed! You will receive a confirmation message shortly.', 'success');
+                
+                // Close modal
+                this.closeBookingModal();
+
+                // Reset form
+                document.getElementById('bookingForm').reset();
+            }
+
+            viewBarberDetails(barberId) {
+                const barber = this.barbers.find(b => b.id === barberId);
+                if (barber) {
+                    // Center map on barber location
+                    this.map.setView([barber.location.lat, barber.location.lng], 15);
+                    
+                    // Open barber's popup
+                    const barberMarker = this.barberMarkers.find(marker => {
+                        const latLng = marker.getLatLng();
+                        return latLng.lat === barber.location.lat && latLng.lng === barber.location.lng;
+                    });
+                    
+                    if (barberMarker) {
+                        barberMarker.openPopup();
+                    }
+                }
+            }
+
+            showManualLocationInput() {
+                const newLocation = prompt('Enter your location (city, address, or landmark):', 'New Delhi');
+                if (newLocation) {
+                    // In a real app, you would geocode this address
+                    this.showToast(`Searching for barbers in ${newLocation}`, 'info');
+                    
+                    // For demo, we'll use a random location near the user
+                    const randomOffset = () => (Math.random() - 0.5) * 0.02;
+                    this.userLocation = {
+                        lat: this.userLocation.lat + randomOffset(),
+                        lng: this.userLocation.lng + randomOffset()
+                    };
+                    
+                    this.updateLocationDisplay();
+                    this.initMap();
+                    this.findNearbyBarbers();
+                }
+            }
+
+            showToast(message, type = 'info') {
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+                toast.textContent = message;
+                
+                // Style based on type
+                if (type === 'error') {
+                    toast.style.background = 'var(--error)';
+                } else if (type === 'success') {
+                    toast.style.background = 'var(--success)';
+                } else if (type === 'info') {
+                    toast.style.background = 'var(--primary)';
+                }
+                
+                document.body.appendChild(toast);
+                
+                // Remove toast after 3 seconds
+                setTimeout(() => {
+                    toast.remove();
+                }, 3000);
+            }
+        }
+
+        // Initialize the app when DOM is loaded
+        let app;
+        document.addEventListener('DOMContentLoaded', function() {
+            app = new BarberBookingApp();
+        });
+    </script>
+</body>
+</html>

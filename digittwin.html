@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriVision AI | Digital Twin Farm Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        :root {
+            --primary: #2E8B57;
+            --primary-dark: #1F6B41;
+            --secondary: #1A1A1A;
+            --accent: #8B4513;
+            --light: #F8F5F0;
+            --gray: #6C757D;
+            --white: #FFFFFF;
+            --gold: #D4AF37;
+            --error: #e74c3c;
+            --success: #2ecc71;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--secondary);
+            background-color: var(--light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Page Container */
+        .page-container {
+            position: relative;
+            min-height: 100vh;
+        }
+
+        .page {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            min-height: 100vh;
+        }
+
+        .page.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: var(--white);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .logo h1 {
+            font-size: 28px;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+        }
+
+        .logo span {
+            color: var(--secondary);
+        }
+
+        .logo .ai-badge {
+            background: var(--gold);
+            color: white;
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 5px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--primary);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .language-selector select {
+            padding: 8px 15px;
+            border: 1px solid #E5E5E5;
+            border-radius: 5px;
+            background-color: white;
+            font-size: 14px;
+        }
+
+        .auth-buttons a {
+            text-decoration: none;
+            color: var(--secondary);
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: var(--transition);
+        }
+
+        .auth-buttons a.login {
+            color: var(--gray);
+        }
+
+        .auth-buttons a.signup {
+            background: var(--primary);
+            color: white;
+        }
+
+        .auth-buttons a.signup:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            height: 700px;
+            background: linear-gradient(135deg, rgba(46, 139, 87, 0.9) 0%, rgba(31, 107, 65, 0.8) 100%), url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2832&q=80') no-repeat center center;
+            background-size: cover;
+            color: white;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            z-index: 2;
+        }
+
+        .hero h2 {
+            font-size: 52px;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 20px;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: var(--gold);
+            color: white;
+            padding: 16px 35px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .cta-button:hover {
+            background: #C19B2E;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Features Section */
+        .features {
+            padding: 100px 0;
+            background-color: var(--white);
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-title h2 {
+            font-size: 42px;
+            color: var(--secondary);
+            margin-bottom: 15px;
+        }
+
+        .section-title p {
+            color: var(--gray);
+            max-width: 700px;
+            margin: 0 auto;
+            font-size: 18px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+        }
+
+        .feature-card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 40px 30px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            text-align: center;
+            border: 1px solid rgba(46, 139, 87, 0.1);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(46, 139, 87, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            font-size: 32px;
+            color: var(--primary);
+        }
+
+        .feature-card h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .feature-card p {
+            color: var(--gray);
+            line-height: 1.8;
+        }
+
+        /* Digital Twin Section */
+        .digital-twin {
+            padding: 100px 0;
+            background: linear-gradient(135deg, #f8f5f0 0%, #e8f5e8 100%);
+        }
+
+        .twin-container {
+            display: flex;
+            align-items: center;
+            gap: 60px;
+        }
+
+        .twin-visual {
+            flex: 1;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            height: 500px;
+            background: url('https://images.unsplash.com/photo-1586771107445-d3ca888129ce?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2942&q=80') no-repeat center center;
+            background-size: cover;
+            position: relative;
+        }
+
+        .twin-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .twin-content {
+            flex: 1;
+        }
+
+        .twin-content h2 {
+            font-size: 38px;
+            margin-bottom: 20px;
+            color: var(--secondary);
+        }
+
+        .twin-content p {
+            color: var(--gray);
+            margin-bottom: 30px;
+            font-size: 18px;
+            line-height: 1.8;
+        }
+
+        .twin-features {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+
+        .twin-features li {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 16px;
+        }
+
+        .twin-features i {
+            color: var(--primary);
+            font-size: 18px;
+        }
+
+        /* AI Assistant Section */
+        .ai-assistant-section {
+            padding: 100px 0;
+            background-color: var(--white);
+        }
+
+        .assistant-container {
+            display: flex;
+            align-items: center;
+            gap: 60px;
+        }
+
+        .assistant-content {
+            flex: 1;
+        }
+
+        .assistant-content h2 {
+            font-size: 38px;
+            margin-bottom: 20px;
+            color: var(--secondary);
+        }
+
+        .assistant-content p {
+            color: var(--gray);
+            margin-bottom: 30px;
+            font-size: 18px;
+            line-height: 1.8;
+        }
+
+        .assistant-demo {
+            flex: 1;
+            background: var(--light);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .assistant-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .assistant-avatar {
+            width: 50px;
+            height: 50px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+
+        .assistant-messages {
+            height: 300px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 15px;
+            border-radius: 18px;
+            font-size: 14px;
+        }
+
+        .message.bot {
+            background: #f0f0f0;
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+
+        .message.user {
+            background: var(--primary);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+
+        .assistant-input {
+            display: flex;
+            gap: 10px;
+        }
+
+        .assistant-input input {
+            flex: 1;
+            padding: 15px;
+            border: 1px solid #E5E5E5;
+            border-radius: 50px;
+            font-size: 16px;
+        }
+
+        .assistant-input button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .assistant-input button:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Pricing Section */
+        .pricing {
+            padding: 100px 0;
+            background: linear-gradient(135deg, #f8f5f0 0%, #e8f5e8 100%);
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .pricing-card {
+            background: var(--white);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .pricing-card.featured {
+            border: 2px solid var(--primary);
+            transform: scale(1.05);
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .pricing-card.featured:hover {
+            transform: scale(1.05) translateY(-10px);
+        }
+
+        .pricing-header {
+            padding: 30px;
+            text-align: center;
+            background: var(--primary);
+            color: white;
+        }
+
+        .pricing-header h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .pricing-price {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .pricing-period {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+
+        .pricing-features {
+            padding: 30px;
+            list-style: none;
+        }
+
+        .pricing-features li {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pricing-features i {
+            color: var(--primary);
+        }
+
+        .pricing-actions {
+            padding: 0 30px 30px;
+        }
+
+        .pricing-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .pricing-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .pricing-card.featured .pricing-btn {
+            background: var(--gold);
+        }
+
+        .pricing-card.featured .pricing-btn:hover {
+            background: #C19B2E;
+        }
+
+        /* Testimonials */
+        .testimonials {
+            padding: 100px 0;
+            background-color: var(--white);
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .testimonial-card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .testimonial-content {
+            margin-bottom: 20px;
+            font-style: italic;
+            color: var(--gray);
+            line-height: 1.8;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #E5E5E5;
+        }
+
+        .author-info h4 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .author-info p {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--secondary);
+            color: white;
+            padding: 80px 0 0;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: #CCCCCC;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding: 30px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #999;
+            font-size: 14px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .hero h2 {
+                font-size: 42px;
+            }
+            
+            .twin-container, .assistant-container {
+                flex-direction: column;
+            }
+            
+            .twin-visual, .assistant-demo {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-top {
+                flex-wrap: wrap;
+            }
+            
+            .nav-links {
+                order: 3;
+                margin-top: 15px;
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .hero h2 {
+                font-size: 36px;
+            }
+            
+            .hero {
+                height: 600px;
+            }
+            
+            .section-title h2 {
+                font-size: 32px;
+            }
+            
+            .features-grid, .pricing-grid, .testimonials-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .pricing-card.featured {
+                transform: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h2 {
+                font-size: 28px;
+            }
+            
+            .hero p {
+                font-size: 16px;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <!-- Landing Page -->
+        <div id="landing-page" class="page active">
+            <!-- Header -->
+            <header>
+                <div class="container">
+                    <div class="header-top">
+                        <div class="logo" id="logo">
+                            <h1>AgriVision<span>AI</span> <span class="ai-badge">Premium</span></h1>
+                        </div>
+                        <ul class="nav-links">
+                            <li><a href="#features">Features</a></li>
+                            <li><a href="#digital-twin">Digital Twin</a></li>
+                            <li><a href="#ai-assistant">AI Assistant</a></li>
+                            <li><a href="#pricing">Pricing</a></li>
+                            <li><a href="#testimonials">Testimonials</a></li>
+                        </ul>
+                        <div class="header-actions">
+                            <div class="language-selector">
+                                <select>
+                                    <option>English</option>
+                                    <option>हिन्दी</option>
+                                    <option>தமிழ்</option>
+                                    <option>বাংলা</option>
+                                    <option>తెలుగు</option>
+                                </select>
+                            </div>
+                            <div class="auth-buttons">
+                                <a href="#" class="login" id="login-link">Login</a>
+                                <a href="#" class="signup" id="signup-link">Sign Up</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Hero Section -->
+            <section class="hero">
+                <div class="container">
+                    <div class="hero-content">
+                        <h2>Revolutionizing Agriculture with AI-Powered Digital Twins</h2>
+                        <p>Predict crop yield, detect pests in real-time, and get personalized guidance in your language. The future of precision farming is here.</p>
+                        <a href="#" class="cta-button" id="explore-demo">Explore Digital Twin Demo</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Features Section -->
+            <section class="features" id="features">
+                <div class="container">
+                    <div class="section-title">
+                        <h2>Advanced Farm Intelligence</h2>
+                        <p>Our AI-powered platform combines drone imagery, IoT sensors, and machine learning to create a digital twin of your farm</p>
+                    </div>
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-seedling"></i>
+                            </div>
+                            <h3>Pest & Disease Detection</h3>
+                            <p>AI-powered real-time identification of pests and diseases with 95% accuracy, providing immediate treatment recommendations.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-tint"></i>
+                            </div>
+                            <h3>Smart Irrigation</h3>
+                            <p>IoT sensors monitor soil moisture and weather data to optimize water usage, reducing consumption by up to 30%.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <h3>Yield Prediction</h3>
+                            <p>Advanced algorithms predict crop yields with 90% accuracy, helping farmers plan harvests and maximize profits.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <h3>Multilingual AI Assistant</h3>
+                            <p>Get personalized guidance in your native language. Simply ask: "Mujhe apne kheth mein aaj kya karna hai?"</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-satellite"></i>
+                            </div>
+                            <h3>Satellite Monitoring</h3>
+                            <p>High-resolution satellite imagery tracks crop health, growth patterns, and identifies problem areas before they become visible.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-mobile-alt"></i>
+                            </div>
+                            <h3>Mobile-First Design</h3>
+                            <p>Access all features from your smartphone, with offline capabilities for areas with limited connectivity.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Digital Twin Section -->
+            <section class="digital-twin" id="digital-twin">
+                <div class="container">
+                    <div class="twin-container">
+                        <div class="twin-visual">
+                            <div class="twin-overlay">
+                                Interactive Digital Twin Visualization
+                            </div>
+                        </div>
+                        <div class="twin-content">
+                            <h2>Your Farm's Digital Twin</h2>
+                            <p>We create a precise virtual replica of your farm using drone imagery, satellite data, and IoT sensors. Monitor every aspect of your farm in real-time from anywhere.</p>
+                            
+                            <ul class="twin-features">
+                                <li><i class="fas fa-check-circle"></i> Real-time crop health monitoring</li>
+                                <li><i class="fas fa-check-circle"></i> Soil nutrient analysis and recommendations</li>
+                                <li><i class="fas fa-check-circle"></i> Pest and disease early warning system</li>
+                                <li><i class="fas fa-check-circle"></i> Weather-integrated irrigation scheduling</li>
+                                <li><i class="fas fa-check-circle"></i> Growth stage tracking and harvest prediction</li>
+                            </ul>
+                            
+                            <a href="#" class="cta-button">Create Your Digital Twin</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AI Assistant Section -->
+            <section class="ai-assistant-section" id="ai-assistant">
+                <div class="container">
+                    <div class="assistant-container">
+                        <div class="assistant-content">
+                            <h2>Your Personal Farming Assistant</h2>
+                            <p>Interact with our AI assistant in your preferred language. Get personalized guidance, ask questions, and receive real-time recommendations for your farm.</p>
+                            
+                            <div style="margin-bottom: 30px;">
+                                <h3 style="margin-bottom: 15px;">Try asking:</h3>
+                                <ul class="twin-features">
+                                    <li><i class="fas fa-microphone"></i> "Mujhe apne kheth mein aaj kya karna hai?"</li>
+                                    <li><i class="fas fa-microphone"></i> "How do I treat leaf rust on my wheat crop?"</li>
+                                    <li><i class="fas fa-microphone"></i> "When should I harvest my rice field?"</li>
+                                    <li><i class="fas fa-microphone"></i> "What fertilizer should I use for my soil type?"</li>
+                                </ul>
+                            </div>
+                            
+                            <a href="#" class="cta-button">Start Conversation</a>
+                        </div>
+                        <div class="assistant-demo">
+                            <div class="assistant-header">
+                                <div class="assistant-avatar">
+                                    <i class="fas fa-robot"></i>
+                                </div>
+                                <div>
+                                    <h3>Krishi Mitra AI</h3>
+                                    <p>Online - Ready to help</p>
+                                </div>
+                            </div>
+                            <div class="assistant-messages">
+                                <div class="message bot">
+                                    Hello! I'm Krishi Mitra, your AI farming assistant. I can help you in हिन्दी, தமிழ், বাংলা, తెలుగు, and more. How can I assist you today?
+                                </div>
+                                <div class="message user">
+                                    मेरी गेहूं की फसल में पीले धब्बे दिख रहे हैं। क्या करूं?
+                                </div>
+                                <div class="message bot">
+                                    आपकी गेहूं की फसल में पीले धब्बे Yellow Rust का संकेत हो सकते हैं। मैं आपके डिजिटल ट्विन डेटा की जांच कर रहा हूं... हां, मेरी AI छवि विश्लेषण ने Yellow Rust की पुष्टि की है। कृपया Propiconazole 25% EC (1ml/Litre) का छिड़काव करें और 10 दिनों के बाद दोहराएं।
+                                </div>
+                            </div>
+                            <div class="assistant-input">
+                                <input type="text" placeholder="Type your message or click mic to speak...">
+                                <button><i class="fas fa-microphone"></i></button>
+                                <button><i class="fas fa-paper-plane"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Pricing Section -->
+            <section class="pricing" id="pricing">
+                <div class="container">
+                    <div class="section-title">
+                        <h2>Choose Your Plan</h2>
+                        <p>Flexible pricing designed for farmers of all scales</p>
+                    </div>
+                    <div class="pricing-grid">
+                        <div class="pricing-card">
+                            <div class="pricing-header">
+                                <h3>Basic</h3>
+                                <div class="pricing-price">₹999</div>
+                                <div class="pricing-period">per month</div>
+                            </div>
+                            <ul class="pricing-features">
+                                <li><i class="fas fa-check"></i> Basic Digital Twin</li>
+                                <li><i class="fas fa-check"></i> Satellite Monitoring</li>
+                                <li><i class="fas fa-check"></i> Pest Detection Alerts</li>
+                                <li><i class="fas fa-times"></i> AI Assistant</li>
+                                <li><i class="fas fa-times"></i> IoT Sensor Integration</li>
+                                <li><i class="fas fa-times"></i> Yield Prediction</li>
+                            </ul>
+                            <div class="pricing-actions">
+                                <a href="#" class="pricing-btn">Get Started</a>
+                            </div>
+                        </div>
+                        <div class="pricing-card featured">
+                            <div class="pricing-header">
+                                <h3>Premium</h3>
+                                <div class="pricing-price">₹2,499</div>
+                                <div class="pricing-period">per month</div>
+                            </div>
+                            <ul class="pricing-features">
+                                <li><i class="fas fa-check"></i> Advanced Digital Twin</li>
+                                <li><i class="fas fa-check"></i> Drone + Satellite Imaging</li>
+                                <li><i class="fas fa-check"></i> Real-time Pest Detection</li>
+                                <li><i class="fas fa-check"></i> Multilingual AI Assistant</li>
+                                <li><i class="fas fa-check"></i> IoT Sensor Integration</li>
+                                <li><i class="fas fa-check"></i> Accurate Yield Prediction</li>
+                            </ul>
+                            <div class="pricing-actions">
+                                <a href="#" class="pricing-btn">Get Started</a>
+                            </div>
+                        </div>
+                        <div class="pricing-card">
+                            <div class="pricing-header">
+                                <h3>Enterprise</h3>
+                                <div class="pricing-price">Custom</div>
+                                <div class="pricing-period">tailored pricing</div>
+                            </div>
+                            <ul class="pricing-features">
+                                <li><i class="fas fa-check"></i> All Premium Features</li>
+                                <li><i class="fas fa-check"></i> Custom AI Models</li>
+                                <li><i class="fas fa-check"></i> API Access</li>
+                                <li><i class="fas fa-check"></i> Dedicated Support</li>
+                                <li><i class="fas fa-check"></i> Multi-Farm Management</li>
+                                <li><i class="fas fa-check"></i> Advanced Analytics</li>
+                            </ul>
+                            <div class="pricing-actions">
+                                <a href="#" class="pricing-btn">Contact Sales</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Testimonials -->
+            <section class="testimonials" id="testimonials">
+                <div class="container">
+                    <div class="section-title">
+                        <h2>Success Stories</h2>
+                        <p>Hear from farmers who transformed their operations with AgriVision AI</p>
+                    </div>
+                    <div class="testimonials-grid">
+                        <div class="testimonial-card">
+                            <div class="testimonial-content">
+                                "AgriVision AI detected a pest infestation in my soybean crop two weeks before it became visible. The treatment recommendation saved my entire harvest. This technology is revolutionary for Indian farmers."
+                            </div>
+                            <div class="testimonial-author">
+                                <div class="author-avatar"></div>
+                                <div class="author-info">
+                                    <h4>Rajesh Kumar</h4>
+                                    <p>Wheat & Soybean Farmer, Madhya Pradesh</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="testimonial-card">
+                            <div class="testimonial-content">
+                                "The AI assistant in Hindi has been a game-changer. I simply ask what to do each day, and it gives me personalized advice. My yield has increased by 22% in just one season."
+                            </div>
+                            <div class="testimonial-author">
+                                <div class="author-avatar"></div>
+                                <div class="author-info">
+                                    <h4>Priya Sharma</h4>
+                                    <p>Rice Farmer, Punjab</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="testimonial-card">
+                            <div class="testimonial-content">
+                                "The digital twin helped me optimize irrigation across my 50-acre farm. I reduced water usage by 35% while improving crop health. The ROI was achieved in just 4 months."
+                            </div>
+                            <div class="testimonial-author">
+                                <div class="author-avatar"></div>
+                                <div class="author-info">
+                                    <h4>Vikram Singh</h4>
+                                    <p>Commercial Farmer, Maharashtra</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Footer -->
+            <footer>
+                <div class="container">
+                    <div class="footer-content">
+                        <div class="footer-column">
+                            <h3>AgriVision AI</h3>
+                            <p>Your Farm's Digital Twin, Powered by AI. Revolutionizing agriculture with cutting-edge technology and traditional wisdom.</p>
+                        </div>
+                        <div class="footer-column">
+                            <h3>Quick Links</h3>
+                            <ul class="footer-links">
+                                <li><a href="#">Home</a></li>
+                                <li><a href="#features">Features</a></li>
+                                <li><a href="#digital-twin">Digital Twin</a></li>
+                                <li><a href="#pricing">Pricing</a></li>
+                                <li><a href="#">Blog</a></li>
+                            </ul>
+                        </div>
+                        <div class="footer-column">
+                            <h3>Support</h3>
+                            <ul class="footer-links">
+                                <li><a href="#">Help Center</a></li>
+                                <li><a href="#">Farm Setup Guide</a></li>
+                                <li><a href="#">API Documentation</a></li>
+                                <li><a href="#">Contact Us</a></li>
+                                <li><a href="#">Privacy Policy</a></li>
+                            </ul>
+                        </div>
+                        <div class="footer-column">
+                            <h3>Contact Info</h3>
+                            <ul class="footer-links">
+                                <li><i class="fas fa-map-marker-alt"></i> AgriTech Park, Hyderabad, India</li>
+                                <li><i class="fas fa-phone"></i> +91 98765 43210</li>
+                                <li><i class="fas fa-envelope"></i> support@agrivisionai.com</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="footer-bottom">
+                        <p>&copy; 2023 AgriVision AI. All rights reserved. Proudly supporting Atmanirbhar Krishi Bharat.</p>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        // Navigation
+        const navLinks = document.querySelectorAll('.nav-links a');
+        const exploreDemo = document.getElementById('explore-demo');
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        exploreDemo.addEventListener('click', (e) => {
+            e.preventDefault();
+            const digitalTwinSection = document.getElementById('digital-twin');
+            window.scrollTo({
+                top: digitalTwinSection.offsetTop - 100,
+                behavior: 'smooth'
+            });
+        });
+
+        // AI Assistant Demo
+        const assistantMessages = document.querySelector('.assistant-messages');
+        const assistantInput = document.querySelector('.assistant-input input');
+        const sendButton = document.querySelector('.assistant-input button:last-child');
+        const micButton = document.querySelector('.assistant-input button:first-child');
+
+        // Sample responses for demo
+        const responses = {
+            "hi": "Hello! I'm Krishi Mitra, your AI farming assistant. How can I help you today?",
+            "hello": "Namaste! I'm Krishi Mitra, your AI farming assistant. How can I assist with your farm today?",
+            "help": "I can help you with pest detection, irrigation scheduling, fertilizer recommendations, harvest timing, and much more. What specific issue are you facing?",
+            "pest": "I can analyze your digital twin to detect pests. Could you describe the symptoms you're seeing or upload a photo of the affected plants?",
+            "water": "Based on your soil moisture sensors and weather forecast, I recommend irrigating tomorrow morning. Your soil moisture is currently at 65% capacity.",
+            "yield": "Based on current growth patterns and weather conditions, I predict your wheat yield will be approximately 4.2 tons per hectare this season.",
+            "fertilizer": "Your soil analysis shows nitrogen levels are low. I recommend applying 50kg of urea per acre before the next irrigation cycle."
+        };
+
+        sendButton.addEventListener('click', () => {
+            const message = assistantInput.value.trim().toLowerCase();
+            if (message) {
+                // Add user message
+                const userMessage = document.createElement('div');
+                userMessage.className = 'message user';
+                userMessage.textContent = message;
+                assistantMessages.appendChild(userMessage);
+                
+                // Clear input
+                assistantInput.value = '';
+                
+                // Simulate AI response after a short delay
+                setTimeout(() => {
+                    let response = "I understand you're asking about \"" + message + "\". For personalized advice, I need to analyze your farm's digital twin data. Would you like me to check your specific farm conditions?";
+                    
+                    // Check for keyword matches
+                    for (const [key, value] of Object.entries(responses)) {
+                        if (message.includes(key)) {
+                            response = value;
+                            break;
+                        }
+                    }
+                    
+                    const botMessage = document.createElement('div');
+                    botMessage.className = 'message bot';
+                    botMessage.textContent = response;
+                    assistantMessages.appendChild(botMessage);
+                    
+                    // Scroll to bottom
+                    assistantMessages.scrollTop = assistantMessages.scrollHeight;
+                }, 1000);
+            }
+        });
+
+        // Allow sending with Enter key
+        assistantInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendButton.click();
+            }
+        });
+
+        // Mic button functionality
+        micButton.addEventListener('click', () => {
+            alert('Voice input activated. Please speak now... (Demo: Voice input would be implemented in a production app)');
+            // In a real app, this would trigger the Web Speech API
+        });
+
+        // Language selector
+        const languageSelector = document.querySelector('.language-selector select');
+        languageSelector.addEventListener('change', () => {
+            const selectedLanguage = languageSelector.value;
+            alert(`Language changed to ${selectedLanguage}. The interface would update to ${selectedLanguage} in a production app.`);
+        });
+
+        // Smooth scrolling for all anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Add some interactive elements to pricing cards
+        const pricingCards = document.querySelectorAll('.pricing-card');
+        pricingCards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = card.classList.contains('featured') 
+                    ? 'scale(1.05) translateY(-5px)' 
+                    : 'translateY(-5px)';
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = card.classList.contains('featured') 
+                    ? 'scale(1.05)' 
+                    : 'translateY(0)';
+            });
+        });
+    </script>
+</body>
+</html>

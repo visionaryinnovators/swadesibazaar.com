@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artisan Forge | Premium Metalwork</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --gold-dark: #B8860B;
+            --charcoal: #1A1A1A;
+            --bronze: #8B4513;
+            --ivory: #F8F5F0;
+            --silver: #C0C0C0;
+            --platinum: #E5E4E2;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--charcoal);
+            background-color: var(--ivory);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-family: 'Cinzel', serif;
+            font-weight: 600;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: var(--charcoal);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .logo h1 {
+            font-size: 28px;
+            color: var(--gold);
+            letter-spacing: 1px;
+        }
+
+        .logo span {
+            color: var(--silver);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: var(--silver);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--gold);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--gold);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            height: 80vh;
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.9) 0%, rgba(139, 69, 19, 0.8) 100%), url('https://images.unsplash.com/photo-1584735264936-94ee8e2b1bc1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2072&q=80') no-repeat center center;
+            background-size: cover;
+            color: white;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            max-width: 700px;
+            z-index: 2;
+        }
+
+        .hero h2 {
+            font-size: 52px;
+            margin-bottom: 20px;
+            line-height: 1.2;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .hero p {
+            font-size: 20px;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: var(--gold);
+            color: var(--charcoal);
+            padding: 16px 35px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            letter-spacing: 1px;
+        }
+
+        .cta-button:hover {
+            background: var(--gold-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Premium Section */
+        .premium-section {
+            padding: 100px 0;
+            background: linear-gradient(to bottom, var(--ivory) 0%, #f0ebe0 100%);
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 70px;
+        }
+
+        .section-title h2 {
+            font-size: 42px;
+            color: var(--charcoal);
+            margin-bottom: 15px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            width: 100px;
+            height: 3px;
+            background: var(--gold);
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .section-title p {
+            color: var(--bronze);
+            max-width: 600px;
+            margin: 0 auto;
+            font-size: 18px;
+        }
+
+        /* Luxury Products */
+        .luxury-products {
+            padding: 100px 0;
+            background-color: var(--charcoal);
+            color: var(--ivory);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 40px;
+        }
+
+        .product-card {
+            background: linear-gradient(145deg, #2a2a2a, #1f1f1f);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .product-card:hover {
+            transform: translateY(-15px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border-color: var(--gold);
+        }
+
+        .product-image {
+            height: 280px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.05);
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: var(--gold);
+            color: var(--charcoal);
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .product-info {
+            padding: 25px;
+        }
+
+        .product-info h3 {
+            font-size: 22px;
+            margin-bottom: 10px;
+            color: var(--gold);
+        }
+
+        .product-description {
+            margin-bottom: 15px;
+            color: #ccc;
+            font-size: 15px;
+        }
+
+        .product-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #aaa;
+        }
+
+        .product-price {
+            font-weight: 700;
+            font-size: 24px;
+            color: var(--gold);
+            margin-bottom: 20px;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            text-align: center;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background: var(--gold);
+            color: var(--charcoal);
+        }
+
+        .btn-primary:hover {
+            background: var(--gold-dark);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--gold);
+            border: 1px solid var(--gold);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        /* Booking Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: var(--ivory);
+            margin: 50px auto;
+            width: 90%;
+            max-width: 800px;
+            border-radius: 10px;
+            overflow: hidden;
+            animation: modalFade 0.3s;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        @keyframes modalFade {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 30px;
+            background: var(--charcoal);
+            color: var(--ivory);
+        }
+
+        .modal-header h2 {
+            color: var(--gold);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--gold);
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .booking-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .booking-steps::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #ddd;
+            z-index: 1;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #ddd;
+            color: #777;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-bottom: 10px;
+            transition: var(--transition);
+        }
+
+        .step.active .step-number {
+            background: var(--gold);
+            color: var(--charcoal);
+        }
+
+        .step-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #777;
+        }
+
+        .step.active .step-label {
+            color: var(--charcoal);
+        }
+
+        .booking-form {
+            display: none;
+        }
+
+        .booking-form.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: var(--transition);
+            background-color: white;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .booking-summary {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .summary-total {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .map-container {
+            height: 300px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        #sellerLocationMap {
+            height: 100%;
+            width: 100%;
+        }
+
+        .courier-options {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .courier-option {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .courier-option:hover {
+            border-color: var(--gold);
+        }
+
+        .courier-option.selected {
+            border-color: var(--gold);
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        .courier-logo {
+            height: 40px;
+            margin-bottom: 10px;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        /* Process Section */
+        .process {
+            padding: 100px 0;
+            background-color: var(--ivory);
+        }
+
+        .process-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin-top: 50px;
+        }
+
+        .process-step {
+            text-align: center;
+            padding: 40px 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .process-step:hover {
+            transform: translateY(-10px);
+        }
+
+        .process-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(212, 175, 55, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            font-size: 32px;
+            color: var(--gold);
+        }
+
+        .process-step h3 {
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: var(--charcoal);
+        }
+
+        /* Testimonials */
+        .testimonials {
+            padding: 100px 0;
+            background: linear-gradient(135deg, var(--charcoal) 0%, #2a2a2a 100%);
+            color: var(--ivory);
+        }
+
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .testimonial-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .testimonial-text {
+            font-style: italic;
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--charcoal);
+            font-weight: 700;
+        }
+
+        .author-info h4 {
+            color: var(--gold);
+            margin-bottom: 5px;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--charcoal);
+            color: var(--ivory);
+            padding: 80px 0 0;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: var(--gold);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: #CCCCCC;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--gold);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding: 30px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #999;
+            font-size: 14px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .hero h2 {
+                font-size: 42px;
+            }
+            
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-top {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 15px;
+            }
+            
+            .hero h2 {
+                font-size: 36px;
+            }
+            
+            .hero {
+                height: 70vh;
+            }
+            
+            .section-title h2 {
+                font-size: 32px;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .booking-steps {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .booking-steps::before {
+                display: none;
+            }
+            
+            .step {
+                flex-direction: row;
+                gap: 15px;
+            }
+            
+            .step-label {
+                margin-top: 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h2 {
+                font-size: 28px;
+            }
+            
+            .hero p {
+                font-size: 16px;
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .product-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-top">
+                <div class="logo">
+                    <h1>Artisan<span>Forge</span></h1>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#products">Collections</a></li>
+                    <li><a href="#process">Craftsmanship</a></li>
+                    <li><a href="#testimonials">Testimonials</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="container">
+            <div class="hero-content">
+                <h2>Exquisite Metalwork Crafted to Perfection</h2>
+                <p>Discover our exclusive collection of handcrafted metal masterpieces, where traditional techniques meet contemporary design.</p>
+                <a href="#products" class="cta-button">Explore Collection</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Premium Section -->
+    <section class="premium-section">
+        <div class="container">
+            <div class="section-title">
+                <h2>The Art of Metal</h2>
+                <p>Each piece in our collection is a testament to the skill and dedication of master artisans who transform raw materials into timeless works of art.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Luxury Products -->
+    <section class="luxury-products" id="products">
+        <div class="container">
+            <div class="section-title">
+                <h2>Signature Collection</h2>
+                <p>Limited edition pieces crafted with precision and passion</p>
+            </div>
+            <div class="products-grid" id="productsContainer">
+                <!-- Products will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Process Section -->
+    <section class="process" id="process">
+        <div class="container">
+            <div class="section-title">
+                <h2>Our Craftsmanship</h2>
+                <p>The meticulous process behind every masterpiece</p>
+            </div>
+            <div class="process-steps">
+                <div class="process-step">
+                    <div class="process-icon">
+                        <i class="fas fa-drafting-compass"></i>
+                    </div>
+                    <h3>Design & Concept</h3>
+                    <p>Each piece begins as a detailed sketch, blending traditional motifs with contemporary aesthetics.</p>
+                </div>
+                <div class="process-step">
+                    <div class="process-icon">
+                        <i class="fas fa-hammer"></i>
+                    </div>
+                    <h3>Hand Forging</h3>
+                    <p>Master artisans shape the metal using time-honored techniques passed down through generations.</p>
+                </div>
+                <div class="process-step">
+                    <div class="process-icon">
+                        <i class="fas fa-gem"></i>
+                    </div>
+                    <h3>Finishing & Detailing</h3>
+                    <p>Every piece undergoes meticulous polishing and finishing to achieve its signature luster.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials" id="testimonials">
+        <div class="container">
+            <div class="section-title">
+                <h2>Client Testimonials</h2>
+                <p>What our discerning clients say about our creations</p>
+            </div>
+            <div class="testimonial-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-text">
+                        "The bronze sculpture I commissioned exceeded all expectations. The attention to detail is simply remarkable."
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">AR</div>
+                        <div class="author-info">
+                            <h4>Amara Rodriguez</h4>
+                            <p>Interior Designer</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-text">
+                        "Working with Artisan Forge was a seamless experience. Their craftsmanship is unparalleled in today's market."
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">JS</div>
+                        <div class="author-info">
+                            <h4>James Sullivan</h4>
+                            <p>Art Collector</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-text">
+                        "The custom gates they created for our estate are not just functional but true works of art that welcome guests with grandeur."
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">EP</div>
+                        <div class="author-info">
+                            <h4>Eleanor Prescott</h4>
+                            <p>Estate Owner</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Booking Modal -->
+    <div class="modal" id="bookingModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Book Your Masterpiece</h2>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="booking-steps">
+                    <div class="step active" data-step="1">
+                        <div class="step-number">1</div>
+                        <div class="step-label">Product Details</div>
+                    </div>
+                    <div class="step" data-step="2">
+                        <div class="step-number">2</div>
+                        <div class="step-label">Delivery & Payment</div>
+                    </div>
+                    <div class="step" data-step="3">
+                        <div class="step-number">3</div>
+                        <div class="step-label">Confirmation</div>
+                    </div>
+                </div>
+
+                <!-- Step 1: Product Details -->
+                <form id="step1Form" class="booking-form active">
+                    <div class="booking-summary">
+                        <h3 id="bookingProductName">Product Name</h3>
+                        <div class="summary-item">
+                            <span>Price:</span>
+                            <span id="bookingProductPrice">₹0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Estimated Delivery:</span>
+                            <span>7-10 business days</span>
+                        </div>
+                        <div class="summary-total">
+                            <span>Total:</span>
+                            <span id="bookingTotalPrice">₹0</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="customerName">Full Name</label>
+                        <input type="text" id="customerName" class="form-control" placeholder="Enter your full name" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="customerEmail">Email Address</label>
+                            <input type="email" id="customerEmail" class="form-control" placeholder="Enter your email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="customerPhone">Phone Number</label>
+                            <input type="tel" id="customerPhone" class="form-control" placeholder="Enter your phone number" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="deliveryAddress">Delivery Address</label>
+                        <textarea id="deliveryAddress" class="form-control" rows="3" placeholder="Enter complete delivery address" required></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" id="cancelBooking">Cancel</button>
+                        <button type="button" class="btn btn-primary" id="nextToStep2">Continue</button>
+                    </div>
+                </form>
+
+                <!-- Step 2: Delivery & Payment -->
+                <form id="step2Form" class="booking-form">
+                    <div class="form-group">
+                        <label>Select Courier Service</label>
+                        <div class="courier-options">
+                            <div class="courier-option" data-courier="bluedart">
+                                <div class="courier-logo">
+                                    <i class="fas fa-shipping-fast" style="font-size: 40px; color: #1E3A8A;"></i>
+                                </div>
+                                <h4>Blue Dart</h4>
+                                <p>Free Delivery</p>
+                                <p>3-5 Business Days</p>
+                            </div>
+                            <div class="courier-option" data-courier="delhivery">
+                                <div class="courier-logo">
+                                    <i class="fas fa-truck" style="font-size: 40px; color: #FF6B00;"></i>
+                                </div>
+                                <h4>Delhivery</h4>
+                                <p>Free Delivery</p>
+                                <p>5-7 Business Days</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Seller Location</label>
+                        <div class="map-container">
+                            <div id="sellerLocationMap"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="specialInstructions">Special Instructions (Optional)</label>
+                        <textarea id="specialInstructions" class="form-control" rows="3" placeholder="Any special requests or instructions"></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" id="backToStep1">Back</button>
+                        <button type="button" class="btn btn-primary" id="nextToStep3">Proceed to Payment</button>
+                    </div>
+                </form>
+
+                <!-- Step 3: Confirmation -->
+                <div id="step3Form" class="booking-form">
+                    <div class="booking-summary">
+                        <h3>Order Summary</h3>
+                        <div class="summary-item">
+                            <span>Product:</span>
+                            <span id="confirmProductName">-</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Price:</span>
+                            <span id="confirmProductPrice">-</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Courier:</span>
+                            <span id="confirmCourier">-</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Delivery Address:</span>
+                            <span id="confirmAddress">-</span>
+                        </div>
+                        <div class="summary-total">
+                            <span>Total Amount:</span>
+                            <span id="confirmTotal">-</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <p style="text-align: center; margin: 20px 0;">
+                            <i class="fas fa-check-circle" style="color: var(--gold); font-size: 48px;"></i>
+                        </p>
+                        <p style="text-align: center; font-size: 18px;">
+                            Your order has been successfully placed! The seller will contact you shortly via WhatsApp to confirm details.
+                        </p>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" id="backToStep2">Back</button>
+                        <button type="button" class="btn btn-primary" id="completeBooking">Complete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Artisan Forge</h3>
+                    <p>Creating timeless metalwork masterpieces through traditional craftsmanship and contemporary design.</p>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#products">Collections</a></li>
+                        <li><a href="#process">Our Process</a></li>
+                        <li><a href="#testimonials">Testimonials</a></li>
+                        <li><a href="#contact">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contact Info</h3>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Artisan Lane, Jaipur, India</li>
+                        <li><i class="fas fa-phone"></i> +91 98765 43210</li>
+                        <li><i class="fas fa-envelope"></i> info@artisanforge.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 Artisan Forge. All rights reserved. | Crafted with precision and passion</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC4wGDrRHs4gQN6p8Q9X7VqY9t8d4Jk8Xw",
+            authDomain: "artisan-forge.firebaseapp.com",
+            projectId: "artisan-forge",
+            storageBucket: "artisan-forge.appspot.com",
+            messagingSenderId: "123456789012",
+            appId: "1:123456789012:web:abcdef1234567890"
+        };
+
+        // Initialize Firebase
+        if (typeof firebase === 'undefined') {
+            console.log('Firebase not loaded');
+        } else {
+            firebase.initializeApp(firebaseConfig);
+            const db = firebase.firestore();
+        }
+
+        // Sample Product Data
+        const products = [
+            {
+                id: 1,
+                name: "Bronze Serenity Sculpture",
+                description: "Handcrafted bronze sculpture inspired by flowing water and natural forms. Each piece is unique with intricate detailing.",
+                price: 125000,
+                material: "Bronze",
+                dimensions: "24\" H x 18\" W x 12\" D",
+                weight: "15 kg",
+                delivery: "7-10 business days",
+                badge: "Limited Edition"
+            },
+            {
+                id: 2,
+                name: "Copper Essence Vase",
+                description: "Elegant copper vase with hammered texture and polished finish. Perfect as a centerpiece or standalone art piece.",
+                price: 85000,
+                material: "Copper",
+                dimensions: "18\" H x 10\" W",
+                weight: "8 kg",
+                delivery: "5-7 business days",
+                badge: "Best Seller"
+            },
+            {
+                id: 3,
+                name: "Silver Harmony Bowl",
+                description: "Exquisite silver bowl with intricate filigree work. A statement piece that reflects light beautifully.",
+                price: 195000,
+                material: "Sterling Silver",
+                dimensions: "12\" Diameter x 6\" H",
+                weight: "5 kg",
+                delivery: "10-14 business days",
+                badge: "Premium"
+            },
+            {
+                id: 4,
+                name: "Brustic Steel Centerpiece",
+                description: "Modern steel centerpiece with geometric patterns and brushed finish. Combines industrial aesthetic with artistic flair.",
+                price: 75000,
+                material: "Stainless Steel",
+                dimensions: "14\" H x 16\" W x 14\" D",
+                weight: "12 kg",
+                delivery: "7-10 business days",
+                badge: "Contemporary"
+            },
+            {
+                id: 5,
+                name: "Golden Lotus Sculpture",
+                description: "24K gold-plated brass sculpture depicting a blooming lotus. Symbolizes purity, enlightenment, and rebirth.",
+                price: 225000,
+                material: "Gold-plated Brass",
+                dimensions: "20\" H x 16\" W",
+                weight: "10 kg",
+                delivery: "14-21 business days",
+                badge: "Exclusive"
+            },
+            {
+                id: 6,
+                name: "Art Deco Metal Wall Art",
+                description: "Large-scale wall art featuring geometric Art Deco patterns in mixed metals. Makes a dramatic statement in any space.",
+                price: 150000,
+                material: "Mixed Metals",
+                dimensions: "36\" H x 48\" W",
+                weight: "20 kg",
+                delivery: "10-14 business days",
+                badge: "Statement Piece"
+            }
+        ];
+
+        // DOM Elements
+        const productsContainer = document.getElementById('productsContainer');
+        const bookingModal = document.getElementById('bookingModal');
+        const modalClose = document.getElementById('modalClose');
+        const cancelBooking = document.getElementById('cancelBooking');
+        const steps = document.querySelectorAll('.step');
+        const bookingForms = document.querySelectorAll('.booking-form');
+        const courierOptions = document.querySelectorAll('.courier-option');
+        
+        // Booking Data
+        let bookingData = {
+            product: null,
+            customer: {},
+            courier: null,
+            total: 0
+        };
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProducts();
+            setupEventListeners();
+            initSellerLocationMap();
+        });
+
+        // Load Products
+        function loadProducts() {
+            productsContainer.innerHTML = '';
+            
+            products.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.setAttribute('data-product', product.id);
+                
+                productCard.innerHTML = `
+                    <div class="product-image">
+                        <img src="https://images.unsplash.com/photo-1584735264936-94ee8e2b1bc1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2072&q=80" alt="${product.name}">
+                        <span class="product-badge">${product.badge}</span>
+                    </div>
+                    <div class="product-info">
+                        <h3>${product.name}</h3>
+                        <p class="product-description">${product.description}</p>
+                        <div class="product-meta">
+                            <span><i class="fas fa-weight-hanging"></i> ${product.weight}</span>
+                            <span><i class="fas fa-ruler-combined"></i> ${product.dimensions}</span>
+                        </div>
+                        <div class="product-price">₹${product.price.toLocaleString()}</div>
+                        <div class="product-actions">
+                            <button class="btn btn-secondary view-details">View Details</button>
+                            <button class="btn btn-primary book-now">Book Now</button>
+                        </div>
+                    </div>
+                `;
+                
+                productsContainer.appendChild(productCard);
+                
+                // Add event listeners to buttons
+                const bookNowBtn = productCard.querySelector('.book-now');
+                bookNowBtn.addEventListener('click', () => openBookingModal(product));
+                
+                const viewDetailsBtn = productCard.querySelector('.view-details');
+                viewDetailsBtn.addEventListener('click', () => showProductDetails(product));
+            });
+        }
+
+        // Setup Event Listeners
+        function setupEventListeners() {
+            // Modal controls
+            modalClose.addEventListener('click', closeBookingModal);
+            cancelBooking.addEventListener('click', closeBookingModal);
+            
+            // Step navigation
+            document.getElementById('nextToStep2').addEventListener('click', goToStep2);
+            document.getElementById('backToStep1').addEventListener('click', goToStep1);
+            document.getElementById('nextToStep3').addEventListener('click', goToStep3);
+            document.getElementById('backToStep2').addEventListener('click', goToStep2);
+            document.getElementById('completeBooking').addEventListener('click', completeBooking);
+            
+            // Courier selection
+            courierOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    courierOptions.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    bookingData.courier = this.getAttribute('data-courier');
+                });
+            });
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target === bookingModal) {
+                    closeBookingModal();
+                }
+            });
+        }
+
+        // Open Booking Modal
+        function openBookingModal(product) {
+            bookingData.product = product;
+            
+            // Update modal with product details
+            document.getElementById('bookingProductName').textContent = product.name;
+            document.getElementById('bookingProductPrice').textContent = `₹${product.price.toLocaleString()}`;
+            document.getElementById('bookingTotalPrice').textContent = `₹${product.price.toLocaleString()}`;
+            
+            // Reset forms
+            document.getElementById('step1Form').reset();
+            document.getElementById('step2Form').reset();
+            document.getElementById('step3Form').style.display = 'none';
+            
+            // Show first step
+            showStep(1);
+            
+            // Display modal
+            bookingModal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close Booking Modal
+        function closeBookingModal() {
+            bookingModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            bookingData = {
+                product: null,
+                customer: {},
+                courier: null,
+                total: 0
+            };
+        }
+
+        // Show Specific Step
+        function showStep(stepNumber) {
+            // Update step indicators
+            steps.forEach(step => {
+                if (parseInt(step.getAttribute('data-step')) <= stepNumber) {
+                    step.classList.add('active');
+                } else {
+                    step.classList.remove('active');
+                }
+            });
+            
+            // Show corresponding form
+            bookingForms.forEach(form => {
+                form.classList.remove('active');
+            });
+            
+            document.getElementById(`step${stepNumber}Form`).classList.add('active');
+        }
+
+        // Step Navigation Functions
+        function goToStep2() {
+            // Validate step 1
+            const name = document.getElementById('customerName').value;
+            const email = document.getElementById('customerEmail').value;
+            const phone = document.getElementById('customerPhone').value;
+            const address = document.getElementById('deliveryAddress').value;
+            
+            if (!name || !email || !phone || !address) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            // Save customer data
+            bookingData.customer = {
+                name: name,
+                email: email,
+                phone: phone,
+                address: address
+            };
+            
+            showStep(2);
+        }
+
+        function goToStep1() {
+            showStep(1);
+        }
+
+        function goToStep3() {
+            // Validate step 2
+            if (!bookingData.courier) {
+                alert('Please select a courier service');
+                return;
+            }
+            
+            // Update confirmation details
+            document.getElementById('confirmProductName').textContent = bookingData.product.name;
+            document.getElementById('confirmProductPrice').textContent = `₹${bookingData.product.price.toLocaleString()}`;
+            document.getElementById('confirmCourier').textContent = bookingData.courier === 'bluedart' ? 'Blue Dart (Free)' : 'Delhivery (Free)';
+            document.getElementById('confirmAddress').textContent = bookingData.customer.address;
+            document.getElementById('confirmTotal').textContent = `₹${bookingData.product.price.toLocaleString()}`;
+            
+            showStep(3);
+        }
+
+        function completeBooking() {
+            // Save booking to Firebase
+            saveBookingToFirebase();
+            
+            // Send WhatsApp notification to seller
+            sendWhatsAppNotification();
+            
+            // Show success message
+            alert('Your booking has been confirmed! The seller will contact you shortly.');
+            
+            // Close modal
+            closeBookingModal();
+        }
+
+        // Save Booking to Firebase
+        function saveBookingToFirebase() {
+            const booking = {
+                product: bookingData.product,
+                customer: bookingData.customer,
+                courier: bookingData.courier,
+                total: bookingData.product.price,
+                timestamp: new Date(),
+                status: 'pending'
+            };
+            
+            // In a real application, this would save to Firebase
+            console.log('Booking saved to Firebase:', booking);
+            
+            // Simulate Firebase save
+            if (typeof db !== 'undefined') {
+                db.collection('bookings').add(booking)
+                    .then((docRef) => {
+                        console.log('Booking saved with ID: ', docRef.id);
+                    })
+                    .catch((error) => {
+                        console.error('Error saving booking: ', error);
+                    });
+            }
+        }
+
+        // Send WhatsApp Notification
+        function sendWhatsAppNotification() {
+            const sellerPhone = '+919876543210'; // Seller's phone number
+            const message = `New Booking Alert!%0A%0AProduct: ${bookingData.product.name}%0APrice: ₹${bookingData.product.price.toLocaleString()}%0ACustomer: ${bookingData.customer.name}%0APhone: ${bookingData.customer.phone}%0AEmail: ${bookingData.customer.email}%0AAddress: ${bookingData.customer.address}%0ACourier: ${bookingData.courier}`;
+            
+            const whatsappUrl = `https://wa.me/${sellerPhone}?text=${message}`;
+            
+            // Open WhatsApp in a new tab
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // Initialize Seller Location Map
+        function initSellerLocationMap() {
+            const map = L.map('sellerLocationMap').setView([26.9124, 75.7873], 13); // Jaipur coordinates
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            // Add seller location marker
+            L.marker([26.9124, 75.7873])
+                .addTo(map)
+                .bindPopup('Artisan Forge Workshop<br>Jaipur, India')
+                .openPopup();
+        }
+
+        // Show Product Details (for view details button)
+        function showProductDetails(product) {
+            alert(`Product Details:\n\nName: ${product.name}\nMaterial: ${product.material}\nDimensions: ${product.dimensions}\nWeight: ${product.weight}\nDelivery: ${product.delivery}\n\n${product.description}`);
+        }
+
+        // Courier API Integration (Simulated)
+        function integrateCourierAPI(courier, bookingData) {
+            // In a real application, this would integrate with actual courier APIs
+            console.log(`Integrating with ${courier} API`);
+            
+            // Simulate API response
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve({
+                        success: true,
+                        trackingId: generateTrackingId(),
+                        estimatedDelivery: courier === 'bluedart' ? '3-5 business days' : '5-7 business days',
+                        cost: 0 // Free delivery
+                    });
+                }, 1000);
+            });
+        }
+
+        // Generate Tracking ID
+        function generateTrackingId() {
+            return 'TRK' + Math.random().toString(36).substr(2, 9).toUpperCase();
+        }
+    </script>
+</body>
+</html>

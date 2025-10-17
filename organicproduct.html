@@ -1,0 +1,1634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Organic Collection | SwaDesi Bazaar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    
+    <style>
+        :root {
+            --primary: #2E8B57;
+            --primary-dark: #1F6B41;
+            --secondary: #1A1A1A;
+            --accent: #8B4513;
+            --light: #F8F5F0;
+            --gray: #6C757D;
+            --white: #FFFFFF;
+            --gold: #D4AF37;
+            --error: #e74c3c;
+            --success: #2ecc71;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--secondary);
+            background-color: var(--light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Page Container */
+        .page-container {
+            position: relative;
+            min-height: 100vh;
+        }
+
+        .page {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            min-height: 100vh;
+        }
+
+        .page.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Back Button */
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-weight: 500;
+            cursor: pointer;
+            padding: 10px 0;
+            margin-bottom: 20px;
+            transition: var(--transition);
+        }
+
+        .back-button:hover {
+            color: var(--primary-dark);
+            transform: translateX(-5px);
+        }
+
+        /* Header Styles */
+        header {
+            background-color: var(--white);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .logo h1 {
+            font-size: 28px;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+        }
+
+        .logo span {
+            color: var(--secondary);
+        }
+
+        .search-bar {
+            flex: 1;
+            max-width: 600px;
+            margin: 0 30px;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 14px 20px;
+            border: 1px solid #E5E5E5;
+            border-radius: 50px;
+            font-size: 16px;
+            transition: var(--transition);
+            background-color: #f9f9f9;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(46, 139, 87, 0.2);
+        }
+
+        .search-bar button {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 9px 20px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .search-bar button:hover {
+            background: var(--primary-dark);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .language-selector select {
+            padding: 8px 15px;
+            border: 1px solid #E5E5E5;
+            border-radius: 5px;
+            background-color: white;
+            font-size: 14px;
+        }
+
+        .auth-buttons a {
+            text-decoration: none;
+            color: var(--secondary);
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: var(--transition);
+        }
+
+        .auth-buttons a.login {
+            color: var(--gray);
+        }
+
+        .auth-buttons a.signup {
+            background: var(--primary);
+            color: white;
+        }
+
+        .auth-buttons a.signup:hover {
+            background: var(--primary-dark);
+        }
+
+        .cart-icon {
+            position: relative;
+            font-size: 22px;
+            color: var(--secondary);
+            cursor: pointer;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--primary);
+            color: white;
+            font-size: 12px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Navigation */
+        nav {
+            background-color: var(--secondary);
+            padding: 15px 0;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--primary);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Premium Hero Section */
+        .premium-hero {
+            position: relative;
+            height: 600px;
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.85) 0%, rgba(46, 139, 87, 0.75) 100%), url('https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80') no-repeat center center;
+            background-size: cover;
+            color: white;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .premium-hero-content {
+            max-width: 700px;
+            z-index: 2;
+        }
+
+        .premium-hero h2 {
+            font-size: 52px;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .premium-hero p {
+            font-size: 20px;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .premium-tag {
+            display: inline-block;
+            background: var(--gold);
+            color: var(--secondary);
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 14px 30px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .cta-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Premium Features */
+        .premium-features {
+            padding: 80px 0;
+            background-color: var(--white);
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .section-title h2 {
+            font-size: 36px;
+            color: var(--secondary);
+            margin-bottom: 15px;
+        }
+
+        .section-title p {
+            color: var(--gray);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            background: var(--white);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            text-align: center;
+            border: 1px solid rgba(46, 139, 87, 0.1);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
+        }
+
+        .feature-icon {
+            width: 70px;
+            height: 70px;
+            background: rgba(46, 139, 87, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 28px;
+            color: var(--primary);
+        }
+
+        .feature-card h3 {
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+
+        .feature-card p {
+            color: var(--gray);
+        }
+
+        /* Premium Organic Products */
+        .premium-products {
+            padding: 80px 0;
+            background-color: var(--light);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .premium-product-card {
+            background: var(--white);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .premium-product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .premium-product-image {
+            height: 250px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .premium-product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .premium-product-card:hover .premium-product-image img {
+            transform: scale(1.05);
+        }
+
+        .premium-product-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: var(--gold);
+            color: var(--secondary);
+            padding: 5px 15px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .organic-badge {
+            background: var(--primary);
+            color: white;
+        }
+
+        .premium-product-info {
+            padding: 25px;
+        }
+
+        .premium-product-info h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: var(--secondary);
+        }
+
+        .premium-product-seller {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        .seller-avatar {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background-color: #E5E5E5;
+        }
+
+        .premium-product-location {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            color: var(--gray);
+            margin-bottom: 15px;
+        }
+
+        .premium-product-price {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .premium-price {
+            font-weight: 700;
+            font-size: 22px;
+            color: var(--secondary);
+        }
+
+        .original-price {
+            text-decoration: line-through;
+            color: var(--gray);
+            font-size: 16px;
+            margin-right: 10px;
+        }
+
+        .premium-add-to-cart {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+            gap: 8px;
+        }
+
+        .premium-add-to-cart:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
+        }
+
+        /* Booking System */
+        .booking-system {
+            padding: 80px 0;
+            background-color: var(--white);
+        }
+
+        .booking-container {
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+        }
+
+        .booking-form-container {
+            flex: 1;
+            background: var(--white);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .booking-map-container {
+            flex: 1;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .booking-map {
+            height: 500px;
+            width: 100%;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 15px;
+            border: 1px solid #E5E5E5;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: var(--transition);
+            background-color: #f9f9f9;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(46, 139, 87, 0.2);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .courier-options {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .courier-option {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            border: 2px solid #E5E5E5;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .courier-option.selected {
+            border-color: var(--primary);
+            background: rgba(46, 139, 87, 0.05);
+        }
+
+        .courier-logo {
+            height: 40px;
+            margin-bottom: 10px;
+            object-fit: contain;
+        }
+
+        .courier-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .courier-details {
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        .free-delivery {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .submit-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 16px 30px;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: block;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .submit-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Order Confirmation */
+        .order-confirmation {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            background: var(--white);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+        }
+
+        .confirmation-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(46, 204, 113, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 36px;
+            color: var(--success);
+        }
+
+        .order-confirmation h3 {
+            font-size: 28px;
+            margin-bottom: 15px;
+            color: var(--secondary);
+        }
+
+        .order-confirmation p {
+            color: var(--gray);
+            margin-bottom: 25px;
+        }
+
+        .order-details {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        .order-details h4 {
+            margin-bottom: 15px;
+            color: var(--secondary);
+        }
+
+        .order-detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .order-detail-label {
+            color: var(--gray);
+        }
+
+        .order-detail-value {
+            font-weight: 600;
+        }
+
+        /* Seller Notification */
+        .seller-notification {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .seller-notification h4 {
+            margin-bottom: 15px;
+            color: var(--secondary);
+        }
+
+        .whatsapp-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: #25D366;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .whatsapp-btn:hover {
+            background: #128C7E;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--secondary);
+            color: white;
+            padding: 60px 0 0;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: #CCCCCC;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding: 30px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #999;
+            font-size: 14px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .premium-hero h2 {
+                font-size: 40px;
+            }
+            
+            .search-bar {
+                max-width: 400px;
+            }
+            
+            .booking-container {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-top {
+                flex-wrap: wrap;
+            }
+            
+            .search-bar {
+                order: 3;
+                margin: 15px 0 0;
+                max-width: 100%;
+            }
+            
+            .premium-hero h2 {
+                font-size: 32px;
+            }
+            
+            .premium-hero {
+                height: 500px;
+            }
+            
+            .section-title h2 {
+                font-size: 28px;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .premium-hero h2 {
+                font-size: 28px;
+            }
+            
+            .premium-hero p {
+                font-size: 16px;
+            }
+            
+            .features-grid, .products-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <!-- Premium Organic Products Page -->
+        <div id="premium-organic-page" class="page active">
+            <!-- Header -->
+            <header>
+                <div class="container">
+                    <div class="header-top">
+                        <div class="logo" id="premium-logo">
+                            <h1>Swa<span>Desi</span> Bazaar</h1>
+                        </div>
+                        <div class="search-bar">
+                            <input type="text" placeholder="Search for premium organic products...">
+                            <button><i class="fas fa-search"></i></button>
+                        </div>
+                        <div class="header-actions">
+                            <div class="language-selector">
+                                <select>
+                                    <option>English</option>
+                                    <option>हिन्दी</option>
+                                    <option>தமிழ்</option>
+                                    <option>বাংলা</option>
+                                    <option>తెలుగు</option>
+                                </select>
+                            </div>
+                            <div class="auth-buttons">
+                                <a href="#" class="login" id="premium-login-link">Login</a>
+                                <a href="#" class="signup" id="premium-signup-link">Sign Up</a>
+                            </div>
+                            <div class="cart-icon">
+                                <i class="fas fa-shopping-bag"></i>
+                                <span class="cart-count">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <nav>
+                    <div class="container">
+                        <ul class="nav-links">
+                            <li><a href="#">Home</a></li>
+                            <li><a href="#">Premium Organic</a></li>
+                            <li><a href="#">Farm Fresh</a></li>
+                            <li><a href="#">Artisanal Foods</a></li>
+                            <li><a href="#">Herbal Products</a></li>
+                            <li><a href="#">Local Markets</a></li>
+                            <li><a href="#">Farmers</a></li>
+                        </ul>
+                    </div>
+                </nav>
+            </header>
+
+            <!-- Premium Hero Section -->
+            <section class="premium-hero">
+                <div class="container">
+                    <div class="premium-hero-content">
+                        <span class="premium-tag">PREMIUM ORGANIC COLLECTION</span>
+                        <h2>Farm-to-Table Excellence, Delivered to Your Doorstep</h2>
+                        <p>Experience the finest organic produce, carefully sourced from local farms and delivered with our premium service. Purity, quality, and sustainability in every product.</p>
+                        <a href="#premium-products" class="cta-button">Explore Premium Collection</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Premium Features -->
+            <section class="premium-features">
+                <div class="container">
+                    <div class="section-title">
+                        <h2>Why Choose Our Premium Organic Collection</h2>
+                        <p>We're redefining organic shopping with exceptional quality and service</p>
+                    </div>
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-seedling"></i>
+                            </div>
+                            <h3>100% Certified Organic</h3>
+                            <p>All our products are certified organic with no pesticides, chemicals, or artificial additives.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-truck"></i>
+                            </div>
+                            <h3>Free Premium Delivery</h3>
+                            <p>Enjoy free delivery with our premium courier partners like BlueDart and Delhivery.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <h3>Real-Time Farm Location</h3>
+                            <p>Track your product's origin with real-time GPS location of our partner farms.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-phone-alt"></i>
+                            </div>
+                            <h3>Direct Farmer Connect</h3>
+                            <p>Get instant WhatsApp notifications to farmers when you place an order.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Premium Organic Products -->
+            <section class="premium-products" id="premium-products">
+                <div class="container">
+                    <div class="section-title">
+                        <h2>Premium Organic Collection</h2>
+                        <p>Handpicked, carefully curated organic products from trusted local farms</p>
+                    </div>
+                    <div class="products-grid" id="premiumProductsContainer">
+                        <!-- Products will be dynamically loaded here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Booking System -->
+            <section class="booking-system" id="booking-system">
+                <div class="container">
+                    <div class="section-title">
+                        <h2>Book Your Premium Organic Products</h2>
+                        <p>Complete your order with our premium booking system</p>
+                    </div>
+                    
+                    <div class="booking-container">
+                        <div class="booking-form-container">
+                            <form id="bookingForm">
+                                <h3 style="margin-bottom: 20px;">Order Details</h3>
+                                
+                                <div class="form-group">
+                                    <label for="customerName">Full Name</label>
+                                    <input type="text" id="customerName" class="form-control" placeholder="Enter your full name" required>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="customerEmail">Email Address</label>
+                                        <input type="email" id="customerEmail" class="form-control" placeholder="Enter your email" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="customerPhone">Phone Number</label>
+                                        <input type="tel" id="customerPhone" class="form-control" placeholder="Enter your phone number" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="deliveryAddress">Delivery Address</label>
+                                    <textarea id="deliveryAddress" class="form-control" rows="3" placeholder="Enter your complete delivery address" required></textarea>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="deliveryDate">Preferred Delivery Date</label>
+                                    <input type="date" id="deliveryDate" class="form-control" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Select Courier Service</label>
+                                    <div class="courier-options">
+                                        <div class="courier-option" data-courier="bluedart">
+                                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Blue_Dart_Logo.svg/2560px-Blue_Dart_Logo.svg.png" alt="Blue Dart" class="courier-logo">
+                                            <div class="courier-name">Blue Dart</div>
+                                            <div class="courier-details">
+                                                <span class="free-delivery">Free Delivery</span>
+                                                <div>1-2 Days</div>
+                                            </div>
+                                        </div>
+                                        <div class="courier-option" data-courier="delhivery">
+                                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Delhivery_Logo.svg/2560px-Delhivery_Logo.svg.png" alt="Delhivery" class="courier-logo">
+                                            <div class="courier-name">Delhivery</div>
+                                            <div class="courier-details">
+                                                <span class="free-delivery">Free Delivery</span>
+                                                <div>2-3 Days</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <button type="submit" class="submit-btn" id="submitBooking">
+                                    <i class="fas fa-shopping-bag"></i> Confirm Booking
+                                </button>
+                            </form>
+                            
+                            <div class="order-confirmation" id="orderConfirmation">
+                                <div class="confirmation-icon">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <h3>Order Confirmed!</h3>
+                                <p>Your premium organic order has been successfully placed.</p>
+                                
+                                <div class="order-details">
+                                    <h4>Order Summary</h4>
+                                    <div class="order-detail-row">
+                                        <span class="order-detail-label">Order ID:</span>
+                                        <span class="order-detail-value" id="confirmationOrderId">#SWA12345</span>
+                                    </div>
+                                    <div class="order-detail-row">
+                                        <span class="order-detail-label">Total Amount:</span>
+                                        <span class="order-detail-value" id="confirmationTotal">₹0</span>
+                                    </div>
+                                    <div class="order-detail-row">
+                                        <span class="order-detail-label">Delivery Date:</span>
+                                        <span class="order-detail-value" id="confirmationDate">-</span>
+                                    </div>
+                                    <div class="order-detail-row">
+                                        <span class="order-detail-label">Courier Service:</span>
+                                        <span class="order-detail-value" id="confirmationCourier">-</span>
+                                    </div>
+                                </div>
+                                
+                                <p>You will receive a confirmation email shortly.</p>
+                                
+                                <div class="seller-notification">
+                                    <h4>Seller Notification Sent</h4>
+                                    <p>The farmer has been notified via WhatsApp about your order.</p>
+                                    <a href="#" class="whatsapp-btn" id="whatsappLink" target="_blank">
+                                        <i class="fab fa-whatsapp"></i> View WhatsApp Message
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="booking-map-container">
+                            <div class="booking-map" id="bookingMap"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Footer -->
+            <footer>
+                <div class="container">
+                    <div class="footer-content">
+                        <div class="footer-column">
+                            <h3>SwaDesi Bazaar</h3>
+                            <p>Your Premium Organic Market, Powered by Technology. Connecting you with authentic local farmers and artisans.</p>
+                        </div>
+                        <div class="footer-column">
+                            <h3>Quick Links</h3>
+                            <ul class="footer-links">
+                                <li><a href="#">Home</a></li>
+                                <li><a href="#">About Us</a></li>
+                                <li><a href="#">Sell on SwaDesi</a></li>
+                                <li><a href="#">Careers</a></li>
+                                <li><a href="#">Contact Us</a></li>
+                            </ul>
+                        </div>
+                        <div class="footer-column">
+                            <h3>Customer Service</h3>
+                            <ul class="footer-links">
+                                <li><a href="#">Help Center</a></li>
+                                <li><a href="#">Returns & Refunds</a></li>
+                                <li><a href="#">Shipping Info</a></li>
+                                <li><a href="#">Track Your Order</a></li>
+                                <li><a href="#">Privacy Policy</a></li>
+                            </ul>
+                        </div>
+                        <div class="footer-column">
+                            <h3>Contact Info</h3>
+                            <ul class="footer-links">
+                                <li><i class="fas fa-map-marker-alt"></i> 123 Organic Market, New Delhi, India</li>
+                                <li><i class="fas fa-phone"></i> +91 98765 43210</li>
+                                <li><i class="fas fa-envelope"></i> premium@swadesibazaar.com</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="footer-bottom">
+                        <p>&copy; 2023 SwaDesi Bazaar Premium Organic. All rights reserved.</p>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC4wGDrRHs4gQN6p8Q9X7VqY9t8d4Jk8Xw",
+            authDomain: "swadesi-bazaar-premium.firebaseapp.com",
+            projectId: "swadesi-bazaar-premium",
+            storageBucket: "swadesi-bazaar-premium.appspot.com",
+            messagingSenderId: "123456789012",
+            appId: "1:123456789012:web:abcdef1234567890"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Premium Organic Products Data
+        const premiumProducts = [
+            {
+                id: 1,
+                name: "Organic Himalayan Red Rice",
+                price: 450,
+                originalPrice: 520,
+                seller: "Himalayan Organics",
+                location: "Uttarakhand",
+                image: "https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+                category: "grains",
+                farmerPhone: "+919876543210",
+                coordinates: [30.0668, 79.0193]
+            },
+            {
+                id: 2,
+                name: "Cold-Pressed Coconut Oil",
+                price: 680,
+                originalPrice: 750,
+                seller: "Kerala Naturals",
+                location: "Kerala",
+                image: "https://images.unsplash.com/photo-1584370848018-446cafd63819?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2062&q=80",
+                category: "oils",
+                farmerPhone: "+919876543211",
+                coordinates: [10.8505, 76.2711]
+            },
+            {
+                id: 3,
+                name: "Organic Turmeric Powder",
+                price: 320,
+                originalPrice: 380,
+                seller: "Spice Roots",
+                location: "Tamil Nadu",
+                image: "https://images.unsplash.com/photo-1599088348607-9cebd352d7a0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+                category: "spices",
+                farmerPhone: "+919876543212",
+                coordinates: [11.1271, 78.6569]
+            },
+            {
+                id: 4,
+                name: "Fresh Organic Mangoes",
+                price: 850,
+                originalPrice: 950,
+                seller: "Mango Valley Farms",
+                location: "Maharashtra",
+                image: "https://images.unsplash.com/photo-1553279768-865429fa0078?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80",
+                category: "fruits",
+                farmerPhone: "+919876543213",
+                coordinates: [19.7515, 75.7139]
+            },
+            {
+                id: 5,
+                name: "Organic Almonds",
+                price: 1200,
+                originalPrice: 1350,
+                seller: "Kashmir Nut Farms",
+                location: "Jammu & Kashmir",
+                image: "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2069&q=80",
+                category: "nuts",
+                farmerPhone: "+919876543214",
+                coordinates: [34.0837, 74.7973]
+            },
+            {
+                id: 6,
+                name: "Organic Honey",
+                price: 580,
+                originalPrice: 650,
+                seller: "Himalayan Bee Farms",
+                location: "Himachal Pradesh",
+                image: "https://images.unsplash.com/photo-1587049633312-d628ae50a8ae?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2080&q=80",
+                category: "sweeteners",
+                farmerPhone: "+919876543215",
+                coordinates: [31.1048, 77.1734]
+            }
+        ];
+
+        // Global variables
+        let selectedProduct = null;
+        let selectedCourier = null;
+        let bookingMap = null;
+        let farmerMarker = null;
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPremiumProducts();
+            setupCourierSelection();
+            setupBookingForm();
+            initializeBookingMap();
+            setupCartButtons();
+        });
+
+        // Load Premium Products
+        function loadPremiumProducts() {
+            const container = document.getElementById('premiumProductsContainer');
+            
+            premiumProducts.forEach(product => {
+                const productCard = createProductCard(product);
+                container.appendChild(productCard);
+            });
+        }
+
+        // Create Product Card
+        function createProductCard(product) {
+            const card = document.createElement('div');
+            card.className = 'premium-product-card';
+            card.setAttribute('data-product-id', product.id);
+            
+            card.innerHTML = `
+                <div class="premium-product-image">
+                    <img src="${product.image}" alt="${product.name}">
+                    <span class="premium-product-badge organic-badge">100% ORGANIC</span>
+                </div>
+                <div class="premium-product-info">
+                    <h3>${product.name}</h3>
+                    <div class="premium-product-seller">
+                        <div class="seller-avatar"></div>
+                        <span>${product.seller}</span>
+                    </div>
+                    <div class="premium-product-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>${product.location}</span>
+                    </div>
+                    <div class="premium-product-price">
+                        <div>
+                            <span class="original-price">₹${product.originalPrice}</span>
+                            <span class="premium-price">₹${product.price}</span>
+                        </div>
+                        <button class="premium-add-to-cart" data-product-id="${product.id}">
+                            <i class="fas fa-shopping-bag"></i> Add to Cart
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        // Setup Add to Cart Buttons
+        function setupCartButtons() {
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('premium-add-to-cart') || 
+                    e.target.closest('.premium-add-to-cart')) {
+                    
+                    const button = e.target.classList.contains('premium-add-to-cart') ? 
+                                  e.target : e.target.closest('.premium-add-to-cart');
+                    
+                    const productId = button.getAttribute('data-product-id');
+                    addToCart(productId);
+                    
+                    // Scroll to booking section
+                    document.getElementById('booking-system').scrollIntoView({ 
+                        behavior: 'smooth' 
+                    });
+                }
+            });
+        }
+
+        // Add to Cart Functionality
+        function addToCart(productId) {
+            const product = premiumProducts.find(p => p.id == productId);
+            if (!product) return;
+            
+            selectedProduct = product;
+            
+            // Update cart count
+            const cartCount = document.querySelector('.cart-count');
+            let currentCount = parseInt(cartCount.textContent);
+            cartCount.textContent = currentCount + 1;
+            
+            // Show confirmation
+            alert(`${product.name} added to cart!`);
+            
+            // Update farmer location on map
+            updateFarmerLocation(product.coordinates, product.seller);
+            
+            // Update order summary
+            updateOrderSummary(product);
+        }
+
+        // Setup Courier Selection
+        function setupCourierSelection() {
+            const courierOptions = document.querySelectorAll('.courier-option');
+            
+            courierOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove selected class from all options
+                    courierOptions.forEach(opt => opt.classList.remove('selected'));
+                    
+                    // Add selected class to clicked option
+                    this.classList.add('selected');
+                    
+                    // Store selected courier
+                    selectedCourier = this.getAttribute('data-courier');
+                });
+            });
+        }
+
+        // Initialize Booking Map
+        function initializeBookingMap() {
+            bookingMap = L.map('bookingMap').setView([20.5937, 78.9629], 5);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(bookingMap);
+            
+            // Add user location if available
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const userLat = position.coords.latitude;
+                        const userLng = position.coords.longitude;
+                        
+                        L.marker([userLat, userLng])
+                            .addTo(bookingMap)
+                            .bindPopup('Your Location')
+                            .openPopup();
+                    },
+                    (error) => {
+                        console.log('Geolocation error:', error);
+                    }
+                );
+            }
+        }
+
+        // Update Farmer Location on Map
+        function updateFarmerLocation(coordinates, sellerName) {
+            // Remove existing farmer marker
+            if (farmerMarker) {
+                bookingMap.removeLayer(farmerMarker);
+            }
+            
+            // Add new farmer marker
+            farmerMarker = L.marker(coordinates)
+                .addTo(bookingMap)
+                .bindPopup(`<b>${sellerName}</b><br>Product Origin`)
+                .openPopup();
+            
+            // Adjust map view to show both user and farmer
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const userLat = position.coords.latitude;
+                        const userLng = position.coords.longitude;
+                        
+                        const group = new L.featureGroup([
+                            L.marker([userLat, userLng]),
+                            farmerMarker
+                        ]);
+                        
+                        bookingMap.fitBounds(group.getBounds().pad(0.1));
+                    },
+                    (error) => {
+                        // If user location not available, just focus on farmer
+                        bookingMap.setView(coordinates, 7);
+                    }
+                );
+            } else {
+                // If geolocation not supported, just focus on farmer
+                bookingMap.setView(coordinates, 7);
+            }
+        }
+
+        // Update Order Summary
+        function updateOrderSummary(product) {
+            // This would be expanded in a real implementation
+            console.log(`Order summary updated for: ${product.name}`);
+        }
+
+        // Setup Booking Form
+        function setupBookingForm() {
+            const bookingForm = document.getElementById('bookingForm');
+            const orderConfirmation = document.getElementById('orderConfirmation');
+            
+            // Set minimum delivery date to tomorrow
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const tomorrowFormatted = tomorrow.toISOString().split('T')[0];
+            document.getElementById('deliveryDate').min = tomorrowFormatted;
+            
+            bookingForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Validate form
+                if (!validateBookingForm()) {
+                    return;
+                }
+                
+                // Process booking
+                processBooking();
+            });
+        }
+
+        // Validate Booking Form
+        function validateBookingForm() {
+            const customerName = document.getElementById('customerName').value;
+            const customerEmail = document.getElementById('customerEmail').value;
+            const customerPhone = document.getElementById('customerPhone').value;
+            const deliveryAddress = document.getElementById('deliveryAddress').value;
+            const deliveryDate = document.getElementById('deliveryDate').value;
+            
+            if (!customerName || !customerEmail || !customerPhone || !deliveryAddress || !deliveryDate) {
+                alert('Please fill in all required fields.');
+                return false;
+            }
+            
+            if (!selectedProduct) {
+                alert('Please add a product to your cart before booking.');
+                return false;
+            }
+            
+            if (!selectedCourier) {
+                alert('Please select a courier service.');
+                return false;
+            }
+            
+            return true;
+        }
+
+        // Process Booking
+        function processBooking() {
+            // Get form data
+            const customerName = document.getElementById('customerName').value;
+            const customerEmail = document.getElementById('customerEmail').value;
+            const customerPhone = document.getElementById('customerPhone').value;
+            const deliveryAddress = document.getElementById('deliveryAddress').value;
+            const deliveryDate = document.getElementById('deliveryDate').value;
+            
+            // Generate order ID
+            const orderId = 'SWA' + Math.floor(10000 + Math.random() * 90000);
+            
+            // Save order to Firebase
+            saveOrderToFirebase({
+                orderId: orderId,
+                customerName: customerName,
+                customerEmail: customerEmail,
+                customerPhone: customerPhone,
+                deliveryAddress: deliveryAddress,
+                deliveryDate: deliveryDate,
+                product: selectedProduct,
+                courier: selectedCourier,
+                status: 'confirmed',
+                timestamp: new Date()
+            });
+            
+            // Send WhatsApp notification to farmer
+            sendWhatsAppNotification(selectedProduct.farmerPhone, {
+                orderId: orderId,
+                product: selectedProduct.name,
+                customer: customerName,
+                phone: customerPhone,
+                address: deliveryAddress,
+                date: deliveryDate
+            });
+            
+            // Show confirmation
+            showOrderConfirmation({
+                orderId: orderId,
+                product: selectedProduct,
+                courier: selectedCourier,
+                deliveryDate: deliveryDate
+            });
+            
+            // Reset form
+            document.getElementById('bookingForm').reset();
+            
+            // Reset cart
+            const cartCount = document.querySelector('.cart-count');
+            cartCount.textContent = '0';
+            selectedProduct = null;
+            
+            // Reset courier selection
+            document.querySelectorAll('.courier-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            selectedCourier = null;
+        }
+
+        // Save Order to Firebase
+        function saveOrderToFirebase(orderData) {
+            db.collection('premiumOrders').add(orderData)
+                .then((docRef) => {
+                    console.log('Order saved with ID: ', docRef.id);
+                })
+                .catch((error) => {
+                    console.error('Error saving order: ', error);
+                    // In a real app, you would handle this error appropriately
+                });
+        }
+
+        // Send WhatsApp Notification
+        function sendWhatsAppNotification(farmerPhone, orderDetails) {
+            // Format the message
+            const message = `New Order Notification%0A%0A` +
+                           `Order ID: ${orderDetails.orderId}%0A` +
+                           `Product: ${orderDetails.product}%0A` +
+                           `Customer: ${orderDetails.customer}%0A` +
+                           `Phone: ${orderDetails.phone}%0A` +
+                           `Address: ${orderDetails.address}%0A` +
+                           `Delivery Date: ${orderDetails.date}%0A%0A` +
+                           `Please prepare the order for delivery.`;
+            
+            // Create WhatsApp link
+            const whatsappLink = `https://wa.me/${farmerPhone}?text=${message}`;
+            
+            // Update the WhatsApp link in the confirmation
+            document.getElementById('whatsappLink').href = whatsappLink;
+            
+            // In a real implementation, you might want to actually send this
+            // For demo purposes, we'll just log it
+            console.log('WhatsApp notification prepared:', whatsappLink);
+        }
+
+        // Show Order Confirmation
+        function showOrderConfirmation(orderDetails) {
+            // Hide form, show confirmation
+            document.getElementById('bookingForm').style.display = 'none';
+            document.getElementById('orderConfirmation').style.display = 'block';
+            
+            // Update confirmation details
+            document.getElementById('confirmationOrderId').textContent = '#' + orderDetails.orderId;
+            document.getElementById('confirmationTotal').textContent = '₹' + orderDetails.product.price;
+            document.getElementById('confirmationDate').textContent = orderDetails.deliveryDate;
+            document.getElementById('confirmationCourier').textContent = 
+                orderDetails.courier === 'bluedart' ? 'Blue Dart' : 'Delhivery';
+        }
+
+        // Courier Service API Integration (Mock)
+        function integrateCourierAPI(courier, orderDetails) {
+            // This is a mock implementation
+            // In a real application, you would integrate with actual courier APIs
+            
+            const apiEndpoints = {
+                bluedart: 'https://api.bluedart.com/shipments',
+                delhivery: 'https://api.delhivery.com/orders'
+            };
+            
+            const payload = {
+                order_id: orderDetails.orderId,
+                customer_name: orderDetails.customerName,
+                customer_phone: orderDetails.customerPhone,
+                customer_address: orderDetails.deliveryAddress,
+                product: orderDetails.product.name,
+                weight: '1kg', // This would be dynamic in a real app
+                value: orderDetails.product.price
+            };
+            
+            // Mock API call
+            console.log(`Sending request to ${apiEndpoints[courier]} with payload:`, payload);
+            
+            // In a real implementation, you would use fetch or axios
+            // fetch(apiEndpoints[courier], {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/json',
+            //         'Authorization': 'Bearer YOUR_API_KEY'
+            //     },
+            //     body: JSON.stringify(payload)
+            // })
+            // .then(response => response.json())
+            // .then(data => {
+            //     console.log('Courier API response:', data);
+            // })
+            // .catch(error => {
+            //     console.error('Courier API error:', error);
+            // });
+            
+            // For demo, return a mock response
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve({
+                        success: true,
+                        tracking_id: 'TRK' + Math.floor(1000000000 + Math.random() * 9000000000),
+                        estimated_delivery: orderDetails.deliveryDate
+                    });
+                }, 1000);
+            });
+        }
+    </script>
+</body>
+</html>

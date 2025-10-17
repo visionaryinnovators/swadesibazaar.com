@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KrishiVani Pro | Premium Weather Intelligence for Indian Agriculture</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        :root {
+            --primary: #2E8B57;
+            --primary-dark: #1F6B41;
+            --secondary: #1A1A1A;
+            --accent: #8B4513;
+            --light: #F8F5F0;
+            --gold: #D4AF37;
+            --gray: #6C757D;
+            --white: #FFFFFF;
+            --warning: #FFA500;
+            --danger: #DC143C;
+            --info: #1E90FF;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--secondary);
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Premium Header */
+        .premium-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 15px 0;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo h1 {
+            font-size: 28px;
+            color: white;
+            letter-spacing: -0.5px;
+        }
+
+        .logo span {
+            color: var(--gold);
+        }
+
+        .logo-icon {
+            font-size: 32px;
+            color: var(--gold);
+        }
+
+        .language-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .language-selector select {
+            padding: 8px 15px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 14px;
+        }
+
+        .language-selector select option {
+            background-color: var(--primary-dark);
+            color: white;
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            height: 600px;
+            background: linear-gradient(135deg, rgba(46, 139, 87, 0.9) 0%, rgba(31, 107, 65, 0.9) 100%), url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2832&q=80') no-repeat center center;
+            background-size: cover;
+            color: white;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            z-index: 2;
+        }
+
+        .hero h2 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 18px;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .search-box {
+            display: flex;
+            max-width: 600px;
+            margin-top: 30px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 16px 20px;
+            border: none;
+            border-radius: 5px 0 0 5px;
+            font-size: 16px;
+        }
+
+        .search-box button {
+            background: var(--gold);
+            color: var(--secondary);
+            border: none;
+            padding: 0 25px;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .search-box button:hover {
+            background: #e6b800;
+        }
+
+        /* Current Weather */
+        .current-weather {
+            padding: 50px 0;
+            background-color: var(--white);
+        }
+
+        .weather-card {
+            background: linear-gradient(135deg, #1E3C72 0%, #2A5298 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .weather-main {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .weather-icon {
+            font-size: 64px;
+        }
+
+        .temperature {
+            font-size: 48px;
+            font-weight: 700;
+        }
+
+        .weather-details {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .weather-detail {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Forecast Section */
+        .forecast {
+            padding: 80px 0;
+            background-color: var(--light);
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .section-title h2 {
+            font-size: 36px;
+            color: var(--secondary);
+            margin-bottom: 15px;
+        }
+
+        .section-title p {
+            color: var(--gray);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .forecast-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .forecast-day {
+            background: var(--white);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .forecast-day:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .forecast-date {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--secondary);
+        }
+
+        .forecast-icon {
+            font-size: 36px;
+            margin: 15px 0;
+            color: var(--primary);
+        }
+
+        .forecast-temp {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .forecast-desc {
+            color: var(--gray);
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .weather-alert {
+            background: var(--danger);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .weather-warning {
+            background: var(--warning);
+            color: var(--secondary);
+        }
+
+        /* Agricultural Insights */
+        .agricultural-insights {
+            padding: 80px 0;
+            background-color: var(--white);
+        }
+
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .insight-card {
+            background: var(--white);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border-left: 4px solid var(--primary);
+        }
+
+        .insight-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .insight-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(46, 139, 87, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: var(--primary);
+        }
+
+        .insight-card h3 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: var(--secondary);
+        }
+
+        .insight-card p {
+            color: var(--gray);
+            margin-bottom: 20px;
+        }
+
+        .insight-status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .status-good {
+            background: rgba(46, 204, 113, 0.2);
+            color: #27ae60;
+        }
+
+        .status-warning {
+            background: rgba(241, 196, 15, 0.2);
+            color: #f39c12;
+        }
+
+        .status-danger {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+        }
+
+        /* Regional Map */
+        .regional-map {
+            padding: 80px 0;
+            background-color: var(--light);
+        }
+
+        .map-container {
+            height: 500px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        #weatherMap {
+            height: 100%;
+            width: 100%;
+        }
+
+        /* Alerts Section */
+        .alerts {
+            padding: 80px 0;
+            background-color: var(--white);
+        }
+
+        .alert-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .alert-card {
+            background: var(--white);
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--danger);
+            transition: var(--transition);
+        }
+
+        .alert-card.warning {
+            border-left-color: var(--warning);
+        }
+
+        .alert-card.info {
+            border-left-color: var(--info);
+        }
+
+        .alert-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .alert-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .alert-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(220, 20, 60, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: var(--danger);
+        }
+
+        .warning .alert-icon {
+            background: rgba(255, 165, 0, 0.1);
+            color: var(--warning);
+        }
+
+        .info .alert-icon {
+            background: rgba(30, 144, 255, 0.1);
+            color: var(--info);
+        }
+
+        .alert-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--secondary);
+        }
+
+        .alert-content p {
+            color: var(--gray);
+            margin-bottom: 15px;
+        }
+
+        .alert-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: rgba(46, 139, 87, 0.1);
+        }
+
+        /* Footer */
+        footer {
+            background: linear-gradient(135deg, var(--secondary) 0%, #2C3E50 100%);
+            color: white;
+            padding: 60px 0 0;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: var(--gold);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: #CCCCCC;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--gold);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding: 30px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #999;
+            font-size: 14px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .hero h2 {
+                font-size: 40px;
+            }
+            
+            .weather-card {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .hero h2 {
+                font-size: 32px;
+            }
+            
+            .hero {
+                height: 500px;
+            }
+            
+            .section-title h2 {
+                font-size: 28px;
+            }
+            
+            .forecast-container {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h2 {
+                font-size: 28px;
+            }
+            
+            .hero p {
+                font-size: 16px;
+            }
+            
+            .insights-grid, .alert-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-box {
+                flex-direction: column;
+            }
+            
+            .search-box input {
+                border-radius: 5px;
+                margin-bottom: 10px;
+            }
+            
+            .search-box button {
+                border-radius: 5px;
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Premium Header -->
+    <header class="premium-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-seedling logo-icon"></i>
+                    <h1>Krishi<span>Vani</span> Pro</h1>
+                </div>
+                <div class="language-selector">
+                    <select id="languageSelect">
+                        <option value="en">English</option>
+                        <option value="hi">हिन्दी</option>
+                        <option value="ta">தமிழ்</option>
+                        <option value="te">తెలుగు</option>
+                        <option value="bn">বাংলা</option>
+                        <option value="mr">मराठी</option>
+                        <option value="gu">ગુજરાતી</option>
+                        <option value="kn">ಕನ್ನಡ</option>
+                        <option value="ml">മലയാളം</option>
+                        <option value="pa">ਪੰਜਾਬੀ</option>
+                        <option value="or">ଓଡ଼ିଆ</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h2>Premium Weather Intelligence for Indian Agriculture</h2>
+                <p>Get accurate 10-day weather forecasts, agricultural insights, and early warnings for cyclones, droughts, and floods. Make informed decisions for your crops and business.</p>
+                <div class="search-box">
+                    <input type="text" id="locationInput" placeholder="Enter your district, village or pin code...">
+                    <button id="searchButton"><i class="fas fa-search"></i> Search</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Current Weather -->
+    <section class="current-weather">
+        <div class="container">
+            <div class="weather-card">
+                <div class="weather-main">
+                    <div class="weather-icon">
+                        <i class="fas fa-sun"></i>
+                    </div>
+                    <div>
+                        <div class="temperature">28°C</div>
+                        <div class="location">New Delhi, Delhi</div>
+                        <div class="condition">Mostly Sunny</div>
+                    </div>
+                </div>
+                <div class="weather-details">
+                    <div class="weather-detail">
+                        <i class="fas fa-wind"></i>
+                        <span>Wind: 12 km/h</span>
+                    </div>
+                    <div class="weather-detail">
+                        <i class="fas fa-tint"></i>
+                        <span>Humidity: 45%</span>
+                    </div>
+                    <div class="weather-detail">
+                        <i class="fas fa-compress-arrows-alt"></i>
+                        <span>Pressure: 1012 hPa</span>
+                    </div>
+                    <div class="weather-detail">
+                        <i class="fas fa-eye"></i>
+                        <span>Visibility: 10 km</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 10-Day Forecast -->
+    <section class="forecast">
+        <div class="container">
+            <div class="section-title">
+                <h2>10-Day Weather Forecast</h2>
+                <p>Detailed weather predictions to help you plan your agricultural activities</p>
+            </div>
+            <div class="forecast-container" id="forecastContainer">
+                <!-- Forecast days will be dynamically added here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Agricultural Insights -->
+    <section class="agricultural-insights">
+        <div class="container">
+            <div class="section-title">
+                <h2>Agricultural Insights</h2>
+                <p>Personalized recommendations based on weather conditions and crop cycles</p>
+            </div>
+            <div class="insights-grid" id="insightsContainer">
+                <!-- Insights will be dynamically added here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Regional Weather Map -->
+    <section class="regional-map">
+        <div class="container">
+            <div class="section-title">
+                <h2>Regional Weather Map</h2>
+                <p>Interactive map showing weather patterns across India</p>
+            </div>
+            <div class="map-container">
+                <div id="weatherMap"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Weather Alerts -->
+    <section class="alerts">
+        <div class="container">
+            <div class="section-title">
+                <h2>Weather Alerts & Warnings</h2>
+                <p>Critical information about potential weather hazards</p>
+            </div>
+            <div class="alert-cards" id="alertsContainer">
+                <!-- Alerts will be dynamically added here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>KrishiVani Pro</h3>
+                    <p>Your trusted partner in agricultural weather intelligence. Making farming smarter and more profitable.</p>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">Forecast</a></li>
+                        <li><a href="#">Agricultural Tips</a></li>
+                        <li><a href="#">Market Prices</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Services</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Weather Forecast</a></li>
+                        <li><a href="#">Crop Advisory</a></li>
+                        <li><a href="#">Pest & Disease Alert</a></li>
+                        <li><a href="#">Irrigation Schedule</a></li>
+                        <li><a href="#">Market Insights</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contact Info</h3>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-map-marker-alt"></i> Krishi Bhavan, New Delhi, India</li>
+                        <li><i class="fas fa-phone"></i> +91 1800-123-4567</li>
+                        <li><i class="fas fa-envelope"></i> support@krishivani.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 KrishiVani Pro. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize weather map
+            initWeatherMap();
+            
+            // Load forecast data
+            loadForecastData();
+            
+            // Load agricultural insights
+            loadAgriculturalInsights();
+            
+            // Load weather alerts
+            loadWeatherAlerts();
+            
+            // Setup event listeners
+            setupEventListeners();
+        });
+
+        // Initialize Weather Map
+        function initWeatherMap() {
+            const map = L.map('weatherMap').setView([20.5937, 78.9629], 5);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            // Add weather markers for major cities
+            const cities = [
+                { name: 'New Delhi', lat: 28.6139, lng: 77.2090, temp: '28°C', condition: 'Sunny' },
+                { name: 'Mumbai', lat: 19.0760, lng: 72.8777, temp: '30°C', condition: 'Humid' },
+                { name: 'Chennai', lat: 13.0827, lng: 80.2707, temp: '32°C', condition: 'Partly Cloudy' },
+                { name: 'Kolkata', lat: 22.5726, lng: 88.3639, temp: '29°C', condition: 'Cloudy' },
+                { name: 'Bengaluru', lat: 12.9716, lng: 77.5946, temp: '26°C', condition: 'Rain' },
+                { name: 'Hyderabad', lat: 17.3850, lng: 78.4867, temp: '31°C', condition: 'Clear' }
+            ];
+            
+            cities.forEach(city => {
+                const marker = L.marker([city.lat, city.lng]).addTo(map);
+                marker.bindPopup(`
+                    <div style="text-align: center;">
+                        <h3>${city.name}</h3>
+                        <p><strong>${city.temp}</strong> - ${city.condition}</p>
+                    </div>
+                `);
+            });
+            
+            // Store map reference
+            window.weatherMap = map;
+        }
+
+        // Load Forecast Data
+        function loadForecastData() {
+            const forecastContainer = document.getElementById('forecastContainer');
+            forecastContainer.innerHTML = '';
+            
+            // Sample forecast data
+            const forecastData = [
+                { date: 'Today', icon: 'fa-sun', temp: '28°C', desc: 'Mostly Sunny', alert: null },
+                { date: 'Tue', icon: 'fa-cloud-sun', temp: '27°C', desc: 'Partly Cloudy', alert: null },
+                { date: 'Wed', icon: 'fa-cloud', temp: '26°C', desc: 'Cloudy', alert: null },
+                { date: 'Thu', icon: 'fa-cloud-rain', temp: '24°C', desc: 'Light Rain', alert: 'Rain Expected' },
+                { date: 'Fri', icon: 'fa-cloud-showers-heavy', temp: '23°C', desc: 'Heavy Rain', alert: 'Heavy Rain Warning' },
+                { date: 'Sat', icon: 'fa-bolt', temp: '25°C', desc: 'Thunderstorms', alert: 'Storm Alert' },
+                { date: 'Sun', icon: 'fa-cloud-sun', temp: '27°C', desc: 'Partly Cloudy', alert: null },
+                { date: 'Mon', icon: 'fa-sun', temp: '29°C', desc: 'Sunny', alert: null },
+                { date: 'Tue', icon: 'fa-sun', temp: '30°C', desc: 'Sunny', alert: null },
+                { date: 'Wed', icon: 'fa-cloud', temp: '28°C', desc: 'Cloudy', alert: null }
+            ];
+            
+            forecastData.forEach(day => {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'forecast-day';
+                
+                let alertElement = '';
+                if (day.alert) {
+                    const alertClass = day.alert.includes('Warning') || day.alert.includes('Alert') ? 'weather-alert' : 'weather-warning';
+                    alertElement = `<div class="${alertClass}">${day.alert}</div>`;
+                }
+                
+                dayElement.innerHTML = `
+                    <div class="forecast-date">${day.date}</div>
+                    <div class="forecast-icon"><i class="fas ${day.icon}"></i></div>
+                    <div class="forecast-temp">${day.temp}</div>
+                    <div class="forecast-desc">${day.desc}</div>
+                    ${alertElement}
+                `;
+                
+                forecastContainer.appendChild(dayElement);
+            });
+        }
+
+        // Load Agricultural Insights
+        function loadAgriculturalInsights() {
+            const insightsContainer = document.getElementById('insightsContainer');
+            insightsContainer.innerHTML = '';
+            
+            // Sample insights data
+            const insightsData = [
+                {
+                    icon: 'fa-tint',
+                    title: 'Irrigation Schedule',
+                    description: 'Based on forecast, reduce irrigation frequency for the next 3 days as rainfall is expected.',
+                    status: 'status-good',
+                    statusText: 'Optimal'
+                },
+                {
+                    icon: 'fa-seedling',
+                    title: 'Crop Health Advisory',
+                    description: 'High humidity may increase risk of fungal diseases. Consider preventive spraying.',
+                    status: 'status-warning',
+                    statusText: 'Moderate Risk'
+                },
+                {
+                    icon: 'fa-wind',
+                    title: 'Wind Conditions',
+                    description: 'Strong winds expected on Friday. Secure temporary structures in fields.',
+                    status: 'status-danger',
+                    statusText: 'High Alert'
+                },
+                {
+                    icon: 'fa-temperature-high',
+                    title: 'Temperature Outlook',
+                    description: 'Temperatures will remain in optimal range for wheat cultivation.',
+                    status: 'status-good',
+                    statusText: 'Favorable'
+                },
+                {
+                    icon: 'fa-cloud-rain',
+                    title: 'Rainfall Prediction',
+                    description: 'Heavy rainfall expected Thursday-Saturday. Prepare drainage systems.',
+                    status: 'status-warning',
+                    statusText: 'Advisory'
+                },
+                {
+                    icon: 'fa-sun',
+                    title: 'Sunlight Availability',
+                    description: 'Adequate sunlight expected next week, good for crop growth.',
+                    status: 'status-good',
+                    statusText: 'Excellent'
+                }
+            ];
+            
+            insightsData.forEach(insight => {
+                const insightElement = document.createElement('div');
+                insightElement.className = 'insight-card';
+                
+                insightElement.innerHTML = `
+                    <div class="insight-icon">
+                        <i class="fas ${insight.icon}"></i>
+                    </div>
+                    <h3>${insight.title}</h3>
+                    <p>${insight.description}</p>
+                    <span class="insight-status ${insight.status}">${insight.statusText}</span>
+                `;
+                
+                insightsContainer.appendChild(insightElement);
+            });
+        }
+
+        // Load Weather Alerts
+        function loadWeatherAlerts() {
+            const alertsContainer = document.getElementById('alertsContainer');
+            alertsContainer.innerHTML = '';
+            
+            // Sample alerts data
+            const alertsData = [
+                {
+                    type: 'danger',
+                    icon: 'fa-exclamation-triangle',
+                    title: 'Heavy Rainfall Alert',
+                    description: 'Heavy to very heavy rainfall expected in your region from Thursday to Saturday. Possible flooding in low-lying areas.',
+                    actions: ['View Details', 'Preparedness Tips']
+                },
+                {
+                    type: 'warning',
+                    icon: 'fa-wind',
+                    title: 'Strong Wind Warning',
+                    description: 'Strong winds with speeds up to 40-50 km/h expected on Friday. Secure loose objects in fields.',
+                    actions: ['Safety Measures', 'Crop Protection']
+                },
+                {
+                    type: 'info',
+                    icon: 'fa-temperature-high',
+                    title: 'Heatwave Advisory',
+                    description: 'Temperatures expected to rise next week. Ensure adequate irrigation for crops.',
+                    actions: ['Irrigation Guide', 'Crop Care']
+                },
+                {
+                    type: 'danger',
+                    icon: 'fa-bolt',
+                    title: 'Thunderstorm Alert',
+                    description: 'Severe thunderstorms with lightning expected on Saturday. Avoid field work during storm.',
+                    actions: ['Lightning Safety', 'Reschedule Work']
+                }
+            ];
+            
+            alertsData.forEach(alert => {
+                const alertElement = document.createElement('div');
+                alertElement.className = `alert-card ${alert.type}`;
+                
+                const actionsHTML = alert.actions.map(action => 
+                    `<a href="#" class="btn ${action === 'View Details' || action === 'Safety Measures' ? 'btn-primary' : 'btn-outline'}">${action}</a>`
+                ).join('');
+                
+                alertElement.innerHTML = `
+                    <div class="alert-header">
+                        <div class="alert-icon">
+                            <i class="fas ${alert.icon}"></i>
+                        </div>
+                        <div class="alert-title">${alert.title}</div>
+                    </div>
+                    <div class="alert-content">
+                        <p>${alert.description}</p>
+                    </div>
+                    <div class="alert-actions">
+                        ${actionsHTML}
+                    </div>
+                `;
+                
+                alertsContainer.appendChild(alertElement);
+            });
+        }
+
+        // Setup Event Listeners
+        function setupEventListeners() {
+            const searchButton = document.getElementById('searchButton');
+            const locationInput = document.getElementById('locationInput');
+            const languageSelect = document.getElementById('languageSelect');
+            
+            searchButton.addEventListener('click', function() {
+                const location = locationInput.value.trim();
+                if (location) {
+                    searchLocation(location);
+                } else {
+                    alert('Please enter a location to search.');
+                }
+            });
+            
+            locationInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchButton.click();
+                }
+            });
+            
+            languageSelect.addEventListener('change', function() {
+                changeLanguage(this.value);
+            });
+        }
+
+        // Search Location
+        function searchLocation(location) {
+            // In a real application, this would call a weather API
+            // For demo purposes, we'll just update the UI with the searched location
+            
+            // Update current weather location
+            document.querySelector('.location').textContent = location;
+            
+            // Show loading state
+            const searchButton = document.getElementById('searchButton');
+            const originalText = searchButton.innerHTML;
+            searchButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching...';
+            searchButton.disabled = true;
+            
+            // Simulate API call delay
+            setTimeout(() => {
+                // Update forecast with new data (in a real app, this would be actual data from API)
+                loadForecastData();
+                loadAgriculturalInsights();
+                loadWeatherAlerts();
+                
+                // Reset button
+                searchButton.innerHTML = originalText;
+                searchButton.disabled = false;
+                
+                // Show success message
+                alert(`Weather data updated for ${location}`);
+            }, 1500);
+        }
+
+        // Change Language
+        function changeLanguage(languageCode) {
+            // In a real application, this would load translations for the selected language
+            // For demo purposes, we'll just show an alert
+            
+            const languageNames = {
+                'en': 'English',
+                'hi': 'Hindi',
+                'ta': 'Tamil',
+                'te': 'Telugu',
+                'bn': 'Bengali',
+                'mr': 'Marathi',
+                'gu': 'Gujarati',
+                'kn': 'Kannada',
+                'ml': 'Malayalam',
+                'pa': 'Punjabi',
+                'or': 'Odia'
+            };
+            
+            alert(`Language changed to ${languageNames[languageCode] || languageCode}`);
+            
+            // In a real app, you would:
+            // 1. Store the language preference
+            // 2. Reload the content in the selected language
+            // 3. Update the UI accordingly
+        }
+    </script>
+</body>
+</html>

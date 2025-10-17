@@ -1,0 +1,2496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwaDesi Hospital - Online Doctor Consultation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #2a7de1;
+            --primary-dark: #1a5bb8;
+            --secondary: #4CAF50;
+            --secondary-dark: #3d8c40;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --success: #28a745;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            color: var(--primary);
+            font-size: 28px;
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            color: var(--primary);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .user-info-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar-small {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: var(--secondary-dark);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--primary), #1a5bb8);
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+        }
+
+        .hero h2 {
+            font-size: 42px;
+            margin-bottom: 20px;
+        }
+
+        .hero p {
+            font-size: 18px;
+            max-width: 700px;
+            margin: 0 auto 30px;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 60px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .section-title h2 {
+            font-size: 32px;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .section-title p {
+            color: var(--gray);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Role Selection */
+        .role-selection {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .role-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            width: 300px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .role-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .role-icon {
+            font-size: 50px;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .role-card h3 {
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+
+        .role-card p {
+            color: var(--gray);
+            margin-bottom: 20px;
+        }
+
+        /* Forms */
+        .form-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            max-width: 600px;
+            margin: 0 auto;
+            display: none;
+        }
+
+        .form-container.active {
+            display: block;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-header h3 {
+            font-size: 24px;
+            color: var(--dark);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--light-gray);
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .error-message {
+            color: var(--danger);
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        /* Dashboard */
+        .dashboard {
+            display: none;
+        }
+
+        .dashboard.active {
+            display: block;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-title h2 {
+            font-size: 28px;
+            color: var(--dark);
+        }
+
+        .dashboard-title p {
+            color: var(--gray);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            background-color: var(--light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: var(--primary);
+            font-size: 20px;
+        }
+
+        .card h3 {
+            font-size: 18px;
+            color: var(--dark);
+        }
+
+        .card p {
+            color: var(--gray);
+            margin-bottom: 15px;
+        }
+
+        /* Doctor List */
+        .doctors-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .doctor-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+        }
+
+        .doctor-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .doctor-header {
+            padding: 20px;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .doctor-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: white;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 24px;
+        }
+
+        .doctor-info h3 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .doctor-info p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .doctor-details {
+            padding: 20px;
+        }
+
+        .doctor-detail {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .doctor-detail:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .detail-label {
+            color: var(--gray);
+        }
+
+        .detail-value {
+            font-weight: 500;
+        }
+
+        .doctor-actions {
+            padding: 0 20px 20px;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .filter-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+
+        .filter-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .filter-option {
+            padding: 8px 15px;
+            background-color: var(--light);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-option.active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        /* Booking Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .modal-header h3 {
+            font-size: 22px;
+            color: var(--dark);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        /* Video Call */
+        .video-call-container {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .video-call-container.active {
+            display: block;
+        }
+
+        .video-header {
+            padding: 15px 20px;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .video-content {
+            display: flex;
+            height: 400px;
+        }
+
+        .remote-video {
+            flex: 3;
+            background-color: var(--dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            position: relative;
+        }
+
+        .local-video {
+            flex: 1;
+            background-color: var(--light-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .video-placeholder {
+            text-align: center;
+        }
+
+        .video-placeholder i {
+            font-size: 60px;
+            margin-bottom: 15px;
+            opacity: 0.7;
+        }
+
+        .video-controls {
+            padding: 15px 20px;
+            background-color: var(--light);
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .control-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background-color: white;
+            color: var(--dark);
+            font-size: 18px;
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+
+        .control-btn.end-call {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .control-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Prescription */
+        .prescription-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .prescription-container.active {
+            display: block;
+        }
+
+        .prescription-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .prescription-form .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .prescription-view {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .prescription-view.active {
+            display: block;
+        }
+
+        .prescription-details {
+            margin-bottom: 20px;
+        }
+
+        .prescription-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .prescription-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 50px 0 20px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h3 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 40px;
+            height: 2px;
+            background-color: var(--primary);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: #adb5bd;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #495057;
+            color: #adb5bd;
+            font-size: 14px;
+        }
+
+        /* Status Indicators */
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-upcoming {
+            background-color: var(--warning);
+            color: var(--dark);
+        }
+
+        .status-active {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .status-completed {
+            background-color: var(--gray);
+            color: white;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .role-selection {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .video-content {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .remote-video, .local-video {
+                height: 300px;
+            }
+
+            .auth-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-stethoscope"></i>
+                    <h1>SwaDesi Hospital</h1>
+                </div>
+                <nav class="nav-links">
+                    <a href="#home">Home</a>
+                    <a href="#services">Services</a>
+                    <a href="#doctors">Doctors</a>
+                    <a href="#about">About</a>
+                    <a href="#contact">Contact</a>
+                </nav>
+                <div class="auth-buttons" id="authButtons">
+                    <button class="btn btn-outline" id="loginBtn">Login</button>
+                    <button class="btn btn-primary" id="registerBtn">Register</button>
+                </div>
+                <div class="user-info-header" id="userInfoHeader" style="display: none;">
+                    <div class="user-avatar-small" id="headerUserAvatar">JD</div>
+                    <div>
+                        <h4 id="headerUserName">John Doe</h4>
+                        <p id="headerUserRole">Patient</p>
+                    </div>
+                    <button class="btn btn-outline" id="logoutBtn" style="margin-left: 15px;">Logout</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="container">
+            <h2>Online Doctor Consultation Made Easy</h2>
+            <p>Connect with certified healthcare professionals from the comfort of your home. Get prescriptions, medical advice, and follow-up care through secure video consultations.</p>
+            <button class="btn btn-primary" id="heroBookBtn">Book an Appointment</button>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <section class="main-content">
+        <div class="container">
+            <div class="section-title">
+                <h2>Get Started with SwaDesi Hospital</h2>
+                <p>Select your role to continue. Patients can book appointments and consult doctors, while doctors can manage appointments and provide consultations.</p>
+            </div>
+
+            <!-- Role Selection -->
+            <div class="role-selection" id="roleSelection">
+                <div class="role-card" id="patientRole">
+                    <div class="role-icon">
+                        <i class="fas fa-user-injured"></i>
+                    </div>
+                    <h3>I'm a Patient</h3>
+                    <p>Book appointments, consult doctors online, and get digital prescriptions.</p>
+                    <button class="btn btn-primary">Continue as Patient</button>
+                </div>
+                <div class="role-card" id="doctorRole">
+                    <div class="role-icon">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <h3>I'm a Doctor</h3>
+                    <p>Manage appointments, provide consultations, and write prescriptions.</p>
+                    <button class="btn btn-primary">Continue as Doctor</button>
+                </div>
+            </div>
+
+            <!-- Login Form -->
+            <div class="form-container" id="loginForm">
+                <div class="form-header">
+                    <h3>Login to Your Account</h3>
+                    <p>Enter your credentials to access your dashboard</p>
+                </div>
+                <form id="loginFormElement">
+                    <div class="form-group">
+                        <label for="loginEmail">Email Address</label>
+                        <input type="email" id="loginEmail" class="form-control" placeholder="Enter your email address" required>
+                        <div class="error-message" id="loginEmailError"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" class="form-control" placeholder="Enter your password" required>
+                        <div class="error-message" id="loginPasswordError"></div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+                </form>
+                <p style="text-align: center; margin-top: 20px;">
+                    Don't have an account? <a href="#" id="showRegisterLink">Register here</a>
+                </p>
+            </div>
+
+            <!-- Patient Registration Form -->
+            <div class="form-container" id="patientRegistrationForm">
+                <div class="form-header">
+                    <h3>Patient Registration</h3>
+                    <p>Create your account to book appointments with doctors</p>
+                </div>
+                <form id="patientForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="patientName">Full Name</label>
+                            <input type="text" id="patientName" class="form-control" placeholder="Enter your full name" required>
+                            <div class="error-message" id="patientNameError"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="patientAge">Age</label>
+                            <input type="number" id="patientAge" class="form-control" placeholder="Enter your age" min="1" max="120" required>
+                            <div class="error-message" id="patientAgeError"></div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="patientGender">Gender</label>
+                            <select id="patientGender" class="form-control" required>
+                                <option value="">Select Gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                            <div class="error-message" id="patientGenderError"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="patientPhone">Phone Number</label>
+                            <input type="tel" id="patientPhone" class="form-control" placeholder="Enter your phone number" required>
+                            <div class="error-message" id="patientPhoneError"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="patientEmail">Email Address</label>
+                        <input type="email" id="patientEmail" class="form-control" placeholder="Enter your email address" required>
+                        <div class="error-message" id="patientEmailError"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="patientMedicalCondition">Primary Medical Condition</label>
+                        <div class="filter-options" id="specializationFilter">
+                        <div class="filter-option active" data-specialization="all">All Specializations</div>
+                        <div class="filter-option" data-specialization="cardiology">Cardiology</div>
+                        <div class="filter-option" data-specialization="dermatology">Dermatology</div>
+                        <div class="filter-option" data-specialization="pediatrics">Pediatrics</div>
+                        <div class="filter-option" data-specialization="orthopedics">Orthopedics</div>
+                        <div class="filter-option" data-specialization="neurology">Neurology</div>
+                        <div class="filter-option" data-specialization="psychiatry">Psychiatry</div>
+                        <div class="filter-option" data-specialization="dentistry">Dentistry</div>
+                        <div class="filter-option" data-specialization="ophthalmology">Ophthalmology</div>
+                    </div>
+                        <div class="error-message" id="patientMedicalConditionError"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="patientAddress">Address</label>
+                        <textarea id="patientAddress" class="form-control" placeholder="Enter your complete address" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="patientPassword">Password</label>
+                        <input type="password" id="patientPassword" class="form-control" placeholder="Create a password" minlength="6" required>
+                        <div class="error-message" id="patientPasswordError"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="patientConfirmPassword">Confirm Password</label>
+                        <input type="password" id="patientConfirmPassword" class="form-control" placeholder="Confirm your password" required>
+                        <div class="error-message" id="patientConfirmPasswordError"></div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Register as Patient</button>
+                </form>
+                <p style="text-align: center; margin-top: 20px;">
+                    Already have an account? <a href="#" id="showLoginLink">Login here</a>
+                </p>
+            </div>
+
+            <!-- Doctor Registration Form -->
+            <div class="form-container" id="doctorRegistrationForm">
+                <div class="form-header">
+                    <h3>Doctor Registration</h3>
+                    <p>Register with your government registration number to start consulting</p>
+                </div>
+                <form id="doctorForm">
+                    <div class="form-group">
+                        <label for="doctorRegNo">Medical Registration Number</label>
+                        <input type="text" id="doctorRegNo" class="form-control" placeholder="Enter your government registration number" required>
+                        <small style="color: var(--gray);">We'll verify this with the government database</small>
+                        <div class="error-message" id="doctorRegNoError"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="doctorName">Full Name</label>
+                            <input type="text" id="doctorName" class="form-control" placeholder="Enter your full name" required>
+                            <div class="error-message" id="doctorNameError"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="doctorSpecialization">Specialization</label>
+                            <select id="doctorSpecialization" class="form-control" required>
+                                <option value="">Select Specialization</option>
+                                <option value="cardiology">Cardiology</option>
+                                <option value="dermatology">Dermatology</option>
+                                <option value="pediatrics">Pediatrics</option>
+                                <option value="orthopedics">Orthopedics</option>
+                                <option value="neurology">Neurology</option>
+                                <option value="psychiatry">Psychiatry</option>
+                                <option value="dentistry">Dentistry</option>
+                                <option value="ophthalmology">Ophthalmology</option>
+                            </select>
+                            <div class="error-message" id="doctorSpecializationError"></div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="doctorExperience">Years of Experience</label>
+                            <input type="number" id="doctorExperience" class="form-control" placeholder="Years of experience" min="0" max="60" required>
+                            <div class="error-message" id="doctorExperienceError"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="doctorPhone">Phone Number</label>
+                            <input type="tel" id="doctorPhone" class="form-control" placeholder="Enter your phone number" required>
+                            <div class="error-message" id="doctorPhoneError"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="doctorEmail">Email Address</label>
+                        <input type="email" id="doctorEmail" class="form-control" placeholder="Enter your email address" required>
+                        <div class="error-message" id="doctorEmailError"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="doctorPassword">Password</label>
+                        <input type="password" id="doctorPassword" class="form-control" placeholder="Create a password" minlength="6" required>
+                        <div class="error-message" id="doctorPasswordError"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="doctorConfirmPassword">Confirm Password</label>
+                        <input type="password" id="doctorConfirmPassword" class="form-control" placeholder="Confirm your password" required>
+                        <div class="error-message" id="doctorConfirmPasswordError"></div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Register as Doctor</button>
+                </form>
+                <p style="text-align: center; margin-top: 20px;">
+                    Already have an account? <a href="#" id="showDoctorLoginLink">Login here</a>
+                </p>
+            </div>
+
+            <!-- Patient Dashboard -->
+            <div class="dashboard" id="patientDashboard">
+                <div class="dashboard-header">
+                    <div class="dashboard-title">
+                        <h2>Patient Dashboard</h2>
+                        <p>Welcome back, <span id="patientUserName">John</span>! Here are your appointments and available doctors.</p>
+                    </div>
+                    <div class="user-info">
+                        <div class="user-avatar" id="patientUserAvatar">JD</div>
+                        <div>
+                            <h4 id="patientFullName">John Doe</h4>
+                            <p>Patient</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-cards">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                            <h3>Upcoming Appointment</h3>
+                        </div>
+                        <p id="upcomingAppointmentText">You don't have any upcoming appointments</p>
+                        <button class="btn btn-outline" id="viewAppointmentDetails">View Details</button>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-file-medical"></i>
+                            </div>
+                            <h3>Recent Prescriptions</h3>
+                        </div>
+                        <p>Access your digital prescriptions from previous consultations</p>
+                        <button class="btn btn-outline" id="viewPrescriptionsBtn">View Prescriptions</button>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-video"></i>
+                            </div>
+                            <h3>Video Consultation</h3>
+                        </div>
+                        <p id="consultationStatusText">No active consultation</p>
+                        <button class="btn btn-primary" id="joinConsultationBtn" disabled>Join Consultation</button>
+                    </div>
+                </div>
+
+                <div class="section-title">
+                    <h2>Available Doctors</h2>
+                    <p>Book an appointment with certified healthcare professionals</p>
+                </div>
+
+                <!-- Doctor Filter Section -->
+                <div class="filter-section">
+                    <div class="filter-title">Filter by Specialization</div>
+                    <div class="filter-options" id="specializationFilter">
+                        <div class="filter-option active" data-specialization="all">All Specializations</div>
+                        <div class="filter-option" data-specialization="cardiology">Cardiology</div>
+                        <div class="filter-option" data-specialization="dermatology">Dermatology</div>
+                        <div class="filter-option" data-specialization="pediatrics">Pediatrics</div>
+                        <div class="filter-option" data-specialization="orthopedics">Orthopedics</div>
+                        <div class="filter-option" data-specialization="neurology">Neurology</div>
+                        <div class="filter-option" data-specialization="psychiatry">Psychiatry</div>
+                        <div class="filter-option" data-specialization="dentistry">Dentistry</div>
+                        <div class="filter-option" data-specialization="ophthalmology">Ophthalmology</div>
+                    </div>
+                </div>
+
+                <div class="doctors-list" id="doctorsList">
+                    <!-- Doctors will be populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Doctor Dashboard -->
+            <div class="dashboard" id="doctorDashboard">
+                <div class="dashboard-header">
+                    <div class="dashboard-title">
+                        <h2>Doctor Dashboard</h2>
+                        <p>Welcome back, <span id="doctorUserName">Dr. Wilson</span>! Manage your appointments and consultations.</p>
+                    </div>
+                    <div class="user-info">
+                        <div class="user-avatar" id="doctorUserAvatar">SW</div>
+                        <div>
+                            <h4 id="doctorFullName">Dr. Sarah Wilson</h4>
+                            <p id="doctorSpecializationText">Cardiologist</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-cards">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h3>Today's Appointments</h3>
+                        </div>
+                        <p id="todayAppointmentsCount">You have 0 appointments scheduled for today</p>
+                        <button class="btn btn-outline" id="viewScheduleBtn">View Schedule</button>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <h3>Next Appointment</h3>
+                        </div>
+                        <p id="nextAppointmentText">No upcoming appointments</p>
+                        <button class="btn btn-primary" id="prepareConsultationBtn" disabled>Prepare Consultation</button>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-file-prescription"></i>
+                            </div>
+                            <h3>Pending Prescriptions</h3>
+                        </div>
+                        <p id="pendingPrescriptionsCount">0 prescriptions need to be completed</p>
+                        <button class="btn btn-outline" id="reviewPrescriptionsBtn">Review</button>
+                    </div>
+                </div>
+
+                <!-- Video Call Interface -->
+                <div class="video-call-container" id="videoCallContainer">
+                    <div class="video-header">
+                        <h3 id="consultationWithText">Consultation with Patient</h3>
+                        <div>
+                            <span id="callTimer">00:00</span>
+                            <button class="btn btn-outline" style="margin-left: 15px; color: white; border-color: white;">Minimize</button>
+                        </div>
+                    </div>
+                    <div class="video-content">
+                        <div class="remote-video">
+                            <div class="video-placeholder">
+                                <i class="fas fa-user"></i>
+                                <p id="remoteVideoText">Patient Video</p>
+                            </div>
+                        </div>
+                        <div class="local-video">
+                            <div class="video-placeholder">
+                                <i class="fas fa-user-md"></i>
+                                <p>Your Video</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="video-controls">
+                        <button class="control-btn" id="muteBtn"><i class="fas fa-microphone"></i></button>
+                        <button class="control-btn" id="videoBtn"><i class="fas fa-video"></i></button>
+                        <button class="control-btn" id="screenShareBtn"><i class="fas fa-desktop"></i></button>
+                        <button class="control-btn end-call" id="endCallBtn"><i class="fas fa-phone-slash"></i></button>
+                    </div>
+                </div>
+
+                <!-- Prescription Form -->
+                <div class="prescription-container" id="prescriptionContainer">
+                    <div class="prescription-header">
+                        <h3 id="prescriptionForText">Write Prescription for Patient</h3>
+                        <button class="btn btn-primary" id="savePrescriptionBtn">Save Prescription</button>
+                    </div>
+                    <form class="prescription-form" id="prescriptionForm">
+                        <div class="form-group">
+                            <label for="diagnosis">Diagnosis</label>
+                            <input type="text" id="diagnosis" class="form-control" placeholder="Enter diagnosis">
+                        </div>
+                        <div class="form-group">
+                            <label for="medications">Medications</label>
+                            <textarea id="medications" class="form-control" placeholder="List medications with dosage and instructions"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="notes">Additional Notes</label>
+                            <textarea id="notes" class="form-control" placeholder="Any additional advice or follow-up instructions"></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="nextVisit">Next Visit</label>
+                                <input type="date" id="nextVisit" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="tests">Recommended Tests</label>
+                                <input type="text" id="tests" class="form-control" placeholder="Any recommended tests">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Prescription View -->
+                <div class="prescription-view" id="prescriptionView">
+                    <div class="prescription-header">
+                        <h3>Prescription Details</h3>
+                        <button class="btn btn-outline" id="closePrescriptionView">Close</button>
+                    </div>
+                    <div class="prescription-details" id="prescriptionDetails">
+                        <!-- Prescription details will be populated here -->
+                    </div>
+                </div>
+
+                <div class="section-title">
+                    <h2>Today's Appointments</h2>
+                    <p>Manage your scheduled consultations for today</p>
+                </div>
+
+                <div class="doctors-list" id="doctorAppointmentsList">
+                    <!-- Appointments will be populated dynamically -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Booking Modal -->
+    <div class="modal" id="bookingModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="bookingModalTitle">Book Appointment</h3>
+                <button class="close-modal" id="closeBookingModal">&times;</button>
+            </div>
+            <form id="bookingForm">
+                <div class="form-group">
+                    <label for="appointmentDate">Appointment Date</label>
+                    <input type="date" id="appointmentDate" class="form-control" required>
+                    <div class="error-message" id="appointmentDateError"></div>
+                </div>
+                <div class="form-group">
+                    <label for="appointmentTime">Appointment Time</label>
+                    <select id="appointmentTime" class="form-control" required>
+                        <option value="">Select Time</option>
+                        <option value="09:00">09:00 AM</option>
+                        <option value="10:00">10:00 AM</option>
+                        <option value="11:00">11:00 AM</option>
+                        <option value="14:00">02:00 PM</option>
+                        <option value="15:00">03:00 PM</option>
+                        <option value="16:00">04:00 PM</option>
+                    </select>
+                    <div class="error-message" id="appointmentTimeError"></div>
+                </div>
+                <div class="form-group">
+                    <label for="appointmentReason">Reason for Visit</label>
+                    <textarea id="appointmentReason" class="form-control" placeholder="Briefly describe your symptoms or reason for consultation" rows="3"></textarea>
+                    <div class="error-message" id="appointmentReasonError"></div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Book Appointment</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>SwaDesi Hospital</h3>
+                    <p>Your trusted platform for online medical consultations. Connect with certified healthcare professionals from anywhere.</p>
+                    <div style="margin-top: 20px;">
+                        <a href="#" style="color: white; margin-right: 15px;"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" style="color: white; margin-right: 15px;"><i class="fab fa-twitter"></i></a>
+                        <a href="#" style="color: white; margin-right: 15px;"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" style="color: white;"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Services</a></li>
+                        <li><a href="#">Doctors</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Services</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Video Consultation</a></li>
+                        <li><a href="#">E-Prescription</a></li>
+                        <li><a href="#">Medical Records</a></li>
+                        <li><a href="#">Health Tips</a></li>
+                        <li><a href="#">Emergency Care</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contact Us</h3>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Healthcare St, Medical City</li>
+                        <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
+                        <li><i class="fas fa-envelope"></i> info@swadesihospitalconnect.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 SwaDesi Hospital. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    // Application State
+    const state = {
+        currentUser: null,
+        userType: null,
+        appointments: [],
+        prescriptions: [],
+        activeConsultation: null,
+        doctors: [
+            {
+                id: 1,
+                name: "Dr. Sarah Wilson",
+                specialization: "cardiology",
+                specializationName: "Cardiologist",
+                experience: "12 years",
+                rating: "4.8/5",
+                fee: "$50",
+                avatar: "SW",
+                email: "dr.wilson@swadesihospital.com",
+                password: "password123"
+            },
+            {
+                id: 2,
+                name: "Dr. Robert Miller",
+                specialization: "dermatology",
+                specializationName: "Dermatologist",
+                experience: "8 years",
+                rating: "4.7/5",
+                fee: "$45",
+                avatar: "RM",
+                email: "dr.miller@swadesihospital.com",
+                password: "password123"
+            },
+            {
+                id: 3,
+                name: "Dr. Priya Joshi",
+                specialization: "pediatrics",
+                specializationName: "Pediatrician",
+                experience: "10 years",
+                rating: "4.9/5",
+                fee: "$40",
+                avatar: "PJ",
+                email: "dr.joshi@swadesihospital.com",
+                password: "password123"
+            },
+            {
+                id: 4,
+                name: "Dr. Michael Chen",
+                specialization: "orthopedics",
+                specializationName: "Orthopedic Surgeon",
+                experience: "15 years",
+                rating: "4.8/5",
+                fee: "$60",
+                avatar: "MC",
+                email: "dr.chen@swadesihospital.com",
+                password: "password123"
+            },
+            {
+                id: 5,
+                name: "Dr. Lisa Thompson",
+                specialization: "neurology",
+                specializationName: "Neurologist",
+                experience: "11 years",
+                rating: "4.7/5",
+                fee: "$55",
+                avatar: "LT",
+                email: "dr.thompson@swadesihospital.com",
+                password: "password123"
+            }
+        ],
+        patients: [],
+        currentSpecializationFilter: "all",
+        callTimerId: null
+    };
+
+    // DOM Elements
+    const patientRole = document.getElementById('patientRole');
+    const doctorRole = document.getElementById('doctorRole');
+    const loginForm = document.getElementById('loginForm');
+    const patientRegistrationForm = document.getElementById('patientRegistrationForm');
+    const doctorRegistrationForm = document.getElementById('doctorRegistrationForm');
+    const patientDashboard = document.getElementById('patientDashboard');
+    const doctorDashboard = document.getElementById('doctorDashboard');
+    const videoCallContainer = document.getElementById('videoCallContainer');
+    const prescriptionContainer = document.getElementById('prescriptionContainer');
+    const prescriptionView = document.getElementById('prescriptionView');
+    const loginBtn = document.getElementById('loginBtn');
+    const registerBtn = document.getElementById('registerBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const authButtons = document.getElementById('authButtons');
+    const userInfoHeader = document.getElementById('userInfoHeader');
+    const headerUserAvatar = document.getElementById('headerUserAvatar');
+    const headerUserName = document.getElementById('headerUserName');
+    const headerUserRole = document.getElementById('headerUserRole');
+    const patientUserName = document.getElementById('patientUserName');
+    const patientUserAvatar = document.getElementById('patientUserAvatar');
+    const patientFullName = document.getElementById('patientFullName');
+    const doctorUserName = document.getElementById('doctorUserName');
+    const doctorUserAvatar = document.getElementById('doctorUserAvatar');
+    const doctorFullName = document.getElementById('doctorFullName');
+    const doctorSpecializationText = document.getElementById('doctorSpecializationText');
+    const bookingModal = document.getElementById('bookingModal');
+    const closeBookingModal = document.getElementById('closeBookingModal');
+    const bookingForm = document.getElementById('bookingForm');
+    const doctorsList = document.getElementById('doctorsList');
+    const doctorAppointmentsList = document.getElementById('doctorAppointmentsList');
+    const upcomingAppointmentText = document.getElementById('upcomingAppointmentText');
+    const consultationStatusText = document.getElementById('consultationStatusText');
+    const joinConsultationBtn = document.getElementById('joinConsultationBtn');
+    const todayAppointmentsCount = document.getElementById('todayAppointmentsCount');
+    const nextAppointmentText = document.getElementById('nextAppointmentText');
+    const prepareConsultationBtn = document.getElementById('prepareConsultationBtn');
+    const pendingPrescriptionsCount = document.getElementById('pendingPrescriptionsCount');
+    const consultationWithText = document.getElementById('consultationWithText');
+    const remoteVideoText = document.getElementById('remoteVideoText');
+    const prescriptionForText = document.getElementById('prescriptionForText');
+    const savePrescriptionBtn = document.getElementById('savePrescriptionBtn');
+    const endCallBtn = document.getElementById('endCallBtn');
+    const viewPrescriptionsBtn = document.getElementById('viewPrescriptionsBtn');
+    const closePrescriptionView = document.getElementById('closePrescriptionView');
+    const prescriptionDetails = document.getElementById('prescriptionDetails');
+    const heroBookBtn = document.getElementById('heroBookBtn');
+    const specializationFilter = document.getElementById('specializationFilter');
+    const showRegisterLink = document.getElementById('showRegisterLink');
+    const showLoginLink = document.getElementById('showLoginLink');
+    const showDoctorLoginLink = document.getElementById('showDoctorLoginLink');
+    const loginFormElement = document.getElementById('loginFormElement');
+
+    // Form Validation Functions
+    function validateEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    }
+
+    function validatePhone(phone) {
+        const re = /^[\+]?[1-9][\d]{0,15}$/;
+        return re.test(phone.replace(/\D/g, ''));
+    }
+
+    function validatePassword(password) {
+        return password.length >= 6;
+    }
+
+    function showError(elementId, message) {
+        const errorElement = document.getElementById(elementId);
+        errorElement.textContent = message;
+        errorElement.style.display = 'block';
+    }
+
+    function hideError(elementId) {
+        const errorElement = document.getElementById(elementId);
+        errorElement.style.display = 'none';
+    }
+
+    function validateForm(formData, formType) {
+        let isValid = true;
+
+        if (formType === 'patient') {
+            // Validate patient name
+            if (!formData.name || formData.name.trim().length < 2) {
+                showError('patientNameError', 'Please enter a valid name');
+                isValid = false;
+            } else {
+                hideError('patientNameError');
+            }
+
+            // Validate patient age
+            if (!formData.age || formData.age < 1 || formData.age > 120) {
+                showError('patientAgeError', 'Please enter a valid age (1-120)');
+                isValid = false;
+            } else {
+                hideError('patientAgeError');
+            }
+
+            // Validate patient gender
+            if (!formData.gender) {
+                showError('patientGenderError', 'Please select your gender');
+                isValid = false;
+            } else {
+                hideError('patientGenderError');
+            }
+
+            // Validate patient phone
+            if (!formData.phone || !validatePhone(formData.phone)) {
+                showError('patientPhoneError', 'Please enter a valid phone number');
+                isValid = false;
+            } else {
+                hideError('patientPhoneError');
+            }
+
+            // Validate patient email
+            if (!formData.email || !validateEmail(formData.email)) {
+                showError('patientEmailError', 'Please enter a valid email address');
+                isValid = false;
+            } else {
+                hideError('patientEmailError');
+            }
+
+            // Validate patient medical condition
+            if (!formData.medicalCondition) {
+                showError('patientMedicalConditionError', 'Please select a medical condition');
+                isValid = false;
+            } else {
+                hideError('patientMedicalConditionError');
+            }
+
+            // Validate patient password
+            if (!formData.password || !validatePassword(formData.password)) {
+                showError('patientPasswordError', 'Password must be at least 6 characters long');
+                isValid = false;
+            } else {
+                hideError('patientPasswordError');
+            }
+
+            // Validate patient confirm password
+            if (formData.password !== formData.confirmPassword) {
+                showError('patientConfirmPasswordError', 'Passwords do not match');
+                isValid = false;
+            } else {
+                hideError('patientConfirmPasswordError');
+            }
+        } else if (formType === 'doctor') {
+            // Validate doctor registration number
+            if (!formData.regNo || formData.regNo.trim().length < 5) {
+                showError('doctorRegNoError', 'Please enter a valid registration number');
+                isValid = false;
+            } else {
+                hideError('doctorRegNoError');
+            }
+
+            // Validate doctor name
+            if (!formData.name || formData.name.trim().length < 2) {
+                showError('doctorNameError', 'Please enter a valid name');
+                isValid = false;
+            } else {
+                hideError('doctorNameError');
+            }
+
+            // Validate doctor specialization
+            if (!formData.specialization) {
+                showError('doctorSpecializationError', 'Please select your specialization');
+                isValid = false;
+            } else {
+                hideError('doctorSpecializationError');
+            }
+
+            // Validate doctor experience
+            if (!formData.experience || formData.experience < 0 || formData.experience > 60) {
+                showError('doctorExperienceError', 'Please enter valid years of experience');
+                isValid = false;
+            } else {
+                hideError('doctorExperienceError');
+            }
+
+            // Validate doctor phone
+            if (!formData.phone || !validatePhone(formData.phone)) {
+                showError('doctorPhoneError', 'Please enter a valid phone number');
+                isValid = false;
+            } else {
+                hideError('doctorPhoneError');
+            }
+
+            // Validate doctor email
+            if (!formData.email || !validateEmail(formData.email)) {
+                showError('doctorEmailError', 'Please enter a valid email address');
+                isValid = false;
+            } else {
+                hideError('doctorEmailError');
+            }
+
+            // Validate doctor password
+            if (!formData.password || !validatePassword(formData.password)) {
+                showError('doctorPasswordError', 'Password must be at least 6 characters long');
+                isValid = false;
+            } else {
+                hideError('doctorPasswordError');
+            }
+
+            // Validate doctor confirm password
+            if (formData.password !== formData.confirmPassword) {
+                showError('doctorConfirmPasswordError', 'Passwords do not match');
+                isValid = false;
+            } else {
+                hideError('doctorConfirmPasswordError');
+            }
+        } else if (formType === 'login') {
+            // Validate login email
+            if (!formData.email || !validateEmail(formData.email)) {
+                showError('loginEmailError', 'Please enter a valid email address');
+                isValid = false;
+            } else {
+                hideError('loginEmailError');
+            }
+
+            // Validate login password
+            if (!formData.password) {
+                showError('loginPasswordError', 'Please enter your password');
+                isValid = false;
+            } else {
+                hideError('loginPasswordError');
+            }
+        } else if (formType === 'booking') {
+            // Validate appointment date
+            if (!formData.date) {
+                showError('appointmentDateError', 'Please select an appointment date');
+                isValid = false;
+            } else {
+                hideError('appointmentDateError');
+            }
+
+            // Validate appointment time
+            if (!formData.time) {
+                showError('appointmentTimeError', 'Please select an appointment time');
+                isValid = false;
+            } else {
+                hideError('appointmentTimeError');
+            }
+
+            // Validate appointment reason
+            if (!formData.reason || formData.reason.trim().length < 10) {
+                showError('appointmentReasonError', 'Please provide a detailed reason for your visit (at least 10 characters)');
+                isValid = false;
+            } else {
+                hideError('appointmentReasonError');
+            }
+        }
+
+        return isValid;
+    }
+
+    // Initialize the application
+    function init() {
+        // Check if user is already logged in (from localStorage)
+        const savedUser = localStorage.getItem('currentUser');
+        const savedAppointments = localStorage.getItem('appointments');
+        const savedPrescriptions = localStorage.getItem('prescriptions');
+        const savedPatients = localStorage.getItem('patients');
+        
+        if (savedUser) {
+            state.currentUser = JSON.parse(savedUser);
+            state.userType = state.currentUser.type;
+            updateUIForUser();
+        } else {
+            showRoleSelection();
+        }
+
+        // Load saved data
+        if (savedAppointments) {
+            state.appointments = JSON.parse(savedAppointments);
+        }
+        if (savedPrescriptions) {
+            state.prescriptions = JSON.parse(savedPrescriptions);
+        }
+        if (savedPatients) {
+            state.patients = JSON.parse(savedPatients);
+        }
+
+        // Render doctors list
+        renderDoctorsList();
+        
+        // Set minimum date for booking to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('appointmentDate').min = today;
+    }
+
+    // Save state to localStorage
+    function saveState() {
+        localStorage.setItem('currentUser', JSON.stringify(state.currentUser));
+        localStorage.setItem('appointments', JSON.stringify(state.appointments));
+        localStorage.setItem('prescriptions', JSON.stringify(state.prescriptions));
+        localStorage.setItem('patients', JSON.stringify(state.patients));
+    }
+
+    // Show role selection screen
+    function showRoleSelection() {
+        loginForm.classList.remove('active');
+        patientRegistrationForm.classList.remove('active');
+        doctorRegistrationForm.classList.remove('active');
+        patientDashboard.classList.remove('active');
+        doctorDashboard.classList.remove('active');
+        authButtons.style.display = 'flex';
+        userInfoHeader.style.display = 'none';
+    }
+
+    // Update UI when user is logged in
+    function updateUIForUser() {
+        if (state.currentUser) {
+            // Update header
+            authButtons.style.display = 'none';
+            userInfoHeader.style.display = 'flex';
+            headerUserAvatar.textContent = getInitials(state.currentUser.name);
+            headerUserName.textContent = state.currentUser.name;
+            headerUserRole.textContent = state.userType === 'patient' ? 'Patient' : 'Doctor';
+            
+            // Show appropriate dashboard
+            if (state.userType === 'patient') {
+                updatePatientDashboard();
+                patientDashboard.classList.add('active');
+                doctorDashboard.classList.remove('active');
+            } else {
+                updateDoctorDashboard();
+                doctorDashboard.classList.add('active');
+                patientDashboard.classList.remove('active');
+            }
+            
+            // Hide registration forms
+            loginForm.classList.remove('active');
+            patientRegistrationForm.classList.remove('active');
+            doctorRegistrationForm.classList.remove('active');
+        }
+    }
+
+    // Update patient dashboard with user data
+    function updatePatientDashboard() {
+        patientUserName.textContent = state.currentUser.name.split(' ')[0];
+        patientUserAvatar.textContent = getInitials(state.currentUser.name);
+        patientFullName.textContent = state.currentUser.name;
+        
+        // Update upcoming appointment
+        const upcomingAppointment = state.appointments.find(apt => 
+            apt.patientId === state.currentUser.id && 
+            apt.status === 'upcoming'
+        );
+        
+        if (upcomingAppointment) {
+            const doctor = state.doctors.find(d => d.id === upcomingAppointment.doctorId);
+            upcomingAppointmentText.textContent = `You have an appointment with ${doctor.name} on ${formatDate(upcomingAppointment.date)} at ${upcomingAppointment.time}`;
+            document.getElementById('viewAppointmentDetails').disabled = false;
+        } else {
+            upcomingAppointmentText.textContent = "You don't have any upcoming appointments";
+            document.getElementById('viewAppointmentDetails').disabled = true;
+        }
+        
+        // Update consultation status
+        const activeConsultation = state.appointments.find(apt => 
+            apt.patientId === state.currentUser.id && 
+            apt.status === 'active'
+        );
+        
+        if (activeConsultation) {
+            consultationStatusText.textContent = "Consultation is active. You can join now.";
+            joinConsultationBtn.disabled = false;
+            joinConsultationBtn.textContent = "Join Consultation";
+            joinConsultationBtn.setAttribute('data-appointment-id', activeConsultation.id);
+        } else {
+            consultationStatusText.textContent = "No active consultation";
+            joinConsultationBtn.disabled = true;
+        }
+    }
+
+    // Update doctor dashboard with user data
+    function updateDoctorDashboard() {
+        doctorUserName.textContent = state.currentUser.name;
+        doctorUserAvatar.textContent = getInitials(state.currentUser.name);
+        doctorFullName.textContent = state.currentUser.name;
+        doctorSpecializationText.textContent = state.currentUser.specializationName;
+        
+        // Get all appointments for this doctor (not just today's)
+        const doctorAppointments = state.appointments.filter(apt => 
+            apt.doctorId === state.currentUser.id
+        );
+        
+        // Update appointments count for today
+        const todayAppointments = doctorAppointments.filter(apt => 
+            apt.date === new Date().toISOString().split('T')[0]
+        );
+        
+        todayAppointmentsCount.textContent = `You have ${todayAppointments.length} appointments scheduled for today`;
+        
+        // Update next appointment (any upcoming appointment, not just today)
+        const nextAppointment = doctorAppointments.find(apt => apt.status === 'upcoming');
+        if (nextAppointment) {
+            nextAppointmentText.textContent = `${nextAppointment.patientName} at ${nextAppointment.time} on ${formatDate(nextAppointment.date)}`;
+            prepareConsultationBtn.disabled = false;
+            prepareConsultationBtn.setAttribute('data-appointment-id', nextAppointment.id);
+        } else {
+            nextAppointmentText.textContent = "No upcoming appointments";
+            prepareConsultationBtn.disabled = true;
+        }
+        
+        // Update pending prescriptions
+        const pendingPrescriptions = state.prescriptions.filter(p => p.status === 'pending');
+        pendingPrescriptionsCount.textContent = `${pendingPrescriptions.length} prescriptions need to be completed`;
+        
+        // Render doctor's appointments (show all appointments, not just today's)
+        renderDoctorAppointments();
+    }
+
+    // Render doctors list for patients
+    function renderDoctorsList() {
+        doctorsList.innerHTML = '';
+        
+        // Filter doctors based on specialization
+        let filteredDoctors = state.doctors;
+        if (state.currentSpecializationFilter !== 'all') {
+            filteredDoctors = state.doctors.filter(doctor => 
+                doctor.specialization === state.currentSpecializationFilter
+            );
+        }
+        
+        if (filteredDoctors.length === 0) {
+            doctorsList.innerHTML = '<p>No doctors found for the selected specialization.</p>';
+            return;
+        }
+        
+        filteredDoctors.forEach(doctor => {
+            const doctorCard = document.createElement('div');
+            doctorCard.className = 'doctor-card';
+            doctorCard.innerHTML = `
+                <div class="doctor-header">
+                    <div class="doctor-avatar">${doctor.avatar}</div>
+                    <div class="doctor-info">
+                        <h3>${doctor.name}</h3>
+                        <p>${doctor.specializationName}</p>
+                    </div>
+                </div>
+                <div class="doctor-details">
+                    <div class="doctor-detail">
+                        <span class="detail-label">Experience</span>
+                        <span class="detail-value">${doctor.experience}</span>
+                    </div>
+                    <div class="doctor-detail">
+                        <span class="detail-label">Rating</span>
+                        <span class="detail-value">${doctor.rating}</span>
+                    </div>
+                    <div class="doctor-detail">
+                        <span class="detail-label">Consultation Fee</span>
+                        <span class="detail-value">${doctor.fee}</span>
+                    </div>
+                </div>
+                <div class="doctor-actions">
+                    <button class="btn btn-primary book-appointment-btn" data-doctor-id="${doctor.id}" style="width: 100%;">Book Appointment</button>
+                </div>
+            `;
+            doctorsList.appendChild(doctorCard);
+        });
+        
+        // Add event listeners to book appointment buttons
+        document.querySelectorAll('.book-appointment-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const doctorId = parseInt(e.target.getAttribute('data-doctor-id'));
+                openBookingModal(doctorId);
+            });
+        });
+    }
+
+    // Render appointments for doctor dashboard
+    function renderDoctorAppointments() {
+        doctorAppointmentsList.innerHTML = '';
+        
+        // Get all appointments for this doctor (not just today's)
+        const doctorAppointments = state.appointments.filter(apt => 
+            apt.doctorId === state.currentUser.id
+        );
+        
+        if (doctorAppointments.length === 0) {
+            doctorAppointmentsList.innerHTML = '<p>No appointments scheduled.</p>';
+            return;
+        }
+        
+        // Sort appointments by date and time
+        doctorAppointments.sort((a, b) => {
+            const dateCompare = new Date(a.date) - new Date(b.date);
+            if (dateCompare !== 0) return dateCompare;
+            return a.time.localeCompare(b.time);
+        });
+        
+        doctorAppointments.forEach(appointment => {
+            const appointmentCard = document.createElement('div');
+            appointmentCard.className = 'doctor-card';
+            
+            let statusBadge = '';
+            if (appointment.status === 'upcoming') {
+                statusBadge = '<span class="status-badge status-upcoming">Upcoming</span>';
+            } else if (appointment.status === 'active') {
+                statusBadge = '<span class="status-badge status-active">Active</span>';
+            } else if (appointment.status === 'completed') {
+                statusBadge = '<span class="status-badge status-completed">Completed</span>';
+            }
+            
+            appointmentCard.innerHTML = `
+                <div class="doctor-header">
+                    <div class="doctor-avatar">${getInitials(appointment.patientName)}</div>
+                    <div class="doctor-info">
+                        <h3>${appointment.patientName}</h3>
+                        <p>Appointment on ${formatDate(appointment.date)} at ${appointment.time}</p>
+                    </div>
+                </div>
+                <div class="doctor-details">
+                    <div class="doctor-detail">
+                        <span class="detail-label">Date & Time</span>
+                        <span class="detail-value">${formatDate(appointment.date)} at ${appointment.time}</span>
+                    </div>
+                    <div class="doctor-detail">
+                        <span class="detail-label">Age</span>
+                        <span class="detail-value">${appointment.patientAge} years</span>
+                    </div>
+                    <div class="doctor-detail">
+                        <span class="detail-label">Gender</span>
+                        <span class="detail-value">${appointment.patientGender}</span>
+                    </div>
+                    <div class="doctor-detail">
+                        <span class="detail-label">Reason</span>
+                        <span class="detail-value">${appointment.reason}</span>
+                    </div>
+                    <div class="doctor-detail">
+                        <span class="detail-label">Status</span>
+                        <span class="detail-value">${statusBadge}</span>
+                    </div>
+                </div>
+                <div class="doctor-actions">
+                    ${appointment.status === 'upcoming' ? 
+                        `<button class="btn btn-primary start-consultation-btn" data-appointment-id="${appointment.id}" style="width: 100%;">Start Consultation</button>` : 
+                        appointment.status === 'active' ?
+                        `<button class="btn btn-success join-consultation-btn" data-appointment-id="${appointment.id}" style="width: 100%;">Join Consultation</button>` :
+                        `<button class="btn btn-outline view-prescription-btn" data-appointment-id="${appointment.id}" style="width: 100%;">View Details</button>`
+                    }
+                </div>
+            `;
+            doctorAppointmentsList.appendChild(appointmentCard);
+        });
+        
+        // Add event listeners to action buttons
+        document.querySelectorAll('.start-consultation-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const appointmentId = parseInt(e.target.getAttribute('data-appointment-id'));
+                startConsultation(appointmentId);
+            });
+        });
+        
+        document.querySelectorAll('.join-consultation-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const appointmentId = parseInt(e.target.getAttribute('data-appointment-id'));
+                joinConsultation(appointmentId);
+            });
+        });
+        
+        document.querySelectorAll('.view-prescription-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const appointmentId = parseInt(e.target.getAttribute('data-appointment-id'));
+                viewPrescription(appointmentId);
+            });
+        });
+    }
+
+    // Open booking modal
+    function openBookingModal(doctorId) {
+        if (!state.currentUser || state.userType !== 'patient') {
+            alert('Please register or login as a patient to book an appointment.');
+            return;
+        }
+        
+        const doctor = state.doctors.find(d => d.id === doctorId);
+        document.getElementById('bookingModalTitle').textContent = `Book Appointment with ${doctor.name}`;
+        bookingModal.classList.add('active');
+        
+        // Store the selected doctor ID in the form
+        document.getElementById('bookingForm').setAttribute('data-doctor-id', doctorId);
+    }
+
+    // Start a consultation (doctor)
+    function startConsultation(appointmentId) {
+        const appointment = state.appointments.find(apt => apt.id === appointmentId);
+        if (!appointment) return;
+        
+        // Update appointment status
+        appointment.status = 'active';
+        state.activeConsultation = appointment;
+        
+        // Update UI
+        consultationWithText.textContent = `Consultation with ${appointment.patientName}`;
+        remoteVideoText.textContent = `${appointment.patientName} Video`;
+        prescriptionForText.textContent = `Write Prescription for ${appointment.patientName}`;
+        
+        // Show video call and prescription form
+        videoCallContainer.classList.add('active');
+        prescriptionContainer.classList.add('active');
+        
+        // Update dashboard
+        updateDoctorDashboard();
+        
+        // Start call timer
+        startCallTimer();
+        
+        // Save state
+        saveState();
+    }
+
+    // Join a consultation (patient)
+    function joinConsultation(appointmentId) {
+        const appointment = state.appointments.find(apt => apt.id === appointmentId);
+        if (!appointment) return;
+        
+        // Update UI
+        consultationWithText.textContent = `Consultation with ${appointment.doctorName}`;
+        remoteVideoText.textContent = `${appointment.doctorName} Video`;
+        
+        // Show video call
+        videoCallContainer.classList.add('active');
+        
+        // Start call timer
+        startCallTimer();
+    }
+
+    // Start call timer
+    function startCallTimer() {
+        let seconds = 0;
+        const callTimer = document.getElementById('callTimer');
+        const timer = setInterval(() => {
+            seconds++;
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            callTimer.textContent = `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }, 1000);
+        
+        // Store timer ID for cleanup
+        state.callTimerId = timer;
+    }
+
+    // End consultation
+    function endConsultation() {
+        if (state.activeConsultation) {
+            // Update appointment status
+            state.activeConsultation.status = 'completed';
+            state.activeConsultation = null;
+            
+            // Clear call timer
+            if (state.callTimerId) {
+                clearInterval(state.callTimerId);
+            }
+            
+            // Hide video call
+            videoCallContainer.classList.remove('active');
+            
+            // Update dashboards
+            if (state.userType === 'doctor') {
+                updateDoctorDashboard();
+            } else {
+                updatePatientDashboard();
+            }
+            
+            // Save state
+            saveState();
+        }
+    }
+
+    // View prescription
+    function viewPrescription(appointmentId) {
+        const prescription = state.prescriptions.find(p => p.appointmentId === appointmentId);
+        if (!prescription) {
+            alert('No prescription found for this appointment.');
+            return;
+        }
+        
+        // Populate prescription details
+        prescriptionDetails.innerHTML = `
+            <div class="prescription-item">
+                <h4>Diagnosis</h4>
+                <p>${prescription.diagnosis || 'Not specified'}</p>
+            </div>
+            <div class="prescription-item">
+                <h4>Medications</h4>
+                <p>${prescription.medications || 'Not specified'}</p>
+            </div>
+            <div class="prescription-item">
+                <h4>Additional Notes</h4>
+                <p>${prescription.notes || 'Not specified'}</p>
+            </div>
+            <div class="prescription-item">
+                <h4>Next Visit</h4>
+                <p>${prescription.nextVisit ? formatDate(prescription.nextVisit) : 'Not specified'}</p>
+            </div>
+            <div class="prescription-item">
+                <h4>Recommended Tests</h4>
+                <p>${prescription.tests || 'Not specified'}</p>
+            </div>
+        `;
+        
+        // Show prescription view
+        prescriptionView.classList.add('active');
+    }
+
+    // Save prescription
+    function savePrescription() {
+        if (!state.activeConsultation) return;
+        
+        const prescription = {
+            id: state.prescriptions.length + 1,
+            appointmentId: state.activeConsultation.id,
+            diagnosis: document.getElementById('diagnosis').value,
+            medications: document.getElementById('medications').value,
+            notes: document.getElementById('notes').value,
+            nextVisit: document.getElementById('nextVisit').value,
+            tests: document.getElementById('tests').value,
+            status: 'completed',
+            date: new Date().toISOString().split('T')[0]
+        };
+        
+        state.prescriptions.push(prescription);
+        
+        // Clear form
+        document.getElementById('prescriptionForm').reset();
+        
+        // End consultation
+        endConsultation();
+        
+        // Save state
+        saveState();
+        
+        alert('Prescription saved successfully!');
+    }
+
+    // Filter doctors by specialization
+    function filterDoctorsBySpecialization(specialization) {
+        state.currentSpecializationFilter = specialization;
+        renderDoctorsList();
+        
+        // Update filter UI
+        document.querySelectorAll('.filter-option').forEach(option => {
+            if (option.getAttribute('data-specialization') === specialization) {
+                option.classList.add('active');
+            } else {
+                option.classList.remove('active');
+            }
+        });
+    }
+
+    // Prepare consultation (from the dashboard card)
+    function prepareConsultation() {
+        const appointmentId = parseInt(prepareConsultationBtn.getAttribute('data-appointment-id'));
+        if (appointmentId) {
+            startConsultation(appointmentId);
+        }
+    }
+
+    // Utility functions
+    function getInitials(name) {
+        return name.split(' ').map(n => n[0]).join('').toUpperCase();
+    }
+
+    function formatDate(dateString) {
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        return new Date(dateString).toLocaleDateString(undefined, options);
+    }
+
+    // Event Listeners
+    patientRole.addEventListener('click', () => {
+        patientRegistrationForm.classList.add('active');
+        doctorRegistrationForm.classList.remove('active');
+        loginForm.classList.remove('active');
+        patientDashboard.classList.remove('active');
+        doctorDashboard.classList.remove('active');
+    });
+
+    doctorRole.addEventListener('click', () => {
+        doctorRegistrationForm.classList.add('active');
+        patientRegistrationForm.classList.remove('active');
+        loginForm.classList.remove('active');
+        patientDashboard.classList.remove('active');
+        doctorDashboard.classList.remove('active');
+    });
+
+    // Login form submission
+    loginFormElement.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const loginData = {
+            email: document.getElementById('loginEmail').value,
+            password: document.getElementById('loginPassword').value
+        };
+        
+        if (!validateForm(loginData, 'login')) {
+            return;
+        }
+        
+        // Check if user exists in patients
+        let user = state.patients.find(p => p.email === loginData.email && p.password === loginData.password);
+        if (user) {
+            state.currentUser = user;
+            state.userType = 'patient';
+        } else {
+            // Check if user exists in doctors
+            user = state.doctors.find(d => d.email === loginData.email && d.password === loginData.password);
+            if (user) {
+                state.currentUser = user;
+                state.userType = 'doctor';
+            } else {
+                showError('loginPasswordError', 'Invalid email or password');
+                return;
+            }
+        }
+        
+        // Save to localStorage
+        saveState();
+        
+        // Update UI
+        updateUIForUser();
+        
+        // Reset form
+        document.getElementById('loginFormElement').reset();
+    });
+
+    // Patient form submission
+    document.getElementById('patientForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const patientData = {
+            id: Date.now(),
+            type: 'patient',
+            name: document.getElementById('patientName').value,
+            age: document.getElementById('patientAge').value,
+            gender: document.getElementById('patientGender').value,
+            phone: document.getElementById('patientPhone').value,
+            email: document.getElementById('patientEmail').value,
+            medicalCondition: document.getElementById('patientMedicalCondition').value,
+            address: document.getElementById('patientAddress').value,
+            password: document.getElementById('patientPassword').value,
+            confirmPassword: document.getElementById('patientConfirmPassword').value
+        };
+        
+        if (!validateForm(patientData, 'patient')) {
+            return;
+        }
+        
+        // Check if email already exists
+        if (state.patients.some(p => p.email === patientData.email)) {
+            showError('patientEmailError', 'Email already registered');
+            return;
+        }
+        
+        state.currentUser = patientData;
+        state.userType = 'patient';
+        
+        // Add to patients list
+        state.patients.push(patientData);
+        
+        // Save to localStorage
+        saveState();
+        
+        // Update UI
+        updateUIForUser();
+        
+        // Reset form
+        document.getElementById('patientForm').reset();
+    });
+
+    // Doctor form submission
+    document.getElementById('doctorForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const specialization = document.getElementById('doctorSpecialization').value;
+        const specializationName = document.getElementById('doctorSpecialization').options[document.getElementById('doctorSpecialization').selectedIndex].text;
+        
+        const doctorData = {
+            id: Date.now(),
+            type: 'doctor',
+            name: document.getElementById('doctorName').value,
+            specialization: specialization,
+            specializationName: specializationName,
+            experience: document.getElementById('doctorExperience').value,
+            phone: document.getElementById('doctorPhone').value,
+            email: document.getElementById('doctorEmail').value,
+            regNo: document.getElementById('doctorRegNo').value,
+            password: document.getElementById('doctorPassword').value,
+            confirmPassword: document.getElementById('doctorConfirmPassword').value
+        };
+        
+        if (!validateForm(doctorData, 'doctor')) {
+            return;
+        }
+        
+        // Check if email already exists
+        if (state.doctors.some(d => d.email === doctorData.email)) {
+            showError('doctorEmailError', 'Email already registered');
+            return;
+        }
+        
+        state.currentUser = doctorData;
+        state.userType = 'doctor';
+        
+        // Add to doctors list
+        state.doctors.push(doctorData);
+        
+        // Save to localStorage
+        saveState();
+        
+        // Update UI
+        updateUIForUser();
+        
+        // Reset form
+        document.getElementById('doctorForm').reset();
+    });
+
+    // Booking form submission
+    bookingForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const bookingData = {
+            date: document.getElementById('appointmentDate').value,
+            time: document.getElementById('appointmentTime').value,
+            reason: document.getElementById('appointmentReason').value
+        };
+        
+        if (!validateForm(bookingData, 'booking')) {
+            return;
+        }
+        
+        const doctorId = parseInt(bookingForm.getAttribute('data-doctor-id'));
+        const doctor = state.doctors.find(d => d.id === doctorId);
+        
+        // Check if the selected time slot is available
+        const existingAppointment = state.appointments.find(apt => 
+            apt.doctorId === doctorId && 
+            apt.date === bookingData.date && 
+            apt.time === bookingData.time &&
+            (apt.status === 'upcoming' || apt.status === 'active')
+        );
+        
+        if (existingAppointment) {
+            showError('appointmentTimeError', 'This time slot is already booked. Please select another time.');
+            return;
+        }
+        
+        const appointment = {
+            id: Date.now(),
+            patientId: state.currentUser.id,
+            patientName: state.currentUser.name,
+            patientAge: state.currentUser.age,
+            patientGender: state.currentUser.gender,
+            doctorId: doctorId,
+            doctorName: doctor.name,
+            date: bookingData.date,
+            time: bookingData.time,
+            reason: bookingData.reason,
+            status: 'upcoming'
+        };
+        
+        state.appointments.push(appointment);
+        
+        // Close modal
+        bookingModal.classList.remove('active');
+        
+        // Update dashboard
+        updatePatientDashboard();
+        
+        // Reset form
+        bookingForm.reset();
+        
+        // Save state
+        saveState();
+        
+        alert('Appointment booked successfully!');
+    });
+
+    // Close booking modal
+    closeBookingModal.addEventListener('click', () => {
+        bookingModal.classList.remove('active');
+    });
+
+    // End call button
+    endCallBtn.addEventListener('click', endConsultation);
+
+    // Save prescription button
+    savePrescriptionBtn.addEventListener('click', savePrescription);
+
+    // View prescriptions button
+    viewPrescriptionsBtn.addEventListener('click', () => {
+        // In a real app, this would show a list of prescriptions
+        // For demo, we'll just show the first one if available
+        if (state.prescriptions.length > 0) {
+            viewPrescription(state.prescriptions[0].appointmentId);
+        } else {
+            alert('No prescriptions available.');
+        }
+    });
+
+    // Close prescription view
+    closePrescriptionView.addEventListener('click', () => {
+        prescriptionView.classList.remove('active');
+    });
+
+    // Logout button
+    logoutBtn.addEventListener('click', () => {
+        state.currentUser = null;
+        state.userType = null;
+        localStorage.removeItem('currentUser');
+        showRoleSelection();
+    });
+
+    // Hero book button
+    heroBookBtn.addEventListener('click', () => {
+        if (state.currentUser && state.userType === 'patient') {
+            // If patient is logged in, show doctors list
+            patientDashboard.scrollIntoView({ behavior: 'smooth' });
+        } else {
+            // Otherwise, show role selection
+            showRoleSelection();
+            roleSelection.scrollIntoView({ behavior: 'smooth' });
+        }
+    });
+
+    // Specialization filter buttons
+    specializationFilter.addEventListener('click', (e) => {
+        if (e.target.classList.contains('filter-option')) {
+            const specialization = e.target.getAttribute('data-specialization');
+            filterDoctorsBySpecialization(specialization);
+        }
+    });
+
+    // Prepare consultation button
+    prepareConsultationBtn.addEventListener('click', prepareConsultation);
+
+    // Show login form
+    loginBtn.addEventListener('click', () => {
+        loginForm.classList.add('active');
+        patientRegistrationForm.classList.remove('active');
+        doctorRegistrationForm.classList.remove('active');
+        patientDashboard.classList.remove('active');
+        doctorDashboard.classList.remove('active');
+    });
+
+    // Show register form
+    registerBtn.addEventListener('click', () => {
+        showRoleSelection();
+        roleSelection.scrollIntoView({ behavior: 'smooth' });
+    });
+
+    // Show register link from login
+    showRegisterLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        showRoleSelection();
+        roleSelection.scrollIntoView({ behavior: 'smooth' });
+    });
+
+    // Show login link from patient registration
+    showLoginLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        loginForm.classList.add('active');
+        patientRegistrationForm.classList.remove('active');
+        doctorRegistrationForm.classList.remove('active');
+        patientDashboard.classList.remove('active');
+        doctorDashboard.classList.remove('active');
+    });
+
+    // Show login link from doctor registration
+    showDoctorLoginLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        loginForm.classList.add('active');
+        patientRegistrationForm.classList.remove('active');
+        doctorRegistrationForm.classList.remove('active');
+        patientDashboard.classList.remove('active');
+        doctorDashboard.classList.remove('active');
+    });
+
+    // Initialize the application
+    init();
+</script>
+</body>
+</html>

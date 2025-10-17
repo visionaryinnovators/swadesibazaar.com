@@ -1,0 +1,1606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artisan Woods | Premium Luxury Woodwork</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    
+    <style>
+        :root {
+            --primary: #8B4513;
+            --primary-dark: #654321;
+            --secondary: #1A1A1A;
+            --accent: #D4AF37;
+            --light: #F8F5F0;
+            --gray: #6C757D;
+            --white: #FFFFFF;
+            --error: #e74c3c;
+            --success: #2ecc71;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--secondary);
+            background-color: var(--light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Page Container */
+        .page-container {
+            position: relative;
+            min-height: 100vh;
+        }
+
+        .page {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            min-height: 100vh;
+        }
+
+        .page.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Back Button */
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-weight: 500;
+            cursor: pointer;
+            padding: 10px 0;
+            margin-bottom: 20px;
+            transition: var(--transition);
+        }
+
+        .back-button:hover {
+            color: var(--primary-dark);
+            transform: translateX(-5px);
+        }
+
+        /* Header Styles */
+        header {
+            background-color: var(--white);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .logo h1 {
+            font-size: 28px;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+        }
+
+        .logo span {
+            color: var(--secondary);
+        }
+
+        .search-bar {
+            flex: 1;
+            max-width: 600px;
+            margin: 0 30px;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 14px 20px;
+            border: 1px solid #E5E5E5;
+            border-radius: 50px;
+            font-size: 16px;
+            transition: var(--transition);
+            background-color: #f9f9f9;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.2);
+        }
+
+        .search-bar button {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 9px 20px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .search-bar button:hover {
+            background: var(--primary-dark);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .language-selector select {
+            padding: 8px 15px;
+            border: 1px solid #E5E5E5;
+            border-radius: 5px;
+            background-color: white;
+            font-size: 14px;
+        }
+
+        .auth-buttons a {
+            text-decoration: none;
+            color: var(--secondary);
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: var(--transition);
+        }
+
+        .auth-buttons a.login {
+            color: var(--gray);
+        }
+
+        .auth-buttons a.signup {
+            background: var(--primary);
+            color: white;
+        }
+
+        .auth-buttons a.signup:hover {
+            background: var(--primary-dark);
+        }
+
+        .cart-icon {
+            position: relative;
+            font-size: 22px;
+            color: var(--secondary);
+            cursor: pointer;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--primary);
+            color: white;
+            font-size: 12px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Navigation */
+        nav {
+            background-color: var(--secondary);
+            padding: 15px 0;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--accent);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            height: 600px;
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.8) 0%, rgba(139, 69, 19, 0.7) 100%), url('https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80') no-repeat center center;
+            background-size: cover;
+            color: white;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            max-width: 600px;
+            z-index: 2;
+        }
+
+        .hero h2 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 18px;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: 14px 30px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .cta-button:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Premium Woodwork Section */
+        .premium-woodwork {
+            padding: 80px 0;
+            background-color: var(--white);
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .section-title h2 {
+            font-size: 36px;
+            color: var(--secondary);
+            margin-bottom: 15px;
+        }
+
+        .section-title p {
+            color: var(--gray);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .woodwork-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .woodwork-card {
+            background: var(--white);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .woodwork-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .woodwork-image {
+            height: 250px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .woodwork-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .woodwork-card:hover .woodwork-image img {
+            transform: scale(1.05);
+        }
+
+        .woodwork-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: var(--accent);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .woodwork-info {
+            padding: 20px;
+        }
+
+        .woodwork-info h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .woodwork-artisan {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        .artisan-avatar {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background-color: #E5E5E5;
+        }
+
+        .woodwork-location {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            color: var(--gray);
+            margin-bottom: 15px;
+        }
+
+        .woodwork-price {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .price {
+            font-weight: 700;
+            font-size: 22px;
+            color: var(--secondary);
+        }
+
+        .book-now {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+        }
+
+        .book-now:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
+        }
+
+        /* Booking Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 50px auto;
+            width: 90%;
+            max-width: 800px;
+            border-radius: 10px;
+            overflow: hidden;
+            animation: modalFade 0.3s;
+        }
+
+        @keyframes modalFade {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            background: var(--primary);
+            color: white;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .booking-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 15px;
+            border: 1px solid #E5E5E5;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: var(--transition);
+            background-color: #f9f9f9;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.2);
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .form-section h3 {
+            margin-bottom: 20px;
+            color: var(--secondary);
+        }
+
+        .courier-options {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .courier-option {
+            flex: 1;
+            border: 2px solid #E5E5E5;
+            border-radius: 5px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .courier-option.selected {
+            border-color: var(--primary);
+            background: rgba(139, 69, 19, 0.05);
+        }
+
+        .courier-option i {
+            font-size: 24px;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .courier-option h4 {
+            margin-bottom: 5px;
+        }
+
+        .courier-option p {
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        .submit-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: block;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .submit-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Seller Dashboard */
+        .seller-dashboard {
+            padding: 80px 0;
+            background-color: var(--light);
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 32px;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .stat-card p {
+            color: var(--gray);
+        }
+
+        .bookings-list {
+            background: white;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .booking-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .booking-item:last-child {
+            border-bottom: none;
+        }
+
+        .booking-info h4 {
+            margin-bottom: 5px;
+        }
+
+        .booking-info p {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .booking-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-outline {
+            background: white;
+            color: var(--secondary);
+            border: 1px solid #ddd;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--secondary);
+            color: white;
+            padding: 60px 0 0;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: #CCCCCC;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding: 30px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #999;
+            font-size: 14px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .hero h2 {
+                font-size: 40px;
+            }
+            
+            .search-bar {
+                max-width: 400px;
+            }
+            
+            .booking-form {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-top {
+                flex-wrap: wrap;
+            }
+            
+            .search-bar {
+                order: 3;
+                margin: 15px 0 0;
+                max-width: 100%;
+            }
+            
+            .hero h2 {
+                font-size: 32px;
+            }
+            
+            .hero {
+                height: 500px;
+            }
+            
+            .section-title h2 {
+                font-size: 28px;
+            }
+            
+            .woodwork-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .booking-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .booking-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h2 {
+                font-size: 28px;
+            }
+            
+            .hero p {
+                font-size: 16px;
+            }
+            
+            .courier-options {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <!-- Landing Page -->
+        <div id="landing-page" class="page active">
+            <!-- Header -->
+            <header>
+                <div class="container">
+                    <div class="header-top">
+                        <div class="logo" id="logo">
+                            <h1>Artisan<span>Woods</span></h1>
+                        </div>
+                        <div class="search-bar">
+                            <input type="text" placeholder="Search for premium woodwork, artisans, or categories...">
+                            <button><i class="fas fa-search"></i></button>
+                        </div>
+                        <div class="header-actions">
+                            <div class="language-selector">
+                                <select>
+                                    <option>English</option>
+                                    <option>हिन्दी</option>
+                                    <option>தமிழ்</option>
+                                </select>
+                            </div>
+                            <div class="auth-buttons">
+                                <a href="#" class="login" id="login-link">Login</a>
+                                <a href="#" class="signup" id="signup-link">Sign Up</a>
+                            </div>
+                            <div class="cart-icon">
+                                <i class="fas fa-shopping-bag"></i>
+                                <span class="cart-count">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <nav>
+                    <div class="container">
+                        <ul class="nav-links">
+                            <li><a href="#">Home</a></li>
+                            <li><a href="#">Furniture</a></li>
+                            <li><a href="#">Sculptures</a></li>
+                            <li><a href="#">Home Decor</a></li>
+                            <li><a href="#">Custom Orders</a></li>
+                            <li><a href="#">Artisans</a></li>
+                            <li><a href="#" id="seller-dashboard-link">Seller Dashboard</a></li>
+                        </ul>
+                    </div>
+                </nav>
+            </header>
+
+            <!-- Hero Section -->
+            <section class="hero">
+                <div class="container">
+                    <div class="hero-content">
+                        <h2>Exquisite Handcrafted Woodwork</h2>
+                        <p>Discover premium luxury woodwork pieces crafted by master artisans. Each piece tells a story of tradition, craftsmanship, and timeless beauty.</p>
+                        <a href="#" class="cta-button" id="explore-collection">Explore Collection</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Premium Woodwork Section -->
+            <section class="premium-woodwork">
+                <div class="container">
+                    <div class="section-title">
+                        <h2>Premium Woodwork Collection</h2>
+                        <p>Handcrafted masterpieces from India's finest artisans</p>
+                    </div>
+                    <div class="woodwork-grid" id="woodwork-grid">
+                        <!-- Woodwork items will be dynamically loaded here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Footer -->
+            <footer>
+                <div class="container">
+                    <div class="footer-content">
+                        <div class="footer-column">
+                            <h3>Artisan Woods</h3>
+                            <p>Your gateway to premium luxury woodwork. Connecting you with master artisans across India.</p>
+                        </div>
+                        <div class="footer-column">
+                            <h3>Quick Links</h3>
+                            <ul class="footer-links">
+                                <li><a href="#">Home</a></li>
+                                <li><a href="#">About Us</a></li>
+                                <li><a href="#">Become an Artisan</a></li>
+                                <li><a href="#">Careers</a></li>
+                                <li><a href="#">Contact Us</a></li>
+                            </ul>
+                        </div>
+                        <div class="footer-column">
+                            <h3>Customer Service</h3>
+                            <ul class="footer-links">
+                                <li><a href="#">Help Center</a></li>
+                                <li><a href="#">Returns & Refunds</a></li>
+                                <li><a href="#">Shipping Info</a></li>
+                                <li><a href="#">Track Your Order</a></li>
+                                <li><a href="#">Privacy Policy</a></li>
+                            </ul>
+                        </div>
+                        <div class="footer-column">
+                            <h3>Contact Info</h3>
+                            <ul class="footer-links">
+                                <li><i class="fas fa-map-marker-alt"></i> 123 Artisan Lane, Jaipur, India</li>
+                                <li><i class="fas fa-phone"></i> +91 98765 43210</li>
+                                <li><i class="fas fa-envelope"></i> support@artisanwoods.com</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="footer-bottom">
+                        <p>&copy; 2023 Artisan Woods. All rights reserved.</p>
+                    </div>
+                </div>
+            </footer>
+        </div>
+
+        <!-- Seller Dashboard -->
+        <div id="seller-dashboard" class="page">
+            <!-- Header -->
+            <header>
+                <div class="container">
+                    <div class="header-top">
+                        <div class="logo" id="dashboard-logo">
+                            <h1>Artisan<span>Woods</span></h1>
+                        </div>
+                        <div class="header-actions">
+                            <button class="back-button" id="dashboard-back-button">
+                                <i class="fas fa-arrow-left"></i> Back to Home
+                            </button>
+                            <div class="user-menu">
+                                <div class="user-avatar">AS</div>
+                                <span>Anil Sharma</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <section class="seller-dashboard">
+                <div class="container">
+                    <div class="dashboard-header">
+                        <h2>Seller Dashboard</h2>
+                        <button class="btn btn-primary" id="add-product-btn">
+                            <i class="fas fa-plus"></i> Add Product
+                        </button>
+                    </div>
+
+                    <div class="dashboard-stats">
+                        <div class="stat-card">
+                            <h3 id="total-bookings">0</h3>
+                            <p>Total Bookings</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3 id="pending-orders">0</h3>
+                            <p>Pending Orders</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3 id="completed-orders">0</h3>
+                            <p>Completed Orders</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3 id="total-revenue">₹0</h3>
+                            <p>Total Revenue</p>
+                        </div>
+                    </div>
+
+                    <div class="bookings-list">
+                        <h3 style="padding: 20px; border-bottom: 1px solid #eee;">Recent Bookings</h3>
+                        <div id="bookings-container">
+                            <!-- Bookings will be dynamically loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Booking Modal -->
+        <div class="modal" id="booking-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Book Premium Woodwork</h2>
+                    <button class="modal-close" id="booking-modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="booking-form">
+                        <div class="form-section">
+                            <h3>Product Details</h3>
+                            <div class="form-group full-width">
+                                <label>Selected Item</label>
+                                <div id="selected-product" style="padding: 15px; background: #f9f9f9; border-radius: 5px;">
+                                    <!-- Product details will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h3>Personal Information</h3>
+                            <div class="booking-form">
+                                <div class="form-group">
+                                    <label for="customer-name">Full Name</label>
+                                    <input type="text" id="customer-name" class="form-control" placeholder="Enter your full name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="customer-email">Email Address</label>
+                                    <input type="email" id="customer-email" class="form-control" placeholder="Enter your email" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="customer-phone">Phone Number</label>
+                                    <input type="tel" id="customer-phone" class="form-control" placeholder="Enter your phone number" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="customer-address">Delivery Address</label>
+                                    <textarea id="customer-address" class="form-control" rows="3" placeholder="Enter complete delivery address" required></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h3>Delivery Options</h3>
+                            <p>Choose your preferred delivery service (Free delivery on all orders)</p>
+                            <div class="courier-options">
+                                <div class="courier-option" data-courier="bluedart">
+                                    <i class="fas fa-shipping-fast"></i>
+                                    <h4>Blue Dart</h4>
+                                    <p>2-3 Days Delivery</p>
+                                </div>
+                                <div class="courier-option" data-courier="delhivery">
+                                    <i class="fas fa-truck"></i>
+                                    <h4>Delhivery</h4>
+                                    <p>3-5 Days Delivery</p>
+                                </div>
+                                <div class="courier-option" data-courier="dtdc">
+                                    <i class="fas fa-box"></i>
+                                    <h4>DTDC</h4>
+                                    <p>4-6 Days Delivery</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="submit-btn">Confirm Booking</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Product Modal -->
+        <div class="modal" id="add-product-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Add New Product</h2>
+                    <button class="modal-close" id="add-product-modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="add-product-form">
+                        <div class="booking-form">
+                            <div class="form-group">
+                                <label for="product-name">Product Name</label>
+                                <input type="text" id="product-name" class="form-control" placeholder="Enter product name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="product-category">Category</label>
+                                <select id="product-category" class="form-control" required>
+                                    <option value="">Select category</option>
+                                    <option value="furniture">Furniture</option>
+                                    <option value="sculpture">Sculpture</option>
+                                    <option value="home-decor">Home Decor</option>
+                                    <option value="custom">Custom Order</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="product-price">Price (₹)</label>
+                                <input type="number" id="product-price" class="form-control" placeholder="Enter price" min="1" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="product-description">Description</label>
+                                <textarea id="product-description" class="form-control" rows="3" placeholder="Enter product description" required></textarea>
+                            </div>
+                            <div class="form-group full-width">
+                                <label for="product-image">Product Image URL</label>
+                                <input type="url" id="product-image" class="form-control" placeholder="Enter image URL" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="submit-btn">Add Product</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC4wGDrRHs4gQN6p8Q9X7VqY9t8d4Jk8Xw",
+            authDomain: "artisan-woods.firebaseapp.com",
+            projectId: "artisan-woods",
+            storageBucket: "artisan-woods.appspot.com",
+            messagingSenderId: "123456789012",
+            appId: "1:123456789012:web:abcdef1234567890"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Page Navigation
+        const pages = document.querySelectorAll('.page');
+        const logo = document.getElementById('logo');
+        const dashboardLogo = document.getElementById('dashboard-logo');
+        const loginLink = document.getElementById('login-link');
+        const signupLink = document.getElementById('signup-link');
+        const exploreCollection = document.getElementById('explore-collection');
+        const sellerDashboardLink = document.getElementById('seller-dashboard-link');
+        const dashboardBackButton = document.getElementById('dashboard-back-button');
+
+        function showPage(pageId) {
+            pages.forEach(page => {
+                page.classList.remove('active');
+            });
+            const targetPage = document.getElementById(pageId);
+            targetPage.classList.add('active');
+            
+            if (pageId === 'landing-page') {
+                loadWoodworkItems();
+            } else if (pageId === 'seller-dashboard') {
+                loadSellerDashboard();
+            }
+        }
+
+        logo.addEventListener('click', () => showPage('landing-page'));
+        dashboardLogo.addEventListener('click', () => showPage('landing-page'));
+        loginLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            // In a real app, this would show login form
+            alert('Login functionality would be implemented here');
+        });
+        signupLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            // In a real app, this would show signup form
+            alert('Signup functionality would be implemented here');
+        });
+        exploreCollection.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('woodwork-grid').scrollIntoView({ behavior: 'smooth' });
+        });
+        sellerDashboardLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage('seller-dashboard');
+        });
+        dashboardBackButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage('landing-page');
+        });
+
+        // Sample Woodwork Data
+        const sampleWoodworkItems = [
+            {
+                id: 1,
+                name: "Handcarved Teakwood Dining Table",
+                price: 45000,
+                artisan: "Rajesh Woodcraft",
+                location: "Jaipur, Rajasthan",
+                image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80",
+                category: "furniture",
+                description: "Exquisite handcarved teakwood dining table with traditional motifs. Made from sustainably sourced teak wood."
+            },
+            {
+                id: 2,
+                name: "Rosewood Sculpture - Divine Elephant",
+                price: 28000,
+                artisan: "Mysore Carvings",
+                location: "Mysore, Karnataka",
+                image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80",
+                category: "sculpture",
+                description: "Beautiful rosewood elephant sculpture symbolizing wisdom and strength. Hand-polished to perfection."
+            },
+            {
+                id: 3,
+                name: "Sheesham Wood Coffee Table",
+                price: 18500,
+                artisan: "Himachal Handicrafts",
+                location: "Shimla, Himachal",
+                image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80",
+                category: "furniture",
+                description: "Elegant sheesham wood coffee table with intricate carvings. Perfect for modern living spaces."
+            },
+            {
+                id: 4,
+                name: "Sandalwood Jewelry Box",
+                price: 12500,
+                artisan: "Chennai Crafters",
+                location: "Chennai, Tamil Nadu",
+                image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80",
+                category: "home-decor",
+                description: "Luxurious sandalwood jewelry box with aromatic wood and brass fittings. Keeps jewelry safe and fragrant."
+            }
+        ];
+
+        // Load Woodwork Items
+        function loadWoodworkItems() {
+            const woodworkGrid = document.getElementById('woodwork-grid');
+            woodworkGrid.innerHTML = '';
+
+            // In a real app, this would fetch from Firestore
+            sampleWoodworkItems.forEach(item => {
+                const woodworkCard = document.createElement('div');
+                woodworkCard.className = 'woodwork-card';
+                woodworkCard.setAttribute('data-id', item.id);
+                
+                woodworkCard.innerHTML = `
+                    <div class="woodwork-image">
+                        <img src="${item.image}" alt="${item.name}">
+                        <span class="woodwork-badge">Premium</span>
+                    </div>
+                    <div class="woodwork-info">
+                        <h3>${item.name}</h3>
+                        <div class="woodwork-artisan">
+                            <div class="artisan-avatar"></div>
+                            <span>${item.artisan}</span>
+                        </div>
+                        <div class="woodwork-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>${item.location}</span>
+                        </div>
+                        <div class="woodwork-price">
+                            <span class="price">₹${item.price.toLocaleString()}</span>
+                            <button class="book-now" data-id="${item.id}">Book Now</button>
+                        </div>
+                    </div>
+                `;
+                
+                woodworkGrid.appendChild(woodworkCard);
+            });
+
+            // Add event listeners to book buttons
+            document.querySelectorAll('.book-now').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const itemId = button.getAttribute('data-id');
+                    openBookingModal(itemId);
+                });
+            });
+        }
+
+        // Booking Modal
+        const bookingModal = document.getElementById('booking-modal');
+        const bookingModalClose = document.getElementById('booking-modal-close');
+        const bookingForm = document.getElementById('booking-form');
+        const selectedProductDiv = document.getElementById('selected-product');
+        let selectedProduct = null;
+
+        function openBookingModal(itemId) {
+            selectedProduct = sampleWoodworkItems.find(item => item.id == itemId);
+            
+            if (selectedProduct) {
+                selectedProductDiv.innerHTML = `
+                    <h4>${selectedProduct.name}</h4>
+                    <p><strong>Artisan:</strong> ${selectedProduct.artisan}</p>
+                    <p><strong>Price:</strong> ₹${selectedProduct.price.toLocaleString()}</p>
+                    <p>${selectedProduct.description}</p>
+                `;
+                
+                bookingModal.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        bookingModalClose.addEventListener('click', () => {
+            bookingModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        });
+
+        // Courier Selection
+        document.querySelectorAll('.courier-option').forEach(option => {
+            option.addEventListener('click', () => {
+                document.querySelectorAll('.courier-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                option.classList.add('selected');
+            });
+        });
+
+        // Booking Form Submission
+        bookingForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            if (!selectedProduct) {
+                alert('Please select a product first');
+                return;
+            }
+            
+            const customerName = document.getElementById('customer-name').value;
+            const customerEmail = document.getElementById('customer-email').value;
+            const customerPhone = document.getElementById('customer-phone').value;
+            const customerAddress = document.getElementById('customer-address').value;
+            
+            const selectedCourier = document.querySelector('.courier-option.selected');
+            if (!selectedCourier) {
+                alert('Please select a delivery service');
+                return;
+            }
+            
+            const courier = selectedCourier.getAttribute('data-courier');
+            
+            // Create booking object
+            const booking = {
+                productId: selectedProduct.id,
+                productName: selectedProduct.name,
+                productPrice: selectedProduct.price,
+                artisan: selectedProduct.artisan,
+                customerName,
+                customerEmail,
+                customerPhone,
+                customerAddress,
+                courier,
+                status: 'pending',
+                timestamp: new Date(),
+                bookingId: 'BK' + Date.now()
+            };
+            
+            // Save booking to Firestore
+            db.collection('bookings').add(booking)
+                .then((docRef) => {
+                    console.log('Booking saved with ID: ', docRef.id);
+                    
+                    // Send WhatsApp notification to seller
+                    sendWhatsAppNotification(booking);
+                    
+                    // Show success message
+                    alert('Booking confirmed! You will receive a confirmation email shortly.');
+                    
+                    // Close modal and reset form
+                    bookingModal.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                    bookingForm.reset();
+                    document.querySelectorAll('.courier-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                })
+                .catch((error) => {
+                    console.error('Error saving booking: ', error);
+                    alert('There was an error processing your booking. Please try again.');
+                });
+        });
+
+        // WhatsApp Notification
+        function sendWhatsAppNotification(booking) {
+            // In a real implementation, this would use WhatsApp Business API
+            // For demo purposes, we'll create a WhatsApp message link
+            
+            const sellerPhone = "+919876543210"; // This would be the seller's actual phone number
+            const message = `New Booking Alert!%0A%0AProduct: ${booking.productName}%0APrice: ₹${booking.productPrice}%0ACustomer: ${booking.customerName}%0APhone: ${booking.customerPhone}%0AAddress: ${booking.customerAddress}%0ABooking ID: ${booking.bookingId}`;
+            
+            const whatsappUrl = `https://wa.me/${sellerPhone}?text=${message}`;
+            
+            // In a real app, this would be sent via server-side API
+            // For demo, we'll just log the URL
+            console.log('WhatsApp Notification URL:', whatsappUrl);
+            
+            // Simulate sending notification
+            setTimeout(() => {
+                console.log('WhatsApp notification sent to seller');
+            }, 1000);
+        }
+
+        // Seller Dashboard
+        const addProductBtn = document.getElementById('add-product-btn');
+        const addProductModal = document.getElementById('add-product-modal');
+        const addProductModalClose = document.getElementById('add-product-modal-close');
+        const addProductForm = document.getElementById('add-product-form');
+
+        addProductBtn.addEventListener('click', () => {
+            addProductModal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        });
+
+        addProductModalClose.addEventListener('click', () => {
+            addProductModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        });
+
+        // Add Product Form Submission
+        addProductForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const productName = document.getElementById('product-name').value;
+            const productCategory = document.getElementById('product-category').value;
+            const productPrice = document.getElementById('product-price').value;
+            const productDescription = document.getElementById('product-description').value;
+            const productImage = document.getElementById('product-image').value;
+            
+            const product = {
+                name: productName,
+                category: productCategory,
+                price: parseFloat(productPrice),
+                description: productDescription,
+                image: productImage,
+                artisan: "Anil Sharma", // In real app, get from user profile
+                location: "Jaipur, Rajasthan",
+                timestamp: new Date()
+            };
+            
+            // Save product to Firestore
+            db.collection('products').add(product)
+                .then((docRef) => {
+                    console.log('Product added with ID: ', docRef.id);
+                    alert('Product added successfully!');
+                    addProductModal.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                    addProductForm.reset();
+                    
+                    // Refresh the products list
+                    loadWoodworkItems();
+                })
+                .catch((error) => {
+                    console.error('Error adding product: ', error);
+                    alert('There was an error adding the product. Please try again.');
+                });
+        });
+
+        // Load Seller Dashboard
+        function loadSellerDashboard() {
+            // Load bookings from Firestore
+            db.collection('bookings').orderBy('timestamp', 'desc').get()
+                .then((querySnapshot) => {
+                    const bookingsContainer = document.getElementById('bookings-container');
+                    bookingsContainer.innerHTML = '';
+                    
+                    let totalBookings = 0;
+                    let pendingOrders = 0;
+                    let completedOrders = 0;
+                    let totalRevenue = 0;
+                    
+                    if (querySnapshot.empty) {
+                        bookingsContainer.innerHTML = '<div class="booking-item"><p>No bookings yet</p></div>';
+                    } else {
+                        querySnapshot.forEach((doc) => {
+                            const booking = doc.data();
+                            totalBookings++;
+                            
+                            if (booking.status === 'pending') {
+                                pendingOrders++;
+                            } else if (booking.status === 'completed') {
+                                completedOrders++;
+                            }
+                            
+                            totalRevenue += booking.productPrice;
+                            
+                            const bookingItem = document.createElement('div');
+                            bookingItem.className = 'booking-item';
+                            bookingItem.innerHTML = `
+                                <div class="booking-info">
+                                    <h4>${booking.productName}</h4>
+                                    <p><strong>Customer:</strong> ${booking.customerName} | <strong>Phone:</strong> ${booking.customerPhone}</p>
+                                    <p><strong>Booking ID:</strong> ${booking.bookingId} | <strong>Status:</strong> <span class="status-${booking.status}">${booking.status}</span></p>
+                                    <p><strong>Amount:</strong> ₹${booking.productPrice.toLocaleString()}</p>
+                                </div>
+                                <div class="booking-actions">
+                                    <button class="btn btn-primary" onclick="updateBookingStatus('${doc.id}', 'confirmed')">Confirm</button>
+                                    <button class="btn btn-outline" onclick="updateBookingStatus('${doc.id}', 'completed')">Complete</button>
+                                    <button class="btn btn-outline" onclick="viewBookingDetails('${doc.id}')">Details</button>
+                                </div>
+                            `;
+                            bookingsContainer.appendChild(bookingItem);
+                        });
+                    }
+                    
+                    // Update dashboard stats
+                    document.getElementById('total-bookings').textContent = totalBookings;
+                    document.getElementById('pending-orders').textContent = pendingOrders;
+                    document.getElementById('completed-orders').textContent = completedOrders;
+                    document.getElementById('total-revenue').textContent = `₹${totalRevenue.toLocaleString()}`;
+                })
+                .catch((error) => {
+                    console.error('Error loading bookings: ', error);
+                });
+        }
+
+        // Update Booking Status
+        function updateBookingStatus(bookingId, status) {
+            db.collection('bookings').doc(bookingId).update({
+                status: status
+            })
+            .then(() => {
+                alert(`Booking ${status} successfully!`);
+                loadSellerDashboard(); // Refresh the dashboard
+            })
+            .catch((error) => {
+                console.error('Error updating booking: ', error);
+                alert('Error updating booking status');
+            });
+        }
+
+        // View Booking Details
+        function viewBookingDetails(bookingId) {
+            db.collection('bookings').doc(bookingId).get()
+                .then((doc) => {
+                    if (doc.exists) {
+                        const booking = doc.data();
+                        alert(`Booking Details:\n\nProduct: ${booking.productName}\nCustomer: ${booking.customerName}\nPhone: ${booking.customerPhone}\nAddress: ${booking.customerAddress}\nStatus: ${booking.status}\nAmount: ₹${booking.productPrice}`);
+                    } else {
+                        alert('Booking not found');
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error getting booking: ', error);
+                    alert('Error loading booking details');
+                });
+        }
+
+        // Courier Service Integration (Simulated)
+        function integrateCourierService(booking, courier) {
+            // In a real implementation, this would integrate with courier APIs
+            // For demo purposes, we'll simulate the integration
+            
+            const courierServices = {
+                'bluedart': {
+                    name: 'Blue Dart',
+                    apiUrl: 'https://api.bluedart.com/shipment',
+                    // API credentials and implementation would go here
+                },
+                'delhivery': {
+                    name: 'Delhivery',
+                    apiUrl: 'https://api.delhivery.com/shipment',
+                    // API credentials and implementation would go here
+                },
+                'dtdc': {
+                    name: 'DTDC',
+                    apiUrl: 'https://api.dtdc.com/shipment',
+                    // API credentials and implementation would go here
+                }
+            };
+            
+            const selectedCourier = courierServices[courier];
+            
+            if (selectedCourier) {
+                // Simulate API call
+                console.log(`Integrating with ${selectedCourier.name} API`);
+                console.log('Shipment details:', {
+                    customerName: booking.customerName,
+                    customerAddress: booking.customerAddress,
+                    customerPhone: booking.customerPhone,
+                    product: booking.productName,
+                    weight: '5kg', // This would be calculated based on product
+                    dimensions: '30x20x15 cm' // This would be product-specific
+                });
+                
+                // In a real implementation, we would:
+                // 1. Authenticate with the courier API
+                // 2. Create a shipment request
+                // 3. Get tracking number
+                // 4. Update the booking with tracking information
+                
+                return {
+                    success: true,
+                    trackingNumber: 'TRK' + Date.now(),
+                    estimatedDelivery: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) // 3 days from now
+                };
+            } else {
+                return {
+                    success: false,
+                    error: 'Courier service not available'
+                };
+            }
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            loadWoodworkItems();
+            
+            // Load products from Firestore
+            db.collection('products').get()
+                .then((querySnapshot) => {
+                    if (!querySnapshot.empty) {
+                        // If there are products in Firestore, use them
+                        // This would replace the sample products in a real app
+                        console.log('Products loaded from Firestore');
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error loading products: ', error);
+                });
+        });
+    </script>
+</body>
+</html>

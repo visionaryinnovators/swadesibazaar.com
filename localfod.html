@@ -1,0 +1,1595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LuxeLocal Bites | Premium Artisanal Foods</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    
+    <style>
+        :root {
+            --primary: #C19A6B;
+            --primary-dark: #8B6B3D;
+            --secondary: #1A1A1A;
+            --accent: #8B4513;
+            --light: #F8F5F0;
+            --gray: #6C757D;
+            --white: #FFFFFF;
+            --gold: #D4AF37;
+            --error: #e74c3c;
+            --success: #2ecc71;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--secondary);
+            background-color: var(--light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Luxury Header */
+        .luxury-header {
+            background: linear-gradient(135deg, var(--secondary) 0%, #2c2c2c 100%);
+            color: var(--white);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .logo h1 {
+            font-size: 28px;
+            color: var(--gold);
+            letter-spacing: -0.5px;
+        }
+
+        .logo span {
+            color: var(--white);
+        }
+
+        .luxury-tagline {
+            font-style: italic;
+            color: var(--primary);
+            font-size: 14px;
+            margin-top: -5px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .auth-buttons a {
+            text-decoration: none;
+            color: var(--white);
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: var(--transition);
+        }
+
+        .auth-buttons a.login {
+            color: var(--gray);
+        }
+
+        .auth-buttons a.signup {
+            background: var(--primary);
+            color: var(--secondary);
+        }
+
+        .auth-buttons a.signup:hover {
+            background: var(--primary-dark);
+        }
+
+        .cart-icon {
+            position: relative;
+            font-size: 22px;
+            color: var(--white);
+            cursor: pointer;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--gold);
+            color: var(--secondary);
+            font-size: 12px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Luxury Navigation */
+        .luxury-nav {
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 0;
+            margin-top: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+            text-transform: uppercase;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--primary);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Luxury Hero Section */
+        .luxury-hero {
+            position: relative;
+            height: 80vh;
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80') no-repeat center center;
+            background-size: cover;
+            color: white;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            max-width: 700px;
+            z-index: 2;
+        }
+
+        .hero-content h2 {
+            font-size: 52px;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .hero-content p {
+            font-size: 18px;
+            margin-bottom: 30px;
+            opacity: 0.9;
+            max-width: 600px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: var(--primary);
+            color: var(--secondary);
+            padding: 16px 35px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .cta-button:hover {
+            background: var(--gold);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Premium Features */
+        .premium-features {
+            padding: 100px 0;
+            background-color: var(--white);
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-title h2 {
+            font-size: 36px;
+            color: var(--secondary);
+            margin-bottom: 15px;
+        }
+
+        .section-title p {
+            color: var(--gray);
+            max-width: 600px;
+            margin: 0 auto;
+            font-size: 18px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+
+        .feature-card {
+            background: var(--white);
+            border-radius: 10px;
+            padding: 40px 30px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            text-align: center;
+            border: 1px solid rgba(193, 154, 107, 0.2);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(193, 154, 107, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 32px;
+            color: var(--primary);
+        }
+
+        .feature-card h3 {
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+
+        .feature-card p {
+            color: var(--gray);
+        }
+
+        /* Luxury Categories */
+        .luxury-categories {
+            padding: 100px 0;
+            background-color: var(--light);
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .category-card {
+            position: relative;
+            height: 350px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .category-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .category-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .category-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .category-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+            color: white;
+            padding: 25px;
+        }
+
+        .category-overlay h3 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .category-overlay p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        /* Premium Products */
+        .premium-products {
+            padding: 100px 0;
+            background-color: var(--white);
+        }
+
+        .products-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .products-header h2 {
+            font-size: 32px;
+        }
+
+        .view-all {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: var(--transition);
+            text-transform: uppercase;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+
+        .view-all:hover {
+            gap: 10px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .product-card {
+            background: var(--white);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: 1px solid rgba(193, 154, 107, 0.1);
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
+        }
+
+        .product-image {
+            height: 220px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.05);
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: var(--gold);
+            color: var(--secondary);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .product-info {
+            padding: 25px;
+        }
+
+        .product-info h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .product-seller {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        .seller-avatar {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background-color: #E5E5E5;
+        }
+
+        .product-location {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            color: var(--gray);
+            margin-bottom: 15px;
+        }
+
+        .product-price {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .price {
+            font-weight: 700;
+            font-size: 22px;
+            color: var(--secondary);
+        }
+
+        .add-to-cart {
+            background: var(--primary);
+            color: var(--secondary);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .add-to-cart:hover {
+            background: var(--primary-dark);
+            transform: scale(1.1);
+        }
+
+        /* Booking Section */
+        .booking-section {
+            padding: 100px 0;
+            background: linear-gradient(135deg, var(--secondary) 0%, #2c2c2c 100%);
+            color: white;
+        }
+
+        .booking-container {
+            display: flex;
+            gap: 50px;
+            align-items: center;
+        }
+
+        .booking-content {
+            flex: 1;
+        }
+
+        .booking-content h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: var(--gold);
+        }
+
+        .booking-content p {
+            margin-bottom: 30px;
+            opacity: 0.9;
+            font-size: 18px;
+        }
+
+        .booking-features {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+
+        .booking-features li {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .booking-features i {
+            color: var(--primary);
+        }
+
+        .booking-form-container {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .booking-form h3 {
+            font-size: 24px;
+            margin-bottom: 25px;
+            text-align: center;
+            color: var(--gold);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            font-size: 16px;
+            transition: var(--transition);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(193, 154, 107, 0.2);
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .submit-btn {
+            background: var(--primary);
+            color: var(--secondary);
+            border: none;
+            padding: 16px 30px;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: block;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .submit-btn:hover {
+            background: var(--gold);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Courier Section */
+        .courier-section {
+            padding: 80px 0;
+            background-color: var(--white);
+        }
+
+        .courier-logos {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 50px;
+            flex-wrap: wrap;
+        }
+
+        .courier-logo {
+            height: 60px;
+            filter: grayscale(100%);
+            opacity: 0.7;
+            transition: var(--transition);
+        }
+
+        .courier-logo:hover {
+            filter: grayscale(0%);
+            opacity: 1;
+        }
+
+        /* Luxury Footer */
+        .luxury-footer {
+            background: var(--secondary);
+            color: white;
+            padding: 80px 0 0;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: var(--gold);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: #CCCCCC;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding: 30px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #999;
+            font-size: 14px;
+        }
+
+        /* Map Section */
+        .map-section {
+            margin-top: 50px;
+        }
+
+        .map-container {
+            height: 400px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        #sellerLocationMap {
+            height: 100%;
+            width: 100%;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 50px auto;
+            width: 90%;
+            max-width: 1000px;
+            border-radius: 10px;
+            overflow: hidden;
+            animation: modalFade 0.3s;
+        }
+
+        @keyframes modalFade {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .hero-content h2 {
+                font-size: 40px;
+            }
+            
+            .booking-container {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-top {
+                flex-wrap: wrap;
+            }
+            
+            .hero-content h2 {
+                font-size: 32px;
+            }
+            
+            .luxury-hero {
+                height: 70vh;
+            }
+            
+            .section-title h2 {
+                font-size: 28px;
+            }
+            
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-content h2 {
+                font-size: 28px;
+            }
+            
+            .hero-content p {
+                font-size: 16px;
+            }
+            
+            .features-grid, .categories-grid, .products-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .booking-form-container {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Luxury Header -->
+    <header class="luxury-header">
+        <div class="container">
+            <div class="header-top">
+                <div class="logo">
+                    <h1>Luxe<span>Local</span> Bites</h1>
+                    <div class="luxury-tagline">Premium Artisanal Foods</div>
+                </div>
+                <div class="header-actions">
+                    <div class="auth-buttons">
+                        <a href="#" class="login" id="login-link">Login</a>
+                        <a href="#" class="signup" id="signup-link">Sign Up</a>
+                    </div>
+                    <div class="cart-icon">
+                        <i class="fas fa-shopping-bag"></i>
+                        <span class="cart-count">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <nav class="luxury-nav">
+            <div class="container">
+                <ul class="nav-links">
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Gourmet Foods</a></li>
+                    <li><a href="#">Artisanal Cheeses</a></li>
+                    <li><a href="#">Premium Meats</a></li>
+                    <li><a href="#">Organic Produce</a></li>
+                    <li><a href="#">Local Wines</a></li>
+                    <li><a href="#">Specialty Items</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Luxury Hero Section -->
+    <section class="luxury-hero">
+        <div class="container">
+            <div class="hero-content">
+                <h2>Experience the Finest Local Artisanal Foods</h2>
+                <p>Discover premium, handcrafted foods from local artisans. Curated selection, guaranteed quality, and free luxury delivery to your doorstep.</p>
+                <a href="#booking" class="cta-button">Book Premium Experience</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Premium Features -->
+    <section class="premium-features">
+        <div class="container">
+            <div class="section-title">
+                <h2>Why Choose LuxeLocal Bites</h2>
+                <p>We bring the finest local foods directly to you with premium service</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-gem"></i>
+                    </div>
+                    <h3>Premium Quality</h3>
+                    <p>Every product is carefully curated for exceptional quality and taste. We work only with the finest local artisans.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shipping-fast"></i>
+                    </div>
+                    <h3>Free Luxury Delivery</h3>
+                    <p>Enjoy complimentary premium delivery service with real-time tracking and temperature-controlled transport.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <h3>Real-Time GPS Tracking</h3>
+                    <p>Track your order in real-time from artisan to your doorstep with our advanced GPS tracking system.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-concierge-bell"></i>
+                    </div>
+                    <h3>Premium Service</h3>
+                    <p>Dedicated customer service and personalized recommendations from our food connoisseurs.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Luxury Categories -->
+    <section class="luxury-categories">
+        <div class="container">
+            <div class="section-title">
+                <h2>Premium Food Categories</h2>
+                <p>Explore our curated collection of luxury food items</p>
+            </div>
+            <div class="categories-grid">
+                <div class="category-card">
+                    <img src="https://images.unsplash.com/photo-1546833999-b9f581a1996d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Artisanal Cheeses">
+                    <div class="category-overlay">
+                        <h3>Artisanal Cheeses</h3>
+                        <p>Handcrafted from local farms</p>
+                    </div>
+                </div>
+                <div class="category-card">
+                    <img src="https://images.unsplash.com/photo-1606913084603-3e7702b01627?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Cured Meats">
+                    <div class="category-overlay">
+                        <h3>Cured Meats</h3>
+                        <p>Premium quality charcuterie</p>
+                    </div>
+                </div>
+                <div class="category-card">
+                    <img src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2080&q=80" alt="Fresh Bakery">
+                    <div class="category-overlay">
+                        <h3>Fresh Bakery</h3>
+                        <p>Artisan breads and pastries</p>
+                    </div>
+                </div>
+                <div class="category-card">
+                    <img src="https://images.unsplash.com/photo-1519996529937-47d6c587f6ad?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Organic Produce">
+                    <div class="category-overlay">
+                        <h3>Organic Produce</h3>
+                        <p>Farm-fresh fruits and vegetables</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Premium Products -->
+    <section class="premium-products">
+        <div class="container">
+            <div class="products-header">
+                <h2>Featured Premium Products</h2>
+                <a href="#" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="products-grid">
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://images.unsplash.com/photo-1556679343-c7306c1976bc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2064&q=80" alt="Aged Gouda Cheese">
+                        <span class="product-badge">Premium</span>
+                    </div>
+                    <div class="product-info">
+                        <h3>Aged Gouda Cheese Wheel</h3>
+                        <div class="product-seller">
+                            <div class="seller-avatar"></div>
+                            <span>Holland Cheese Co.</span>
+                        </div>
+                        <div class="product-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Amsterdam • 5 km away</span>
+                        </div>
+                        <div class="product-price">
+                            <span class="price">₹4,250</span>
+                            <button class="add-to-cart">
+                                <i class="fas fa-shopping-bag"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://images.unsplash.com/photo-1606913084603-3e7702b01627?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Prosciutto di Parma">
+                        <span class="product-badge">Limited</span>
+                    </div>
+                    <div class="product-info">
+                        <h3>Prosciutto di Parma (24 Months)</h3>
+                        <div class="product-seller">
+                            <div class="seller-avatar"></div>
+                            <span>Italian Delights</span>
+                        </div>
+                        <div class="product-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Milan • 12 km away</span>
+                        </div>
+                        <div class="product-price">
+                            <span class="price">₹6,800</span>
+                            <button class="add-to-cart">
+                                <i class="fas fa-shopping-bag"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://images.unsplash.com/photo-1541519227354-08fa5d50c44d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Truffle Oil">
+                        <span class="product-badge">Luxury</span>
+                    </div>
+                    <div class="product-info">
+                        <h3>White Truffle Infused Olive Oil</h3>
+                        <div class="product-seller">
+                            <div class="seller-avatar"></div>
+                            <span>Truffle Masters</span>
+                        </div>
+                        <div class="product-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Florence • 8 km away</span>
+                        </div>
+                        <div class="product-price">
+                            <span class="price">₹3,500</span>
+                            <button class="add-to-cart">
+                                <i class="fas fa-shopping-bag"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://images.unsplash.com/photo-1586201375761-83865001e31c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Artisan Bread">
+                        <span class="product-badge">Fresh</span>
+                    </div>
+                    <div class="product-info">
+                        <h3>Sourdough Bread Basket</h3>
+                        <div class="product-seller">
+                            <div class="seller-avatar"></div>
+                            <span>Boulangerie Paris</span>
+                        </div>
+                        <div class="product-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Paris • 3 km away</span>
+                        </div>
+                        <div class="product-price">
+                            <span class="price">₹1,850</span>
+                            <button class="add-to-cart">
+                                <i class="fas fa-shopping-bag"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Booking Section -->
+    <section class="booking-section" id="booking">
+        <div class="container">
+            <div class="booking-container">
+                <div class="booking-content">
+                    <h2>Book Your Premium Experience</h2>
+                    <p>Place your order and enjoy our premium delivery service with real-time tracking and seller notifications.</p>
+                    
+                    <ul class="booking-features">
+                        <li><i class="fas fa-check-circle"></i> Real-time seller notifications via WhatsApp</li>
+                        <li><i class="fas fa-check-circle"></i> Live GPS tracking of your order</li>
+                        <li><i class="fas fa-check-circle"></i> Free premium delivery service</li>
+                        <li><i class="fas fa-check-circle"></i> Temperature-controlled transport</li>
+                        <li><i class="fas fa-check-circle"></i> Dedicated customer support</li>
+                    </ul>
+                    
+                    <div class="map-section">
+                        <h3>Track Seller Location</h3>
+                        <p>View the real-time location of your selected artisan</p>
+                        <div class="map-container">
+                            <div id="sellerLocationMap"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="booking-form-container">
+                    <form class="booking-form" id="bookingForm">
+                        <h3>Place Your Order</h3>
+                        
+                        <div class="form-group">
+                            <label for="customerName">Full Name</label>
+                            <input type="text" id="customerName" class="form-control" placeholder="Enter your full name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="customerPhone">Phone Number</label>
+                            <input type="tel" id="customerPhone" class="form-control" placeholder="Enter your phone number" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="customerEmail">Email Address</label>
+                            <input type="email" id="customerEmail" class="form-control" placeholder="Enter your email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="deliveryAddress">Delivery Address</label>
+                            <textarea id="deliveryAddress" class="form-control" placeholder="Enter your complete delivery address" rows="3" required></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="productSelection">Select Product</label>
+                            <select id="productSelection" class="form-control" required>
+                                <option value="">Choose a product</option>
+                                <option value="Aged Gouda Cheese Wheel">Aged Gouda Cheese Wheel - ₹4,250</option>
+                                <option value="Prosciutto di Parma">Prosciutto di Parma (24 Months) - ₹6,800</option>
+                                <option value="White Truffle Oil">White Truffle Infused Olive Oil - ₹3,500</option>
+                                <option value="Sourdough Bread Basket">Sourdough Bread Basket - ₹1,850</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="deliveryDate">Preferred Delivery Date</label>
+                            <input type="date" id="deliveryDate" class="form-control" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="specialInstructions">Special Instructions</label>
+                            <textarea id="specialInstructions" class="form-control" placeholder="Any special delivery instructions?" rows="2"></textarea>
+                        </div>
+                        
+                        <button type="submit" class="submit-btn">Confirm Premium Booking</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Courier Section -->
+    <section class="courier-section">
+        <div class="container">
+            <div class="section-title">
+                <h2>Premium Delivery Partners</h2>
+                <p>We partner with the best courier services for your luxury experience</p>
+            </div>
+            <div class="courier-logos">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/DHL_Logo.svg/2560px-DHL_Logo.svg.png" alt="DHL" class="courier-logo" style="height: 40px;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/FedEx_Express_logo.svg/2560px-FedEx_Express_logo.svg.png" alt="FedEx" class="courier-logo" style="height: 50px;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Blue_Dart_Logo.svg/2560px-Blue_Dart_Logo.svg.png" alt="Blue Dart" class="courier-logo" style="height: 60px;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/UPS_Logo_svg.svg/2560px-UPS_Logo_svg.svg.png" alt="UPS" class="courier-logo" style="height: 50px;">
+            </div>
+        </div>
+    </section>
+
+    <!-- Luxury Footer -->
+    <footer class="luxury-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>LuxeLocal Bites</h3>
+                    <p>Your premium gateway to the finest local artisanal foods. Experience luxury delivery and exceptional quality.</p>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Become a Seller</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Customer Service</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Delivery Information</a></li>
+                        <li><a href="#">Returns & Refunds</a></li>
+                        <li><a href="#">Track Your Order</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contact Info</h3>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Luxury Lane, Food District</li>
+                        <li><i class="fas fa-phone"></i> +91 98765 43210</li>
+                        <li><i class="fas fa-envelope"></i> concierge@luxelocalbites.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 LuxeLocal Bites. All rights reserved. | Premium Artisanal Food Marketplace</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Order Confirmation Modal -->
+    <div class="modal" id="orderModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Order Confirmation</h2>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="orderDetails">
+                    <!-- Order details will be populated here -->
+                </div>
+                <div class="tracking-info" id="trackingInfo" style="margin-top: 20px; display: none;">
+                    <h3>Tracking Information</h3>
+                    <p>Your order is being prepared and will be shipped soon.</p>
+                    <div class="tracking-steps">
+                        <div class="tracking-step active">
+                            <i class="fas fa-shopping-bag"></i>
+                            <span>Order Placed</span>
+                        </div>
+                        <div class="tracking-step">
+                            <i class="fas fa-utensils"></i>
+                            <span>Preparing</span>
+                        </div>
+                        <div class="tracking-step">
+                            <i class="fas fa-shipping-fast"></i>
+                            <span>Shipped</span>
+                        </div>
+                        <div class="tracking-step">
+                            <i class="fas fa-home"></i>
+                            <span>Delivered</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC4wGDrRHs4gQN6p8Q9X7VqY9t8d4Jk8Xw",
+            authDomain: "luxelocal-bites.firebaseapp.com",
+            projectId: "luxelocal-bites",
+            storageBucket: "luxelocal-bites.appspot.com",
+            messagingSenderId: "123456789012",
+            appId: "1:123456789012:web:abcdef1234567890"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Global Variables
+        let sellerLocationMap;
+        let sellerMarker;
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            initSellerLocationMap();
+            setupEventListeners();
+            setMinDeliveryDate();
+        });
+
+        // Initialize Seller Location Map
+        function initSellerLocationMap() {
+            sellerLocationMap = L.map('sellerLocationMap').setView([28.6139, 77.2090], 12); // Default to Delhi
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(sellerLocationMap);
+            
+            // Add sample seller markers
+            const sellers = [
+                { name: 'Holland Cheese Co.', lat: 28.6139, lng: 77.2090, type: 'cheese' },
+                { name: 'Italian Delights', lat: 28.6200, lng: 77.2150, type: 'meat' },
+                { name: 'Truffle Masters', lat: 28.6050, lng: 77.2000, type: 'oil' },
+                { name: 'Boulangerie Paris', lat: 28.6250, lng: 77.1950, type: 'bakery' }
+            ];
+            
+            sellers.forEach(seller => {
+                const iconColor = getIconColor(seller.type);
+                
+                L.marker([seller.lat, seller.lng])
+                    .addTo(sellerLocationMap)
+                    .bindPopup(`
+                        <div style="text-align: center;">
+                            <h3>${seller.name}</h3>
+                            <p>${getSellerType(seller.type)}</p>
+                            <button class="btn btn-primary" style="margin-top: 10px; padding: 5px 10px; font-size: 12px;">
+                                View Products
+                            </button>
+                        </div>
+                    `);
+            });
+            
+            // Add user location marker if available
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    const userLat = position.coords.latitude;
+                    const userLng = position.coords.longitude;
+                    
+                    L.marker([userLat, userLng])
+                        .addTo(sellerLocationMap)
+                        .bindPopup('Your Location')
+                        .openPopup();
+                        
+                    sellerLocationMap.setView([userLat, userLng], 13);
+                });
+            }
+        }
+
+        function getIconColor(type) {
+            const colors = {
+                cheese: 'yellow',
+                meat: 'red',
+                oil: 'orange',
+                bakery: 'brown'
+            };
+            return colors[type] || 'gray';
+        }
+
+        function getSellerType(type) {
+            const types = {
+                cheese: 'Artisanal Cheeses',
+                meat: 'Premium Meats',
+                oil: 'Specialty Oils',
+                bakery: 'Fresh Bakery'
+            };
+            return types[type] || 'Local Artisan';
+        }
+
+        // Set minimum delivery date to today
+        function setMinDeliveryDate() {
+            const today = new Date();
+            const dd = String(today.getDate()).padStart(2, '0');
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const yyyy = today.getFullYear();
+            
+            const minDate = yyyy + '-' + mm + '-' + dd;
+            document.getElementById('deliveryDate').setAttribute('min', minDate);
+        }
+
+        // Setup Event Listeners
+        function setupEventListeners() {
+            // Booking form submission
+            document.getElementById('bookingForm').addEventListener('submit', handleBookingSubmit);
+            
+            // Modal close button
+            document.getElementById('modalClose').addEventListener('click', closeOrderModal);
+            
+            // Add to cart buttons
+            document.querySelectorAll('.add-to-cart').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    addToCart(this);
+                });
+            });
+            
+            // Auth buttons
+            document.getElementById('login-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('Login functionality would be implemented here');
+            });
+            
+            document.getElementById('signup-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('Signup functionality would be implemented here');
+            });
+        }
+
+        // Handle Booking Form Submission
+        function handleBookingSubmit(e) {
+            e.preventDefault();
+            
+            // Get form data
+            const formData = {
+                customerName: document.getElementById('customerName').value,
+                customerPhone: document.getElementById('customerPhone').value,
+                customerEmail: document.getElementById('customerEmail').value,
+                deliveryAddress: document.getElementById('deliveryAddress').value,
+                productSelection: document.getElementById('productSelection').value,
+                deliveryDate: document.getElementById('deliveryDate').value,
+                specialInstructions: document.getElementById('specialInstructions').value,
+                orderDate: new Date().toISOString(),
+                orderId: generateOrderId(),
+                status: 'confirmed'
+            };
+            
+            // Validate form
+            if (!validateBookingForm(formData)) {
+                return;
+            }
+            
+            // Save to Firebase
+            saveOrderToFirebase(formData);
+            
+            // Send WhatsApp notification to seller
+            sendSellerNotification(formData);
+            
+            // Generate courier booking
+            generateCourierBooking(formData);
+            
+            // Show confirmation modal
+            showOrderConfirmation(formData);
+        }
+
+        // Validate Booking Form
+        function validateBookingForm(formData) {
+            if (!formData.customerName || !formData.customerPhone || !formData.customerEmail || 
+                !formData.deliveryAddress || !formData.productSelection || !formData.deliveryDate) {
+                alert('Please fill in all required fields');
+                return false;
+            }
+            
+            if (!isValidPhone(formData.customerPhone)) {
+                alert('Please enter a valid phone number');
+                return false;
+            }
+            
+            if (!isValidEmail(formData.customerEmail)) {
+                alert('Please enter a valid email address');
+                return false;
+            }
+            
+            return true;
+        }
+
+        function isValidPhone(phone) {
+            const phoneRegex = /^\d{10}$/;
+            return phoneRegex.test(phone);
+        }
+
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // Generate Unique Order ID
+        function generateOrderId() {
+            return 'LLB' + Date.now() + Math.floor(Math.random() * 1000);
+        }
+
+        // Save Order to Firebase
+        function saveOrderToFirebase(orderData) {
+            db.collection('orders').add(orderData)
+                .then((docRef) => {
+                    console.log('Order saved with ID: ', docRef.id);
+                })
+                .catch((error) => {
+                    console.error('Error saving order: ', error);
+                });
+        }
+
+        // Send WhatsApp Notification to Seller
+        function sendSellerNotification(orderData) {
+            // Get seller phone number based on product (in a real app, this would come from database)
+            const sellerPhone = getSellerPhone(orderData.productSelection);
+            
+            // Create WhatsApp message
+            const message = `New Order Notification%0A%0AOrder ID: ${orderData.orderId}%0ACustomer: ${orderData.customerName}%0AProduct: ${orderData.productSelection}%0ADelivery Date: ${orderData.deliveryDate}%0AAddress: ${orderData.deliveryAddress}%0APhone: ${orderData.customerPhone}%0A%0APlease prepare the order for delivery.`;
+            
+            // Create WhatsApp URL
+            const whatsappUrl = `https://wa.me/${sellerPhone}?text=${message}`;
+            
+            // In a real application, you would use a server-side service to send the message
+            // For demo purposes, we'll open WhatsApp with the pre-filled message
+            window.open(whatsappUrl, '_blank');
+            
+            console.log('WhatsApp notification sent to seller');
+        }
+
+        // Get Seller Phone Number (Mock function)
+        function getSellerPhone(product) {
+            // In a real application, this would query the database
+            const sellerPhones = {
+                'Aged Gouda Cheese Wheel': '919876543210',
+                'Prosciutto di Parma': '919876543211',
+                'White Truffle Oil': '919876543212',
+                'Sourdough Bread Basket': '919876543213'
+            };
+            
+            return sellerPhones[product] || '919876543210';
+        }
+
+        // Generate Courier Booking
+        function generateCourierBooking(orderData) {
+            // In a real application, this would integrate with courier APIs
+            // For demo purposes, we'll simulate the API call
+            
+            const courierData = {
+                orderId: orderData.orderId,
+                customerName: orderData.customerName,
+                customerPhone: orderData.customerPhone,
+                customerAddress: orderData.deliveryAddress,
+                product: orderData.productSelection,
+                deliveryDate: orderData.deliveryDate,
+                specialInstructions: orderData.specialInstructions
+            };
+            
+            // Simulate API call to courier service
+            setTimeout(() => {
+                console.log('Courier booking created:', courierData);
+                
+                // Generate tracking ID (simulated)
+                const trackingId = 'LLB' + Date.now();
+                
+                // Update order with tracking information
+                db.collection('orders').where('orderId', '==', orderData.orderId)
+                    .get()
+                    .then((querySnapshot) => {
+                        querySnapshot.forEach((doc) => {
+                            db.collection('orders').doc(doc.id).update({
+                                trackingId: trackingId,
+                                courier: 'Blue Dart',
+                                status: 'shipped'
+                            });
+                        });
+                    });
+                
+                // Show tracking information
+                document.getElementById('trackingInfo').style.display = 'block';
+            }, 2000);
+        }
+
+        // Show Order Confirmation Modal
+        function showOrderConfirmation(orderData) {
+            const orderDetails = document.getElementById('orderDetails');
+            
+            orderDetails.innerHTML = `
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <i class="fas fa-check-circle" style="font-size: 48px; color: var(--success);"></i>
+                    <h3 style="margin: 15px 0; color: var(--success);">Order Confirmed!</h3>
+                </div>
+                
+                <div style="background: #f9f9f9; padding: 20px; border-radius: 10px;">
+                    <h4>Order Details</h4>
+                    <p><strong>Order ID:</strong> ${orderData.orderId}</p>
+                    <p><strong>Customer:</strong> ${orderData.customerName}</p>
+                    <p><strong>Product:</strong> ${orderData.productSelection}</p>
+                    <p><strong>Delivery Date:</strong> ${orderData.deliveryDate}</p>
+                    <p><strong>Delivery Address:</strong> ${orderData.deliveryAddress}</p>
+                    <p><strong>Special Instructions:</strong> ${orderData.specialInstructions || 'None'}</p>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <p><strong>Seller Notification:</strong> Sent via WhatsApp</p>
+                    <p><strong>Courier Service:</strong> Blue Dart (Free Premium Delivery)</p>
+                </div>
+            `;
+            
+            document.getElementById('orderModal').style.display = 'block';
+        }
+
+        // Close Order Modal
+        function closeOrderModal() {
+            document.getElementById('orderModal').style.display = 'none';
+            document.getElementById('bookingForm').reset();
+        }
+
+        // Add to Cart Functionality
+        function addToCart(button) {
+            // Animation
+            button.style.transform = 'scale(1.3)';
+            setTimeout(() => {
+                button.style.transform = 'scale(1)';
+            }, 300);
+            
+            // Update cart count
+            const cartCount = document.querySelector('.cart-count');
+            let currentCount = parseInt(cartCount.textContent);
+            cartCount.textContent = currentCount + 1;
+            
+            // Visual feedback
+            cartCount.style.animation = 'none';
+            setTimeout(() => {
+                cartCount.style.animation = 'pulse 0.5s';
+            }, 10);
+            
+            // Show confirmation
+            alert('Product added to cart!');
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('orderModal');
+            if (event.target === modal) {
+                closeOrderModal();
+            }
+        }
+    </script>
+</body>
+</html>

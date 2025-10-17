@@ -1,0 +1,2071 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LuxeGrocer | Premium Luxury Groceries & Delivery</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    
+    <style>
+        :root {
+            --primary: #D4AF37;
+            --primary-dark: #B8860B;
+            --secondary: #1A1A1A;
+            --accent: #8B4513;
+            --light: #F8F5F0;
+            --gray: #6C757D;
+            --white: #FFFFFF;
+            --error: #e74c3c;
+            --success: #2ecc71;
+            --luxury-gold: #C5A028;
+            --luxury-dark: #0A0A0A;
+            --luxury-light: #F9F7F2;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--secondary);
+            background-color: var(--luxury-light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Page Container */
+        .page-container {
+            position: relative;
+            min-height: 100vh;
+        }
+
+        .page {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            min-height: 100vh;
+        }
+
+        .page.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Luxury Header */
+        .luxury-header {
+            background-color: var(--luxury-dark);
+            color: var(--white);
+            padding: 15px 0;
+            border-bottom: 2px solid var(--luxury-gold);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .logo h1 {
+            font-size: 28px;
+            color: var(--luxury-gold);
+            letter-spacing: -0.5px;
+        }
+
+        .logo span {
+            color: var(--white);
+        }
+
+        .search-bar {
+            flex: 1;
+            max-width: 600px;
+            margin: 0 30px;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 14px 20px;
+            border: 1px solid #444;
+            border-radius: 50px;
+            font-size: 16px;
+            transition: var(--transition);
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: var(--luxury-gold);
+            box-shadow: 0 0 0 3px rgba(197, 160, 40, 0.2);
+        }
+
+        .search-bar button {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            background: var(--luxury-gold);
+            color: var(--luxury-dark);
+            border: none;
+            border-radius: 50px;
+            padding: 9px 20px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .search-bar button:hover {
+            background: var(--primary-dark);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .auth-buttons a {
+            text-decoration: none;
+            color: var(--white);
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: var(--transition);
+        }
+
+        .auth-buttons a.login {
+            color: #CCCCCC;
+        }
+
+        .auth-buttons a.signup {
+            background: var(--luxury-gold);
+            color: var(--luxury-dark);
+        }
+
+        .auth-buttons a.signup:hover {
+            background: var(--primary-dark);
+        }
+
+        .cart-icon {
+            position: relative;
+            font-size: 22px;
+            color: var(--white);
+            cursor: pointer;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--luxury-gold);
+            color: var(--luxury-dark);
+            font-size: 12px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Navigation */
+        nav {
+            background-color: var(--luxury-dark);
+            padding: 15px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--luxury-gold);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--luxury-gold);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Luxury Hero Section */
+        .luxury-hero {
+            position: relative;
+            height: 700px;
+            background: linear-gradient(135deg, rgba(10, 10, 10, 0.85) 0%, rgba(197, 160, 40, 0.7) 100%), url('https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80') no-repeat center center;
+            background-size: cover;
+            color: white;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            max-width: 700px;
+            z-index: 2;
+        }
+
+        .hero h2 {
+            font-size: 52px;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 20px;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: var(--luxury-gold);
+            color: var(--luxury-dark);
+            padding: 16px 35px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .cta-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Premium Features */
+        .premium-features {
+            padding: 100px 0;
+            background-color: var(--luxury-light);
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .section-title h2 {
+            font-size: 42px;
+            color: var(--luxury-dark);
+            margin-bottom: 15px;
+        }
+
+        .section-title p {
+            color: var(--gray);
+            max-width: 700px;
+            margin: 0 auto;
+            font-size: 18px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+
+        .feature-card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 40px 30px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            text-align: center;
+            border: 1px solid rgba(197, 160, 40, 0.2);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(197, 160, 40, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            font-size: 32px;
+            color: var(--luxury-gold);
+        }
+
+        .feature-card h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: var(--luxury-dark);
+        }
+
+        .feature-card p {
+            color: var(--gray);
+            line-height: 1.8;
+        }
+
+        /* Luxury Products */
+        .luxury-products {
+            padding: 100px 0;
+            background: linear-gradient(to bottom, var(--luxury-light) 0%, #f0ede5 100%);
+        }
+
+        .products-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 50px;
+        }
+
+        .products-header h2 {
+            font-size: 42px;
+            color: var(--luxury-dark);
+        }
+
+        .category-filters {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .category-filter {
+            background: var(--white);
+            border: 1px solid #e5e5e5;
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .category-filter.active {
+            background: var(--luxury-gold);
+            color: var(--luxury-dark);
+            border-color: var(--luxury-gold);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .product-card {
+            background: var(--white);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .product-image {
+            height: 250px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.05);
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: var(--luxury-gold);
+            color: var(--luxury-dark);
+            padding: 5px 15px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .product-info {
+            padding: 25px;
+        }
+
+        .product-info h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: var(--luxury-dark);
+        }
+
+        .product-description {
+            color: var(--gray);
+            margin-bottom: 15px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .product-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .product-origin {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .product-rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--luxury-gold);
+        }
+
+        .product-price {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .price {
+            font-weight: 700;
+            font-size: 24px;
+            color: var(--luxury-dark);
+        }
+
+        .add-to-cart {
+            background: var(--luxury-gold);
+            color: var(--luxury-dark);
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 18px;
+        }
+
+        .add-to-cart:hover {
+            background: var(--primary-dark);
+            transform: scale(1.1);
+        }
+
+        /* Booking Section */
+        .booking-section {
+            padding: 100px 0;
+            background-color: var(--luxury-dark);
+            color: var(--white);
+        }
+
+        .booking-container {
+            display: flex;
+            gap: 50px;
+            align-items: center;
+        }
+
+        .booking-content {
+            flex: 1;
+        }
+
+        .booking-content h2 {
+            font-size: 42px;
+            margin-bottom: 20px;
+            color: var(--luxury-gold);
+        }
+
+        .booking-content p {
+            font-size: 18px;
+            margin-bottom: 30px;
+            opacity: 0.9;
+            line-height: 1.8;
+        }
+
+        .booking-features {
+            list-style: none;
+            margin-bottom: 40px;
+        }
+
+        .booking-features li {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 18px;
+        }
+
+        .booking-features i {
+            color: var(--luxury-gold);
+            font-size: 20px;
+        }
+
+        .booking-form-container {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 40px;
+            border: 1px solid rgba(197, 160, 40, 0.3);
+        }
+
+        .booking-form h3 {
+            font-size: 28px;
+            margin-bottom: 25px;
+            color: var(--luxury-gold);
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: var(--transition);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--luxury-gold);
+            box-shadow: 0 0 0 3px rgba(197, 160, 40, 0.2);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            background: var(--luxury-gold);
+            color: var(--luxury-dark);
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Courier Section */
+        .courier-section {
+            padding: 100px 0;
+            background-color: var(--luxury-light);
+        }
+
+        .courier-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .courier-card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            text-align: center;
+            border: 1px solid rgba(197, 160, 40, 0.2);
+        }
+
+        .courier-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .courier-logo {
+            height: 60px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .courier-logo img {
+            max-height: 100%;
+            max-width: 100%;
+        }
+
+        .courier-card h3 {
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: var(--luxury-dark);
+        }
+
+        .courier-card p {
+            color: var(--gray);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .courier-features {
+            list-style: none;
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        .courier-features li {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .courier-features i {
+            color: var(--luxury-gold);
+        }
+
+        .courier-price {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--luxury-dark);
+            margin-bottom: 20px;
+        }
+
+        .free-badge {
+            background: var(--success);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        /* Seller Dashboard */
+        .seller-dashboard {
+            padding: 50px 0;
+            background-color: var(--luxury-light);
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-header h2 {
+            font-size: 32px;
+            color: var(--luxury-dark);
+        }
+
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            border-left: 4px solid var(--luxury-gold);
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--luxury-dark);
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .orders-table {
+            background: var(--white);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .table-header {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+            padding: 20px;
+            background: var(--luxury-dark);
+            color: white;
+            font-weight: 600;
+        }
+
+        .table-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+            padding: 20px;
+            border-bottom: 1px solid #f0f0f0;
+            align-items: center;
+        }
+
+        .table-row:last-child {
+            border-bottom: none;
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-confirmed {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-shipped {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-delivered {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
+        .action-btn {
+            background: var(--luxury-gold);
+            color: var(--luxury-dark);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .action-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Footer */
+        .luxury-footer {
+            background: var(--luxury-dark);
+            color: white;
+            padding: 60px 0 0;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: var(--luxury-gold);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: #CCCCCC;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--luxury-gold);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding: 30px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #999;
+            font-size: 14px;
+        }
+
+        /* Back Button */
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            color: var(--luxury-gold);
+            font-weight: 500;
+            cursor: pointer;
+            padding: 10px 0;
+            margin-bottom: 20px;
+            transition: var(--transition);
+        }
+
+        .back-button:hover {
+            color: var(--primary-dark);
+            transform: translateX(-5px);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 50px auto;
+            width: 90%;
+            max-width: 800px;
+            border-radius: 15px;
+            overflow: hidden;
+            animation: modalFade 0.3s;
+        }
+
+        @keyframes modalFade {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            border-bottom: 1px solid #eee;
+            background: var(--luxury-dark);
+            color: white;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--luxury-gold);
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .hero h2 {
+                font-size: 42px;
+            }
+            
+            .search-bar {
+                max-width: 400px;
+            }
+            
+            .booking-container {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-top {
+                flex-wrap: wrap;
+            }
+            
+            .search-bar {
+                order: 3;
+                margin: 15px 0 0;
+                max-width: 100%;
+            }
+            
+            .hero h2 {
+                font-size: 36px;
+            }
+            
+            .hero {
+                height: 600px;
+            }
+            
+            .section-title h2 {
+                font-size: 32px;
+            }
+            
+            .products-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 20px;
+            }
+            
+            .category-filters {
+                width: 100%;
+                overflow-x: auto;
+                padding-bottom: 10px;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h2 {
+                font-size: 28px;
+            }
+            
+            .hero p {
+                font-size: 16px;
+            }
+            
+            .features-grid, .products-grid, .courier-options {
+                grid-template-columns: 1fr;
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            .table-header, .table-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <!-- Luxury Groceries Landing Page -->
+        <div id="luxury-page" class="page active">
+            <!-- Header -->
+            <header class="luxury-header">
+                <div class="container">
+                    <div class="header-top">
+                        <div class="logo" id="logo">
+                            <h1>Luxe<span>Grocer</span></h1>
+                        </div>
+                        <div class="search-bar">
+                            <input type="text" placeholder="Search for premium groceries, organic products...">
+                            <button><i class="fas fa-search"></i></button>
+                        </div>
+                        <div class="header-actions">
+                            <div class="auth-buttons">
+                                <a href="#" class="login" id="login-link">Login</a>
+                                <a href="#" class="signup" id="signup-link">Sign Up</a>
+                            </div>
+                            <div class="cart-icon">
+                                <i class="fas fa-shopping-bag"></i>
+                                <span class="cart-count">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <nav>
+                    <div class="container">
+                        <ul class="nav-links">
+                            <li><a href="#">Home</a></li>
+                            <li><a href="#">Premium Groceries</a></li>
+                            <li><a href="#">Organic Products</a></li>
+                            <li><a href="#">International Cuisine</a></li>
+                            <li><a href="#">Gourmet Selection</a></li>
+                            <li><a href="#">Wine & Spirits</a></li>
+                            <li><a href="#">Special Offers</a></li>
+                        </ul>
+                    </div>
+                </nav>
+            </header>
+
+            <!-- Hero Section -->
+            <section class="luxury-hero">
+                <div class="container">
+                    <div class="hero-content">
+                        <h2>Exquisite Groceries, Curated for Discerning Tastes</h2>
+                        <p>Discover the world's finest gourmet foods, organic produce, and luxury ingredients delivered directly to your doorstep with our premium service.</p>
+                        <a href="#" class="cta-button" id="explore-products">Explore Premium Selection</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Premium Features -->
+            <section class="premium-features">
+                <div class="container">
+                    <div class="section-title">
+                        <h2>Why Choose LuxeGrocer</h2>
+                        <p>We redefine luxury grocery shopping with unparalleled quality, service, and convenience</p>
+                    </div>
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-crown"></i>
+                            </div>
+                            <h3>Premium Selection</h3>
+                            <p>Carefully curated products from around the world, selected for their exceptional quality and taste.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-truck"></i>
+                            </div>
+                            <h3>White-Glove Delivery</h3>
+                            <p>Temperature-controlled delivery with personalized service to ensure your items arrive in perfect condition.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-leaf"></i>
+                            </div>
+                            <h3>Sustainable & Organic</h3>
+                            <p>Ethically sourced, organic, and sustainable products that are good for you and the planet.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <h3>Expert Curation</h3>
+                            <p>Our team of culinary experts selects only the finest products for your table.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Luxury Products -->
+            <section class="luxury-products">
+                <div class="container">
+                    <div class="products-header">
+                        <h2>Premium Selection</h2>
+                        <div class="category-filters">
+                            <div class="category-filter active">All Products</div>
+                            <div class="category-filter">Organic Produce</div>
+                            <div class="category-filter">Gourmet Foods</div>
+                            <div class="category-filter">International</div>
+                            <div class="category-filter">Wine & Spirits</div>
+                        </div>
+                    </div>
+                    <div class="products-grid">
+                        <!-- Product 1 -->
+                        <div class="product-card" data-product="1">
+                            <div class="product-image">
+                                <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2064&q=80" alt="Organic Avocados">
+                                <span class="product-badge">Organic</span>
+                            </div>
+                            <div class="product-info">
+                                <h3>Premium Hass Avocados</h3>
+                                <p class="product-description">Creamy, nutrient-rich avocados sourced from sustainable farms in Mexico.</p>
+                                <div class="product-meta">
+                                    <div class="product-origin">
+                                        <i class="fas fa-globe-americas"></i>
+                                        <span>Mexico</span>
+                                    </div>
+                                    <div class="product-rating">
+                                        <i class="fas fa-star"></i>
+                                        <span>4.9</span>
+                                    </div>
+                                </div>
+                                <div class="product-price">
+                                    <span class="price">₹450</span>
+                                    <button class="add-to-cart">
+                                        <i class="fas fa-shopping-bag"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Product 2 -->
+                        <div class="product-card" data-product="2">
+                            <div class="product-image">
+                                <img src="https://images.unsplash.com/photo-1563245372-f21724e3856d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2064&q=80" alt="Truffle Oil">
+                                <span class="product-badge">Gourmet</span>
+                            </div>
+                            <div class="product-info">
+                                <h3>Black Truffle Infused Oil</h3>
+                                <p class="product-description">Exquisite oil infused with real Italian black truffles for an unparalleled flavor experience.</p>
+                                <div class="product-meta">
+                                    <div class="product-origin">
+                                        <i class="fas fa-globe-europe"></i>
+                                        <span>Italy</span>
+                                    </div>
+                                    <div class="product-rating">
+                                        <i class="fas fa-star"></i>
+                                        <span>4.8</span>
+                                    </div>
+                                </div>
+                                <div class="product-price">
+                                    <span class="price">₹2,850</span>
+                                    <button class="add-to-cart">
+                                        <i class="fas fa-shopping-bag"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Product 3 -->
+                        <div class="product-card" data-product="3">
+                            <div class="product-image">
+                                <img src="https://images.unsplash.com/photo-1516594915697-87eb3b1c14ea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Artisanal Cheese">
+                                <span class="product-badge">Aged</span>
+                            </div>
+                            <div class="product-info">
+                                <h3>Aged Manchego Cheese</h3>
+                                <p class="product-description">12-month aged Spanish sheep's milk cheese with a rich, nutty flavor profile.</p>
+                                <div class="product-meta">
+                                    <div class="product-origin">
+                                        <i class="fas fa-globe-europe"></i>
+                                        <span>Spain</span>
+                                    </div>
+                                    <div class="product-rating">
+                                        <i class="fas fa-star"></i>
+                                        <span>4.9</span>
+                                    </div>
+                                </div>
+                                <div class="product-price">
+                                    <span class="price">₹1,950</span>
+                                    <button class="add-to-cart">
+                                        <i class="fas fa-shopping-bag"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Product 4 -->
+                        <div class="product-card" data-product="4">
+                            <div class="product-image">
+                                <img src="https://images.unsplash.com/photo-1559056199-641a0ac8b55e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Saffron">
+                                <span class="product-badge">Premium</span>
+                            </div>
+                            <div class="product-info">
+                                <h3>Pure Kashmiri Saffron</h3>
+                                <p class="product-description">The world's finest saffron threads, hand-picked from the valleys of Kashmir.</p>
+                                <div class="product-meta">
+                                    <div class="product-origin">
+                                        <i class="fas fa-globe-asia"></i>
+                                        <span>Kashmir, India</span>
+                                    </div>
+                                    <div class="product-rating">
+                                        <i class="fas fa-star"></i>
+                                        <span>5.0</span>
+                                    </div>
+                                </div>
+                                <div class="product-price">
+                                    <span class="price">₹4,500</span>
+                                    <button class="add-to-cart">
+                                        <i class="fas fa-shopping-bag"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Booking Section -->
+            <section class="booking-section">
+                <div class="container">
+                    <div class="booking-container">
+                        <div class="booking-content">
+                            <h2>Premium Booking Experience</h2>
+                            <p>Reserve exclusive products with our luxury booking system. Sellers receive instant notifications, and you can track your order in real-time with GPS location tracking.</p>
+                            
+                            <ul class="booking-features">
+                                <li><i class="fas fa-check-circle"></i> Instant seller notifications via WhatsApp</li>
+                                <li><i class="fas fa-check-circle"></i> Real-time GPS tracking of your order</li>
+                                <li><i class="fas fa-check-circle"></i> Premium courier services with free delivery</li>
+                                <li><i class="fas fa-check-circle"></i> Temperature-controlled transportation</li>
+                                <li><i class="fas fa-check-circle"></i> Personal concierge service</li>
+                            </ul>
+                            
+                            <a href="#" class="cta-button" id="book-now-btn">Book Premium Service</a>
+                        </div>
+                        
+                        <div class="booking-form-container">
+                            <form class="booking-form" id="bookingForm">
+                                <h3>Book Premium Service</h3>
+                                
+                                <div class="form-group">
+                                    <label for="customerName">Full Name</label>
+                                    <input type="text" id="customerName" class="form-control" placeholder="Enter your full name" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="customerPhone">Phone Number</label>
+                                    <input type="tel" id="customerPhone" class="form-control" placeholder="Enter your phone number" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="customerEmail">Email Address</label>
+                                    <input type="email" id="customerEmail" class="form-control" placeholder="Enter your email" required>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="deliveryDate">Preferred Delivery Date</label>
+                                        <input type="date" id="deliveryDate" class="form-control" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="deliveryTime">Preferred Time</label>
+                                        <select id="deliveryTime" class="form-control" required>
+                                            <option value="">Select time</option>
+                                            <option value="09:00-11:00">9:00 AM - 11:00 AM</option>
+                                            <option value="11:00-13:00">11:00 AM - 1:00 PM</option>
+                                            <option value="13:00-15:00">1:00 PM - 3:00 PM</option>
+                                            <option value="15:00-17:00">3:00 PM - 5:00 PM</option>
+                                            <option value="17:00-19:00">5:00 PM - 7:00 PM</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="deliveryAddress">Delivery Address</label>
+                                    <textarea id="deliveryAddress" class="form-control" rows="3" placeholder="Enter your complete delivery address" required></textarea>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="specialInstructions">Special Instructions</label>
+                                    <textarea id="specialInstructions" class="form-control" rows="2" placeholder="Any special delivery instructions"></textarea>
+                                </div>
+                                
+                                <button type="submit" class="btn">Book Premium Delivery</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Courier Services -->
+            <section class="courier-section">
+                <div class="container">
+                    <div class="section-title">
+                        <h2>Premium Courier Partners</h2>
+                        <p>We partner with the finest delivery services to ensure your luxury items arrive in perfect condition</p>
+                    </div>
+                    
+                    <div class="courier-options">
+                        <div class="courier-card">
+                            <div class="courier-logo">
+                                <!-- Blue Dart Logo Placeholder -->
+                                <div style="background: #0033A0; color: white; padding: 10px 20px; border-radius: 5px; font-weight: bold; font-size: 20px;">BLUE DART</div>
+                            </div>
+                            <h3>Blue Dart Premium</h3>
+                            <p>Temperature-controlled express delivery with real-time tracking and premium handling.</p>
+                            <ul class="courier-features">
+                                <li><i class="fas fa-check"></i> Same-day delivery available</li>
+                                <li><i class="fas fa-check"></i> Temperature-controlled vehicles</li>
+                                <li><i class="fas fa-check"></i> Real-time GPS tracking</li>
+                                <li><i class="fas fa-check"></i> White-glove service</li>
+                            </ul>
+                            <div class="free-badge">FREE DELIVERY</div>
+                            <div class="courier-price">On orders above ₹5,000</div>
+                            <button class="btn">Select Service</button>
+                        </div>
+                        
+                        <div class="courier-card">
+                            <div class="courier-logo">
+                                <!-- Delhivery Logo Placeholder -->
+                                <div style="background: #E31E24; color: white; padding: 10px 20px; border-radius: 5px; font-weight: bold; font-size: 20px;">DELHIVERY</div>
+                            </div>
+                            <h3>Delhivery Express</h3>
+                            <p>Fast and reliable delivery with specialized handling for perishable and fragile items.</p>
+                            <ul class="courier-features">
+                                <li><i class="fas fa-check"></i> Next-day delivery guaranteed</li>
+                                <li><i class="fas fa-check"></i> Specialized perishable handling</li>
+                                <li><i class="fas fa-check"></i> Live order tracking</li>
+                                <li><i class="fas fa-check"></i> Premium packaging</li>
+                            </ul>
+                            <div class="free-badge">FREE DELIVERY</div>
+                            <div class="courier-price">On orders above ₹3,500</div>
+                            <button class="btn">Select Service</button>
+                        </div>
+                        
+                        <div class="courier-card">
+                            <div class="courier-logo">
+                                <!-- FedEx Logo Placeholder -->
+                                <div style="background: #4D148C; color: white; padding: 10px 20px; border-radius: 5px; font-weight: bold; font-size: 20px;">FEDEX</div>
+                            </div>
+                            <h3>FedEx Luxury</h3>
+                            <p>International luxury delivery service with customs clearance and premium handling.</p>
+                            <ul class="courier-features">
+                                <li><i class="fas fa-check"></i> International delivery</li>
+                                <li><i class="fas fa-check"></i> Customs clearance included</li>
+                                <li><i class="fas fa-check"></i> Temperature monitoring</li>
+                                <li><i class="fas fa-check"></i> Priority handling</li>
+                            </ul>
+                            <div class="free-badge">FREE DELIVERY</div>
+                            <div class="courier-price">On orders above ₹7,500</div>
+                            <button class="btn">Select Service</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Footer -->
+            <footer class="luxury-footer">
+                <div class="container">
+                    <div class="footer-content">
+                        <div class="footer-column">
+                            <h3>LuxeGrocer</h3>
+                            <p>Your premier destination for luxury groceries and gourmet ingredients, delivered with exceptional service.</p>
+                        </div>
+                        <div class="footer-column">
+                            <h3>Quick Links</h3>
+                            <ul class="footer-links">
+                                <li><a href="#">Home</a></li>
+                                <li><a href="#">About Us</a></li>
+                                <li><a href="#">Premium Products</a></li>
+                                <li><a href="#">Become a Seller</a></li>
+                                <li><a href="#">Contact Us</a></li>
+                            </ul>
+                        </div>
+                        <div class="footer-column">
+                            <h3>Customer Service</h3>
+                            <ul class="footer-links">
+                                <li><a href="#">Help Center</a></li>
+                                <li><a href="#">Delivery Information</a></li>
+                                <li><a href="#">Returns & Refunds</li>
+                                <li><a href="#">Track Your Order</a></li>
+                                <li><a href="#">Privacy Policy</a></li>
+                            </ul>
+                        </div>
+                        <div class="footer-column">
+                            <h3>Contact Info</h3>
+                            <ul class="footer-links">
+                                <li><i class="fas fa-map-marker-alt"></i> 123 Luxury Lane, Mumbai, India</li>
+                                <li><i class="fas fa-phone"></i> +91 98765 43210</li>
+                                <li><i class="fas fa-envelope"></i> concierge@luxegrocer.com</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="footer-bottom">
+                        <p>&copy; 2023 LuxeGrocer. All rights reserved. Luxury grocery delivery service.</p>
+                    </div>
+                </div>
+            </footer>
+        </div>
+
+        <!-- Seller Dashboard -->
+        <div id="seller-dashboard" class="page">
+            <div class="container">
+                <button class="back-button" id="dashboard-back-button">
+                    <i class="fas fa-arrow-left"></i> Back to Home
+                </button>
+                
+                <div class="seller-dashboard">
+                    <div class="dashboard-header">
+                        <h2>Seller Dashboard</h2>
+                        <div>
+                            <button class="action-btn" id="refresh-orders">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-stats">
+                        <div class="stat-card">
+                            <div class="stat-value" id="total-orders">12</div>
+                            <div class="stat-label">Total Orders</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="pending-orders">3</div>
+                            <div class="stat-label">Pending Orders</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="completed-orders">8</div>
+                            <div class="stat-label">Completed Orders</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">₹86,450</div>
+                            <div class="stat-label">Total Revenue</div>
+                        </div>
+                    </div>
+                    
+                    <div class="orders-table">
+                        <div class="table-header">
+                            <div>Order ID</div>
+                            <div>Customer</div>
+                            <div>Products</div>
+                            <div>Status</div>
+                            <div>Actions</div>
+                        </div>
+                        
+                        <div class="table-row">
+                            <div>#LG-7842</div>
+                            <div>Rahul Sharma</div>
+                            <div>Premium Avocados, Truffle Oil</div>
+                            <div><span class="status-badge status-pending">Pending</span></div>
+                            <div>
+                                <button class="action-btn confirm-order" data-order="7842">
+                                    <i class="fas fa-check"></i> Confirm
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="table-row">
+                            <div>#LG-7839</div>
+                            <div>Priya Patel</div>
+                            <div>Kashmiri Saffron, Manchego Cheese</div>
+                            <div><span class="status-badge status-confirmed">Confirmed</span></div>
+                            <div>
+                                <button class="action-btn ship-order" data-order="7839">
+                                    <i class="fas fa-shipping-fast"></i> Ship
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="table-row">
+                            <div>#LG-7835</div>
+                            <div>Vikram Singh</div>
+                            <div>Truffle Oil, Aged Balsamic</div>
+                            <div><span class="status-badge status-shipped">Shipped</span></div>
+                            <div>
+                                <button class="action-btn track-order" data-order="7835">
+                                    <i class="fas fa-map-marker-alt"></i> Track
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="table-row">
+                            <div>#LG-7828</div>
+                            <div>Ananya Reddy</div>
+                            <div>Organic Produce Bundle</div>
+                            <div><span class="status-badge status-delivered">Delivered</span></div>
+                            <div>
+                                <button class="action-btn view-details" data-order="7828">
+                                    <i class="fas fa-eye"></i> Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Tracking Modal -->
+        <div class="modal" id="tracking-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Order Tracking - #LG-7835</h2>
+                    <button class="modal-close" id="tracking-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="tracking-map" style="height: 400px; border-radius: 10px; overflow: hidden; margin-bottom: 20px;"></div>
+                    
+                    <div class="tracking-timeline">
+                        <h3 style="margin-bottom: 20px;">Delivery Timeline</h3>
+                        
+                        <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                            <div style="width: 20px; height: 20px; border-radius: 50%; background: var(--success); margin-right: 15px;"></div>
+                            <div>
+                                <div style="font-weight: 600;">Order Confirmed</div>
+                                <div style="color: var(--gray); font-size: 14px;">Today, 9:30 AM</div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                            <div style="width: 20px; height: 20px; border-radius: 50%; background: var(--success); margin-right: 15px;"></div>
+                            <div>
+                                <div style="font-weight: 600;">Picked Up by Courier</div>
+                                <div style="color: var(--gray); font-size: 14px;">Today, 11:15 AM</div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                            <div style="width: 20px; height: 20px; border-radius: 50%; background: var(--primary); margin-right: 15px;"></div>
+                            <div>
+                                <div style="font-weight: 600;">Out for Delivery</div>
+                                <div style="color: var(--gray); font-size: 14px;">Expected by 3:00 PM</div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                            <div style="width: 20px; height: 20px; border-radius: 50%; background: #e0e0e0; margin-right: 15px;"></div>
+                            <div>
+                                <div style="font-weight: 600;">Delivered</div>
+                                <div style="color: var(--gray); font-size: 14px;">Pending</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 30px; padding: 20px; background: #f9f9f9; border-radius: 10px;">
+                        <h4 style="margin-bottom: 10px;">Delivery Information</h4>
+                        <p><strong>Courier:</strong> Blue Dart Premium</p>
+                        <p><strong>Tracking Number:</strong> BD7835123456</p>
+                        <p><strong>Estimated Delivery:</strong> Today by 3:00 PM</p>
+                        <p><strong>Delivery Address:</strong> 123 Luxury Lane, Bandra West, Mumbai</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC4wGDrRHs4gQN6p8Q9X7VqY9t8d4Jk8Xw",
+            authDomain: "luxegrocer.firebaseapp.com",
+            projectId: "luxegrocer",
+            storageBucket: "luxegrocer.appspot.com",
+            messagingSenderId: "123456789012",
+            appId: "1:123456789012:web:abcdef1234567890"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Page Navigation
+        const pages = document.querySelectorAll('.page');
+        const logo = document.getElementById('logo');
+        const exploreProducts = document.getElementById('explore-products');
+        const bookNowBtn = document.getElementById('book-now-btn');
+        const dashboardBackButton = document.getElementById('dashboard-back-button');
+        const loginLink = document.getElementById('login-link');
+        const signupLink = document.getElementById('signup-link');
+
+        function showPage(pageId) {
+            pages.forEach(page => {
+                page.classList.remove('active');
+            });
+            const targetPage = document.getElementById(pageId);
+            targetPage.classList.add('active');
+            
+            // Initialize tracking map when tracking modal is shown
+            if (pageId === 'tracking-modal') {
+                setTimeout(() => {
+                    initTrackingMap();
+                }, 100);
+            }
+        }
+
+        logo.addEventListener('click', () => showPage('luxury-page'));
+        exploreProducts.addEventListener('click', () => {
+            document.querySelector('.luxury-products').scrollIntoView({ behavior: 'smooth' });
+        });
+        bookNowBtn.addEventListener('click', () => {
+            document.querySelector('.booking-section').scrollIntoView({ behavior: 'smooth' });
+        });
+        dashboardBackButton.addEventListener('click', () => showPage('luxury-page'));
+        loginLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            // In a real app, this would show login modal
+            alert('Login functionality would be implemented here');
+        });
+        signupLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            // In a real app, this would show signup modal
+            alert('Signup functionality would be implemented here');
+        });
+
+        // Booking Form Submission
+        const bookingForm = document.getElementById('bookingForm');
+        
+        bookingForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Get form data
+            const customerName = document.getElementById('customerName').value;
+            const customerPhone = document.getElementById('customerPhone').value;
+            const customerEmail = document.getElementById('customerEmail').value;
+            const deliveryDate = document.getElementById('deliveryDate').value;
+            const deliveryTime = document.getElementById('deliveryTime').value;
+            const deliveryAddress = document.getElementById('deliveryAddress').value;
+            const specialInstructions = document.getElementById('specialInstructions').value;
+            
+            // Validate form
+            if (!customerName || !customerPhone || !customerEmail || !deliveryDate || !deliveryTime || !deliveryAddress) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            // Create order object
+            const orderData = {
+                customerName,
+                customerPhone,
+                customerEmail,
+                deliveryDate,
+                deliveryTime,
+                deliveryAddress,
+                specialInstructions,
+                status: 'pending',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                orderNumber: generateOrderNumber()
+            };
+            
+            // Save to Firestore
+            db.collection('orders').add(orderData)
+                .then((docRef) => {
+                    console.log('Order saved with ID: ', docRef.id);
+                    
+                    // Send WhatsApp notification to seller
+                    sendSellerNotification(orderData);
+                    
+                    // Show success message
+                    alert('Your premium booking has been confirmed! The seller has been notified and will contact you shortly.');
+                    
+                    // Reset form
+                    bookingForm.reset();
+                    
+                    // In a real app, you would redirect to order confirmation page
+                })
+                .catch((error) => {
+                    console.error('Error saving order: ', error);
+                    alert('There was an error processing your booking. Please try again.');
+                });
+        });
+
+        // Generate unique order number
+        function generateOrderNumber() {
+            const timestamp = Date.now().toString().slice(-6);
+            const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+            return `LG-${timestamp}${random}`;
+        }
+
+        // Send WhatsApp notification to seller
+        function sendSellerNotification(orderData) {
+            // In a real implementation, this would use a backend service
+            // For demo purposes, we'll simulate the notification
+            
+            const sellerPhone = "+919876543210"; // This would be the actual seller's phone number
+            const message = `New Premium Order Received!\n\nOrder: ${orderData.orderNumber}\nCustomer: ${orderData.customerName}\nPhone: ${orderData.customerPhone}\nDelivery: ${orderData.deliveryDate} between ${orderData.deliveryTime}\nAddress: ${orderData.deliveryAddress}\n\nPlease confirm this order as soon as possible.`;
+            
+            // Encode the message for URL
+            const encodedMessage = encodeURIComponent(message);
+            
+            // Create WhatsApp URL (this would open WhatsApp with the message)
+            const whatsappURL = `https://wa.me/${sellerPhone}?text=${encodedMessage}`;
+            
+            // In a real app, you would use a backend service to send this message
+            // For this demo, we'll just log it and show an alert
+            console.log('WhatsApp Notification URL:', whatsappURL);
+            
+            // Simulate sending the notification
+            setTimeout(() => {
+                // Update seller dashboard (in a real app, this would be real-time)
+                updateSellerDashboard();
+                
+                // Show notification sent confirmation
+                console.log('Seller notification sent via WhatsApp');
+            }, 1000);
+        }
+
+        // Update seller dashboard
+        function updateSellerDashboard() {
+            // In a real app, this would fetch real data from Firestore
+            const totalOrders = document.getElementById('total-orders');
+            const pendingOrders = document.getElementById('pending-orders');
+            
+            // Increment order counts
+            totalOrders.textContent = parseInt(totalOrders.textContent) + 1;
+            pendingOrders.textContent = parseInt(pendingOrders.textContent) + 1;
+            
+            // Add new order to the table (in a real app, this would be done through Firestore listeners)
+            const ordersTable = document.querySelector('.orders-table');
+            const newOrderRow = document.createElement('div');
+            newOrderRow.className = 'table-row';
+            newOrderRow.innerHTML = `
+                <div>#LG-${Math.floor(1000 + Math.random() * 9000)}</div>
+                <div>New Customer</div>
+                <div>Premium Products</div>
+                <div><span class="status-badge status-pending">Pending</span></div>
+                <div>
+                    <button class="action-btn confirm-order">
+                        <i class="fas fa-check"></i> Confirm
+                    </button>
+                </div>
+            `;
+            
+            // Insert at the top of the table (after the header)
+            ordersTable.insertBefore(newOrderRow, ordersTable.children[1]);
+            
+            // Set up event listeners for the new button
+            setupOrderActionButtons();
+        }
+
+        // Seller Dashboard Functionality
+        const refreshOrdersBtn = document.getElementById('refresh-orders');
+        
+        refreshOrdersBtn.addEventListener('click', () => {
+            // In a real app, this would refresh data from Firestore
+            alert('Orders refreshed!');
+        });
+
+        // Order action buttons
+        function setupOrderActionButtons() {
+            // Confirm order buttons
+            document.querySelectorAll('.confirm-order').forEach(button => {
+                button.addEventListener('click', function() {
+                    const orderRow = this.closest('.table-row');
+                    const statusCell = orderRow.children[3];
+                    statusCell.innerHTML = '<span class="status-badge status-confirmed">Confirmed</span>';
+                    
+                    // Change button to ship order
+                    const actionCell = orderRow.children[4];
+                    actionCell.innerHTML = '<button class="action-btn ship-order"><i class="fas fa-shipping-fast"></i> Ship</button>';
+                    
+                    // Set up the new button
+                    setupOrderActionButtons();
+                    
+                    // Send confirmation to customer (in a real app)
+                    alert('Order confirmed! Customer has been notified.');
+                });
+            });
+            
+            // Ship order buttons
+            document.querySelectorAll('.ship-order').forEach(button => {
+                button.addEventListener('click', function() {
+                    const orderRow = this.closest('.table-row');
+                    const statusCell = orderRow.children[3];
+                    statusCell.innerHTML = '<span class="status-badge status-shipped">Shipped</span>';
+                    
+                    // Change button to track order
+                    const actionCell = orderRow.children[4];
+                    actionCell.innerHTML = '<button class="action-btn track-order"><i class="fas fa-map-marker-alt"></i> Track</button>';
+                    
+                    // Set up the new button
+                    setupOrderActionButtons();
+                    
+                    // Update order counts
+                    const pendingOrders = document.getElementById('pending-orders');
+                    const completedOrders = document.getElementById('completed-orders');
+                    pendingOrders.textContent = parseInt(pendingOrders.textContent) - 1;
+                    completedOrders.textContent = parseInt(completedOrders.textContent) + 1;
+                    
+                    // Send shipping notification to customer (in a real app)
+                    alert('Order shipped! Customer has been notified with tracking information.');
+                });
+            });
+            
+            // Track order buttons
+            document.querySelectorAll('.track-order').forEach(button => {
+                button.addEventListener('click', function() {
+                    // Show tracking modal
+                    showPage('tracking-modal');
+                });
+            });
+            
+            // View details buttons
+            document.querySelectorAll('.view-details').forEach(button => {
+                button.addEventListener('click', function() {
+                    alert('Order details would be shown here in a real implementation.');
+                });
+            });
+        }
+
+        // Initialize tracking map
+        function initTrackingMap() {
+            // Check if map is already initialized
+            if (window.trackingMap) {
+                window.trackingMap.remove();
+            }
+            
+            const map = L.map('tracking-map').setView([19.0760, 72.8777], 13); // Mumbai coordinates
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            // Add markers for seller location, warehouse, and delivery address
+            const sellerLocation = [19.0760, 72.8777]; // Seller location
+            const warehouseLocation = [19.0860, 72.8877]; // Warehouse location
+            const deliveryLocation = [19.0660, 72.8677]; // Delivery location
+            
+            // Seller marker
+            L.marker(sellerLocation)
+                .addTo(map)
+                .bindPopup('Seller Location<br>LuxeGrocer Premium')
+                .openPopup();
+            
+            // Warehouse marker
+            L.marker(warehouseLocation)
+                .addTo(map)
+                .bindPopup('Distribution Center<br>Temperature Controlled');
+            
+            // Delivery marker
+            L.marker(deliveryLocation)
+                .addTo(map)
+                .bindPopup('Delivery Address<br>Customer Location');
+            
+            // Add a moving delivery vehicle marker (simulated)
+            const deliveryVehicle = L.marker([19.0760, 72.8777], {
+                icon: L.divIcon({
+                    className: 'delivery-vehicle',
+                    html: '<i class="fas fa-truck" style="color: #D4AF37; font-size: 24px;"></i>',
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 12]
+                })
+            }).addTo(map);
+            
+            // Simulate delivery vehicle movement
+            let currentLat = 19.0760;
+            let currentLng = 72.8777;
+            const targetLat = 19.0660;
+            const targetLng = 72.8677;
+            const steps = 100;
+            let currentStep = 0;
+            
+            const moveVehicle = setInterval(() => {
+                if (currentStep >= steps) {
+                    clearInterval(moveVehicle);
+                    return;
+                }
+                
+                currentStep++;
+                currentLat = sellerLocation[0] + (targetLat - sellerLocation[0]) * (currentStep / steps);
+                currentLng = sellerLocation[1] + (targetLng - sellerLocation[1]) * (currentStep / steps);
+                
+                deliveryVehicle.setLatLng([currentLat, currentLng]);
+                
+                // Update map view to follow the vehicle
+                map.setView([currentLat, currentLng], 13);
+            }, 100);
+            
+            // Store map reference
+            window.trackingMap = map;
+        }
+
+        // Close tracking modal
+        const trackingClose = document.getElementById('tracking-close');
+        trackingClose.addEventListener('click', () => {
+            document.getElementById('tracking-modal').style.display = 'none';
+            showPage('seller-dashboard');
+        });
+
+        // Add to Cart Functionality
+        const cartCount = document.querySelector('.cart-count');
+        const addToCartButtons = document.querySelectorAll('.add-to-cart');
+        
+        addToCartButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent opening product details
+                
+                // Animation
+                button.style.transform = 'scale(1.3)';
+                setTimeout(() => {
+                    button.style.transform = 'scale(1)';
+                }, 300);
+                
+                // Update cart count
+                let currentCount = parseInt(cartCount.textContent);
+                cartCount.textContent = currentCount + 1;
+                
+                // Visual feedback
+                cartCount.style.animation = 'none';
+                setTimeout(() => {
+                    cartCount.style.animation = 'pulse 0.5s';
+                }, 10);
+                
+                // Show confirmation
+                alert('Product added to cart!');
+            });
+        });
+
+        // Category Filters
+        const categoryFilters = document.querySelectorAll('.category-filter');
+        
+        categoryFilters.forEach(filter => {
+            filter.addEventListener('click', function() {
+                // Remove active class from all filters
+                categoryFilters.forEach(f => f.classList.remove('active'));
+                
+                // Add active class to clicked filter
+                this.classList.add('active');
+                
+                // In a real app, this would filter products
+                // For this demo, we'll just show an alert
+                alert(`Showing ${this.textContent}`);
+            });
+        });
+
+        // Courier Service Selection
+        const courierButtons = document.querySelectorAll('.courier-card .btn');
+        
+        courierButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const courierCard = this.closest('.courier-card');
+                const courierName = courierCard.querySelector('h3').textContent;
+                
+                // In a real app, this would set the selected courier for the order
+                alert(`Selected ${courierName} for delivery`);
+                
+                // Scroll to booking form
+                document.querySelector('.booking-section').scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+
+        // Initialize everything when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set up order action buttons
+            setupOrderActionButtons();
+            
+            // Set minimum delivery date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('deliveryDate').min = today;
+            
+            // Add CSS animation for cart count
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes pulse {
+                    0% { transform: scale(1); }
+                    50% { transform: scale(1.3); }
+                    100% { transform: scale(1); }
+                }
+            `;
+            document.head.appendChild(style);
+        });
+
+        // Simulate courier API integration
+        function integrateCourierAPI(courier, orderData) {
+            // This is a simulation of courier API integration
+            // In a real implementation, you would make actual API calls
+            
+            console.log(`Integrating with ${courier} API`);
+            
+            // Simulate API request
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    // Simulate successful API response
+                    const trackingNumber = generateTrackingNumber(courier);
+                    resolve({
+                        success: true,
+                        trackingNumber: trackingNumber,
+                        estimatedDelivery: calculateEstimatedDelivery(),
+                        cost: 0 // Free delivery for premium orders
+                    });
+                }, 1000);
+            });
+        }
+
+        function generateTrackingNumber(courier) {
+            const prefixes = {
+                'Blue Dart Premium': 'BD',
+                'Delhivery Express': 'DL',
+                'FedEx Luxury': 'FX'
+            };
+            
+            const prefix = prefixes[courier] || 'LG';
+            const random = Math.floor(1000000000 + Math.random() * 9000000000);
+            return `${prefix}${random}`;
+        }
+
+        function calculateEstimatedDelivery() {
+            const today = new Date();
+            // Add 1-2 days for delivery
+            const deliveryDate = new Date(today);
+            deliveryDate.setDate(today.getDate() + Math.floor(Math.random() * 2) + 1);
+            return deliveryDate.toISOString().split('T')[0];
+        }
+    </script>
+</body>
+</html>

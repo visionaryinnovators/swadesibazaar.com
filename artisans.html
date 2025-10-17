@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artisan Luxe | Premium Handcrafted Luxury</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    
+    <style>
+        :root {
+            --primary: #C9A96E;
+            --primary-dark: #B08C5D;
+            --secondary: #1A1A1A;
+            --accent: #8B4513;
+            --light: #F8F5F0;
+            --gray: #6C757D;
+            --white: #FFFFFF;
+            --error: #e74c3c;
+            --success: #2ecc71;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+            --gold-gradient: linear-gradient(135deg, #C9A96E 0%, #D4B483 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--secondary);
+            background-color: var(--light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Premium Header Styles */
+        .premium-header {
+            background-color: var(--white);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(201, 169, 110, 0.2);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .logo h1 {
+            font-size: 28px;
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .logo span {
+            color: var(--secondary);
+        }
+
+        .search-bar {
+            flex: 1;
+            max-width: 600px;
+            margin: 0 30px;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 14px 20px;
+            border: 1px solid #E5E5E5;
+            border-radius: 50px;
+            font-size: 16px;
+            transition: var(--transition);
+            background-color: #f9f9f9;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(201, 169, 110, 0.2);
+        }
+
+        .search-bar button {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 9px 20px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .search-bar button:hover {
+            background: var(--primary-dark);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .language-selector select {
+            padding: 8px 15px;
+            border: 1px solid #E5E5E5;
+            border-radius: 5px;
+            background-color: white;
+            font-size: 14px;
+        }
+
+        .auth-buttons a {
+            text-decoration: none;
+            color: var(--secondary);
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: var(--transition);
+        }
+
+        .auth-buttons a.login {
+            color: var(--gray);
+        }
+
+        .auth-buttons a.signup {
+            background: var(--primary);
+            color: white;
+        }
+
+        .auth-buttons a.signup:hover {
+            background: var(--primary-dark);
+        }
+
+        .cart-icon {
+            position: relative;
+            font-size: 22px;
+            color: var(--secondary);
+            cursor: pointer;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--primary);
+            color: white;
+            font-size: 12px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Premium Navigation */
+        .premium-nav {
+            background-color: var(--secondary);
+            padding: 15px 0;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--primary);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Premium Hero Section */
+        .premium-hero {
+            position: relative;
+            height: 700px;
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.9) 0%, rgba(139, 69, 19, 0.8) 100%), url('https://images.unsplash.com/photo-1605721911519-3dfeb3be25e7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80') no-repeat center center;
+            background-size: cover;
+            color: white;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            max-width: 700px;
+            z-index: 2;
+        }
+
+        .hero-content h2 {
+            font-size: 52px;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .hero-content p {
+            font-size: 20px;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .premium-cta {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 16px 35px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .premium-cta:hover {
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Premium Features Section */
+        .premium-features {
+            padding: 100px 0;
+            background-color: var(--white);
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-title h2 {
+            font-size: 42px;
+            color: var(--secondary);
+            margin-bottom: 15px;
+        }
+
+        .section-title p {
+            color: var(--gray);
+            max-width: 600px;
+            margin: 0 auto;
+            font-size: 18px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+
+        .feature-card {
+            background: var(--white);
+            border-radius: 10px;
+            padding: 40px 30px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            text-align: center;
+            border: 1px solid rgba(201, 169, 110, 0.2);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(201, 169, 110, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 32px;
+            color: var(--primary);
+        }
+
+        .feature-card h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .feature-card p {
+            color: var(--gray);
+        }
+
+        /* Luxury Products Section */
+        .luxury-products {
+            padding: 100px 0;
+            background-color: var(--light);
+        }
+
+        .products-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 50px;
+        }
+
+        .products-header h2 {
+            font-size: 36px;
+        }
+
+        .view-all {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: var(--transition);
+        }
+
+        .view-all:hover {
+            gap: 10px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .product-card {
+            background: var(--white);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-image {
+            height: 280px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.05);
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: var(--primary);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .product-info {
+            padding: 25px;
+        }
+
+        .product-info h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .product-seller {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        .seller-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #E5E5E5;
+        }
+
+        .product-location {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            color: var(--gray);
+            margin-bottom: 15px;
+        }
+
+        .product-price {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .price {
+            font-weight: 700;
+            font-size: 22px;
+            color: var(--secondary);
+        }
+
+        .book-now-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+        }
+
+        .book-now-btn:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
+        }
+
+        /* Premium Footer */
+        .premium-footer {
+            background: var(--secondary);
+            color: white;
+            padding: 80px 0 0;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h3 {
+            font-size: 22px;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: #CCCCCC;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding: 30px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #999;
+            font-size: 14px;
+        }
+
+        /* Booking Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 50px auto;
+            width: 90%;
+            max-width: 800px;
+            border-radius: 10px;
+            overflow: hidden;
+            animation: modalFade 0.3s;
+        }
+
+        @keyframes modalFade {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .booking-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 15px;
+            border: 1px solid #E5E5E5;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: var(--transition);
+            background-color: #f9f9f9;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(201, 169, 110, 0.2);
+        }
+
+        .booking-summary {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .summary-total {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 700;
+            font-size: 18px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+        }
+
+        .submit-booking {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: block;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .submit-booking:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Tracking Section */
+        .tracking-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 10px;
+        }
+
+        .tracking-map {
+            height: 300px;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        #trackingMap {
+            height: 100%;
+            width: 100%;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .hero-content h2 {
+                font-size: 42px;
+            }
+            
+            .search-bar {
+                max-width: 400px;
+            }
+            
+            .booking-form {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-top {
+                flex-wrap: wrap;
+            }
+            
+            .search-bar {
+                order: 3;
+                margin: 15px 0 0;
+                max-width: 100%;
+            }
+            
+            .hero-content h2 {
+                font-size: 36px;
+            }
+            
+            .premium-hero {
+                height: 600px;
+            }
+            
+            .section-title h2 {
+                font-size: 32px;
+            }
+            
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-content h2 {
+                font-size: 28px;
+            }
+            
+            .hero-content p {
+                font-size: 16px;
+            }
+            
+            .features-grid, .products-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Premium Header -->
+    <header class="premium-header">
+        <div class="container">
+            <div class="header-top">
+                <div class="logo">
+                    <h1>Artisan<span>Luxe</span></h1>
+                </div>
+                <div class="search-bar">
+                    <input type="text" placeholder="Search for luxury products, artisans...">
+                    <button><i class="fas fa-search"></i></button>
+                </div>
+                <div class="header-actions">
+                    <div class="language-selector">
+                        <select>
+                            <option>English</option>
+                            <option>हिन्दी</option>
+                            <option>Français</option>
+                            <option>Español</option>
+                        </select>
+                    </div>
+                    <div class="auth-buttons">
+                        <a href="#" class="login">Login</a>
+                        <a href="#" class="signup">Sign Up</a>
+                    </div>
+                    <div class="cart-icon">
+                        <i class="fas fa-shopping-bag"></i>
+                        <span class="cart-count">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <nav class="premium-nav">
+            <div class="container">
+                <ul class="nav-links">
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Luxury Handicrafts</a></li>
+                    <li><a href="#">Artisan Jewelry</a></li>
+                    <li><a href="#">Premium Textiles</a></li>
+                    <li><a href="#">Custom Orders</a></li>
+                    <li><a href="#">Artisan Stories</a></li>
+                    <li><a href="#">VIP Collection</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Premium Hero Section -->
+    <section class="premium-hero">
+        <div class="container">
+            <div class="hero-content">
+                <h2>Exquisite Handcrafted Luxury</h2>
+                <p>Discover the world's finest artisans and their masterpieces. Each piece tells a story of tradition, skill, and unparalleled craftsmanship.</p>
+                <a href="#" class="premium-cta">Explore Masterpieces</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Premium Features Section -->
+    <section class="premium-features">
+        <div class="container">
+            <div class="section-title">
+                <h2>Why Choose Artisan Luxe</h2>
+                <p>Experience luxury shopping redefined with our exclusive features and services</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-gem"></i>
+                    </div>
+                    <h3>Premium Quality</h3>
+                    <p>Every product is meticulously crafted using the finest materials and traditional techniques.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shipping-fast"></i>
+                    </div>
+                    <h3>Free Premium Delivery</h3>
+                    <p>Complimentary luxury packaging and insured shipping with real-time tracking.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <h3>Artisan Verified</h3>
+                    <p>Each artisan is personally vetted to ensure authenticity and exceptional craftsmanship.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <h3>Real-time Tracking</h3>
+                    <p>Track your order from artisan's workshop to your doorstep with live GPS updates.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Luxury Products Section -->
+    <section class="luxury-products">
+        <div class="container">
+            <div class="products-header">
+                <h2>Exclusive Collection</h2>
+                <a href="#" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="products-grid">
+                <!-- Product 1 -->
+                <div class="product-card" data-product="1">
+                    <div class="product-image">
+                        <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Handmade Pot">
+                        <span class="product-badge">Limited Edition</span>
+                    </div>
+                    <div class="product-info">
+                        <h3>Gold-Plated Terracotta Vase</h3>
+                        <div class="product-seller">
+                            <div class="seller-avatar"></div>
+                            <span>Rajesh Fine Arts</span>
+                        </div>
+                        <div class="product-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Jaipur, Rajasthan</span>
+                        </div>
+                        <div class="product-price">
+                            <span class="price">₹24,500</span>
+                            <button class="book-now-btn" data-product="1">Book Now</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 2 -->
+                <div class="product-card" data-product="2">
+                    <div class="product-image">
+                        <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Silk Saree">
+                        <span class="product-badge">VIP Exclusive</span>
+                    </div>
+                    <div class="product-info">
+                        <h3>Handwoven Banarasi Silk Saree</h3>
+                        <div class="product-seller">
+                            <div class="seller-avatar"></div>
+                            <span>Weaves of Varanasi</span>
+                        </div>
+                        <div class="product-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Varanasi, Uttar Pradesh</span>
+                        </div>
+                        <div class="product-price">
+                            <span class="price">₹52,000</span>
+                            <button class="book-now-btn" data-product="2">Book Now</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 3 -->
+                <div class="product-card" data-product="3">
+                    <div class="product-image">
+                        <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Wooden Sculpture">
+                        <span class="product-badge">Artisan's Choice</span>
+                    </div>
+                    <div class="product-info">
+                        <h3>Sandalwood Carved Elephant</h3>
+                        <div class="product-seller">
+                            <div class="seller-avatar"></div>
+                            <span>Mysore Woodcraft</span>
+                        </div>
+                        <div class="product-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Mysore, Karnataka</span>
+                        </div>
+                        <div class="product-price">
+                            <span class="price">₹38,750</span>
+                            <button class="book-now-btn" data-product="3">Book Now</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 4 -->
+                <div class="product-card" data-product="4">
+                    <div class="product-image">
+                        <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Brass Diya">
+                        <span class="product-badge">Heritage Piece</span>
+                    </div>
+                    <div class="product-info">
+                        <h3>Antique Brass Temple Set</h3>
+                        <div class="product-seller">
+                            <div class="seller-avatar"></div>
+                            <span>Moradabad Metal Arts</span>
+                        </div>
+                        <div class="product-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Moradabad, Uttar Pradesh</span>
+                        </div>
+                        <div class="product-price">
+                            <span class="price">₹67,500</span>
+                            <button class="book-now-btn" data-product="4">Book Now</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Booking Modal -->
+    <div class="modal" id="bookingModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Book Luxury Product</h2>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="bookingForm">
+                    <div class="booking-form">
+                        <div class="form-group">
+                            <label for="customerName">Full Name</label>
+                            <input type="text" id="customerName" class="form-control" placeholder="Enter your full name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="customerEmail">Email Address</label>
+                            <input type="email" id="customerEmail" class="form-control" placeholder="Enter your email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="customerPhone">Phone Number</label>
+                            <input type="tel" id="customerPhone" class="form-control" placeholder="Enter your phone number" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="customerAddress">Delivery Address</label>
+                            <textarea id="customerAddress" class="form-control" rows="3" placeholder="Enter complete delivery address" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="deliveryDate">Preferred Delivery Date</label>
+                            <input type="date" id="deliveryDate" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="specialInstructions">Special Instructions</label>
+                            <textarea id="specialInstructions" class="form-control" rows="3" placeholder="Any special requests or instructions"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="booking-summary">
+                        <h3>Order Summary</h3>
+                        <div class="summary-item">
+                            <span>Product:</span>
+                            <span id="summaryProduct">Gold-Plated Terracotta Vase</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Price:</span>
+                            <span id="summaryPrice">₹24,500</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Shipping:</span>
+                            <span>FREE</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Insurance:</span>
+                            <span>INCLUDED</span>
+                        </div>
+                        <div class="summary-total">
+                            <span>Total:</span>
+                            <span id="summaryTotal">₹24,500</span>
+                        </div>
+                    </div>
+
+                    <div class="tracking-section">
+                        <h3>Real-time Tracking</h3>
+                        <p>Track your order from artisan to your doorstep</p>
+                        <div class="tracking-map">
+                            <div id="trackingMap"></div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-booking">Confirm Booking</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Premium Footer -->
+    <footer class="premium-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Artisan Luxe</h3>
+                    <p>Your gateway to the world's finest handcrafted luxury. Connecting discerning buyers with master artisans.</p>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Become an Artisan</a></li>
+                        <li><a href="#">VIP Membership</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Customer Service</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Returns & Refunds</a></li>
+                        <li><a href="#">Shipping Info</a></li>
+                        <li><a href="#">Track Your Order</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contact Info</h3>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-map-marker-alt"></i> Luxury District, Mumbai, India</li>
+                        <li><i class="fas fa-phone"></i> +91 98765 43210</li>
+                        <li><i class="fas fa-envelope"></i> concierge@artisanluxe.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 Artisan Luxe. All rights reserved. | Crafting Luxury, Preserving Heritage</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC4wGDrRHs4gQN6p8Q9X7VqY9t8d4Jk8Xw",
+            authDomain: "artisan-luxe.firebaseapp.com",
+            projectId: "artisan-luxe",
+            storageBucket: "artisan-luxe.appspot.com",
+            messagingSenderId: "123456789012",
+            appId: "1:123456789012:web:abcdef1234567890"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Product Data
+        const products = {
+            1: {
+                name: "Gold-Plated Terracotta Vase",
+                price: 24500,
+                seller: "Rajesh Fine Arts",
+                location: "Jaipur, Rajasthan",
+                sellerPhone: "+919876543210"
+            },
+            2: {
+                name: "Handwoven Banarasi Silk Saree",
+                price: 52000,
+                seller: "Weaves of Varanasi",
+                location: "Varanasi, Uttar Pradesh",
+                sellerPhone: "+919876543211"
+            },
+            3: {
+                name: "Sandalwood Carved Elephant",
+                price: 38750,
+                seller: "Mysore Woodcraft",
+                location: "Mysore, Karnataka",
+                sellerPhone: "+919876543212"
+            },
+            4: {
+                name: "Antique Brass Temple Set",
+                price: 67500,
+                seller: "Moradabad Metal Arts",
+                location: "Moradabad, Uttar Pradesh",
+                sellerPhone: "+919876543213"
+            }
+        };
+
+        // DOM Elements
+        const bookingModal = document.getElementById('bookingModal');
+        const modalClose = document.getElementById('modalClose');
+        const bookingForm = document.getElementById('bookingForm');
+        const bookNowButtons = document.querySelectorAll('.book-now-btn');
+        const summaryProduct = document.getElementById('summaryProduct');
+        const summaryPrice = document.getElementById('summaryPrice');
+        const summaryTotal = document.getElementById('summaryTotal');
+
+        // Current product being booked
+        let currentProduct = null;
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Setup booking buttons
+            bookNowButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const productId = this.getAttribute('data-product');
+                    openBookingModal(productId);
+                });
+            });
+
+            // Setup modal close
+            modalClose.addEventListener('click', closeBookingModal);
+
+            // Setup form submission
+            bookingForm.addEventListener('submit', handleBookingSubmission);
+
+            // Initialize tracking map
+            initTrackingMap();
+        });
+
+        // Open booking modal
+        function openBookingModal(productId) {
+            currentProduct = products[productId];
+            
+            // Update summary
+            summaryProduct.textContent = currentProduct.name;
+            summaryPrice.textContent = `₹${currentProduct.price.toLocaleString()}`;
+            summaryTotal.textContent = `₹${currentProduct.price.toLocaleString()}`;
+            
+            // Show modal
+            bookingModal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close booking modal
+        function closeBookingModal() {
+            bookingModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            currentProduct = null;
+        }
+
+        // Handle booking form submission
+        function handleBookingSubmission(e) {
+            e.preventDefault();
+            
+            // Get form data
+            const formData = {
+                customerName: document.getElementById('customerName').value,
+                customerEmail: document.getElementById('customerEmail').value,
+                customerPhone: document.getElementById('customerPhone').value,
+                customerAddress: document.getElementById('customerAddress').value,
+                deliveryDate: document.getElementById('deliveryDate').value,
+                specialInstructions: document.getElementById('specialInstructions').value,
+                product: currentProduct.name,
+                price: currentProduct.price,
+                seller: currentProduct.seller,
+                sellerPhone: currentProduct.sellerPhone,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                status: 'pending'
+            };
+
+            // Save booking to Firestore
+            db.collection('bookings').add(formData)
+                .then((docRef) => {
+                    console.log('Booking saved with ID: ', docRef.id);
+                    
+                    // Send WhatsApp notification to seller
+                    sendWhatsAppNotification(formData);
+                    
+                    // Schedule courier service
+                    scheduleCourierService(formData, docRef.id);
+                    
+                    // Show success message
+                    alert('Booking confirmed! You will receive a confirmation email shortly. The artisan has been notified.');
+                    
+                    // Close modal
+                    closeBookingModal();
+                    
+                    // Reset form
+                    bookingForm.reset();
+                })
+                .catch((error) => {
+                    console.error('Error saving booking: ', error);
+                    alert('There was an error processing your booking. Please try again.');
+                });
+        }
+
+        // Send WhatsApp notification to seller
+        function sendWhatsAppNotification(bookingData) {
+            const sellerPhone = bookingData.sellerPhone;
+            const message = `New Booking Alert!%0A%0AProduct: ${bookingData.product}%0APrice: ₹${bookingData.price}%0ACustomer: ${bookingData.customerName}%0APhone: ${bookingData.customerPhone}%0AAddress: ${bookingData.customerAddress}%0ADelivery Date: ${bookingData.deliveryDate}%0A%0APlease prepare the order for shipping.`;
+            
+            // Create WhatsApp URL
+            const whatsappUrl = `https://wa.me/${sellerPhone}?text=${message}`;
+            
+            // Open WhatsApp in new tab (in a real app, this would be done server-side)
+            window.open(whatsappUrl, '_blank');
+            
+            console.log('WhatsApp notification sent to seller');
+        }
+
+        // Schedule courier service
+        function scheduleCourierService(bookingData, bookingId) {
+            // In a real implementation, this would integrate with a courier API
+            // For demo purposes, we'll simulate the process
+            
+            const courierData = {
+                bookingId: bookingId,
+                customerName: bookingData.customerName,
+                customerPhone: bookingData.customerPhone,
+                customerAddress: bookingData.customerAddress,
+                sellerLocation: bookingData.seller,
+                deliveryDate: bookingData.deliveryDate,
+                service: 'free_premium',
+                status: 'scheduled',
+                timestamp: new Date()
+            };
+            
+            // Save courier data to Firestore
+            db.collection('courierServices').add(courierData)
+                .then((docRef) => {
+                    console.log('Courier service scheduled with ID: ', docRef.id);
+                    
+                    // Update booking with courier reference
+                    db.collection('bookings').doc(bookingId).update({
+                        courierId: docRef.id,
+                        courierStatus: 'scheduled'
+                    });
+                    
+                    // Simulate courier API integration
+                    simulateCourierAPI(bookingData, docRef.id);
+                })
+                .catch((error) => {
+                    console.error('Error scheduling courier: ', error);
+                });
+        }
+
+        // Simulate courier API integration
+        function simulateCourierAPI(bookingData, courierId) {
+            // This would be replaced with actual API calls to services like Delhivery, BlueDart, etc.
+            console.log('Integrating with courier service API...');
+            
+            // For demo, we'll just log the integration
+            setTimeout(() => {
+                console.log('Courier service integration completed for booking');
+                
+                // Update courier status
+                db.collection('courierServices').doc(courierId).update({
+                    status: 'confirmed',
+                    trackingNumber: generateTrackingNumber(),
+                    estimatedDelivery: bookingData.deliveryDate
+                });
+            }, 2000);
+        }
+
+        // Generate tracking number
+        function generateTrackingNumber() {
+            return 'ART' + Date.now() + Math.floor(Math.random() * 1000);
+        }
+
+        // Initialize tracking map
+        function initTrackingMap() {
+            const map = L.map('trackingMap').setView([20.5937, 78.9629], 5); // Center on India
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            // Add sample tracking points (in real app, these would come from courier API)
+            const trackingPoints = [
+                { name: 'Artisan Workshop', lat: 26.9124, lng: 75.7873 }, // Jaipur
+                { name: 'Sorting Facility', lat: 28.6139, lng: 77.2090 }, // Delhi
+                { name: 'Local Hub', lat: 19.0760, lng: 72.8777 }, // Mumbai
+                { name: 'Delivery Destination', lat: 12.9716, lng: 77.5946 } // Bangalore
+            ];
+            
+            trackingPoints.forEach((point, index) => {
+                const marker = L.marker([point.lat, point.lng]).addTo(map);
+                marker.bindPopup(`
+                    <div style="text-align: center;">
+                        <h3>${point.name}</h3>
+                        <p>Status: ${index === trackingPoints.length - 1 ? 'Out for Delivery' : 'In Transit'}</p>
+                        <p>Estimated: ${index === trackingPoints.length - 1 ? 'Today' : 'Completed'}</p>
+                    </div>
+                `);
+                
+                if (index === trackingPoints.length - 1) {
+                    marker.openPopup();
+                }
+            });
+            
+            // Store map reference
+            window.trackingMap = map;
+        }
+
+        // Listen for booking status updates (real-time)
+        db.collection('bookings').orderBy('timestamp', 'desc').limit(10)
+            .onSnapshot((snapshot) => {
+                snapshot.docChanges().forEach((change) => {
+                    if (change.type === 'added') {
+                        console.log('New booking: ', change.doc.data());
+                    }
+                    if (change.type === 'modified') {
+                        console.log('Modified booking: ', change.doc.data());
+                    }
+                });
+            });
+
+        // Listen for courier status updates (real-time)
+        db.collection('courierServices').orderBy('timestamp', 'desc').limit(10)
+            .onSnapshot((snapshot) => {
+                snapshot.docChanges().forEach((change) => {
+                    if (change.type === 'added') {
+                        console.log('New courier service: ', change.doc.data());
+                    }
+                    if (change.type === 'modified') {
+                        console.log('Updated courier service: ', change.doc.data());
+                        // In a real app, you would update the UI with tracking info
+                    }
+                });
+            });
+    </script>
+</body>
+</html>

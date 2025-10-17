@@ -1,0 +1,2447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artisan Pottery | Premium Handcrafted Ceramics</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    
+    <style>
+        :root {
+            --primary: #C19A6B;
+            --primary-dark: #8B6B3D;
+            --secondary: #2C2C2C;
+            --accent: #8B4513;
+            --light: #F8F5F0;
+            --gray: #6C757D;
+            --white: #FFFFFF;
+            --error: #e74c3c;
+            --success: #2ecc71;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+            --gold: #D4AF37;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--secondary);
+            background-color: var(--light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Page Container */
+        .page-container {
+            position: relative;
+            min-height: 100vh;
+        }
+
+        .page {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            min-height: 100vh;
+        }
+
+        .page.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Back Button */
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-weight: 500;
+            cursor: pointer;
+            padding: 10px 0;
+            margin-bottom: 20px;
+            transition: var(--transition);
+        }
+
+        .back-button:hover {
+            color: var(--primary-dark);
+            transform: translateX(-5px);
+        }
+
+        /* Header Styles */
+        header {
+            background-color: var(--white);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .logo h1 {
+            font-size: 28px;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+        }
+
+        .logo span {
+            color: var(--secondary);
+        }
+
+        .search-bar {
+            flex: 1;
+            max-width: 600px;
+            margin: 0 30px;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 14px 20px;
+            border: 1px solid #E5E5E5;
+            border-radius: 50px;
+            font-size: 16px;
+            transition: var(--transition);
+            background-color: #f9f9f9;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(193, 154, 107, 0.2);
+        }
+
+        .search-bar button {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 9px 20px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .search-bar button:hover {
+            background: var(--primary-dark);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .auth-buttons a {
+            text-decoration: none;
+            color: var(--secondary);
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: var(--transition);
+        }
+
+        .auth-buttons a.login {
+            color: var(--gray);
+        }
+
+        .auth-buttons a.signup {
+            background: var(--primary);
+            color: white;
+        }
+
+        .auth-buttons a.signup:hover {
+            background: var(--primary-dark);
+        }
+
+        .cart-icon {
+            position: relative;
+            font-size: 22px;
+            color: var(--secondary);
+            cursor: pointer;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--primary);
+            color: white;
+            font-size: 12px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Navigation */
+        nav {
+            background-color: var(--secondary);
+            padding: 15px 0;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--primary);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            height: 600px;
+            background: linear-gradient(135deg, rgba(44, 44, 44, 0.8) 0%, rgba(139, 69, 19, 0.7) 100%), url('https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80') no-repeat center center;
+            background-size: cover;
+            color: white;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            max-width: 600px;
+            z-index: 2;
+        }
+
+        .hero h2 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 18px;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 14px 30px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .cta-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Premium Pottery Section */
+        .premium-pottery {
+            padding: 80px 0;
+            background-color: var(--white);
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .section-title h2 {
+            font-size: 36px;
+            color: var(--secondary);
+            margin-bottom: 15px;
+        }
+
+        .section-title p {
+            color: var(--gray);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .product-card {
+            background: var(--white);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-image {
+            height: 220px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.05);
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: var(--gold);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .product-info {
+            padding: 20px;
+        }
+
+        .product-info h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .product-seller {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        .seller-avatar {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background-color: #E5E5E5;
+        }
+
+        .product-location {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            color: var(--gray);
+            margin-bottom: 15px;
+        }
+
+        .product-price {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .price {
+            font-weight: 700;
+            font-size: 20px;
+            color: var(--secondary);
+        }
+
+        .book-now {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+        }
+
+        .book-now:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Booking Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 50px auto;
+            width: 90%;
+            max-width: 800px;
+            border-radius: 10px;
+            overflow: hidden;
+            animation: modalFade 0.3s;
+        }
+
+        @keyframes modalFade {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            background: var(--secondary);
+            color: white;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .booking-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 15px;
+            border: 1px solid #E5E5E5;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: var(--transition);
+            background-color: #f9f9f9;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(193, 154, 107, 0.2);
+        }
+
+        .booking-summary {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .summary-total {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 700;
+            font-size: 18px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+        }
+
+        .submit-booking {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: block;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .submit-booking:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Seller Map Section */
+        .seller-map {
+            padding: 80px 0;
+            background-color: var(--light);
+        }
+
+        .map-container {
+            height: 500px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        #sellerLocationMap {
+            height: 100%;
+            width: 100%;
+        }
+
+        /* Delivery Options */
+        .delivery-options {
+            padding: 80px 0;
+            background-color: var(--white);
+        }
+
+        .delivery-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .delivery-card {
+            background: var(--white);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            text-align: center;
+            border: 2px solid transparent;
+        }
+
+        .delivery-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
+        }
+
+        .delivery-icon {
+            width: 70px;
+            height: 70px;
+            background: rgba(193, 154, 107, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 28px;
+            color: var(--primary);
+        }
+
+        .delivery-card h3 {
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+
+        .delivery-card p {
+            color: var(--gray);
+            margin-bottom: 20px;
+        }
+
+        .delivery-price {
+            font-weight: 700;
+            font-size: 20px;
+            color: var(--primary);
+        }
+
+        /* AI Assistant */
+        .ai-assistant {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+        }
+
+        .assistant-toggle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: var(--transition);
+        }
+
+        .assistant-toggle:hover {
+            transform: scale(1.1);
+            background: var(--primary-dark);
+        }
+
+        .assistant-window {
+            position: absolute;
+            bottom: 70px;
+            right: 0;
+            width: 350px;
+            height: 450px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .assistant-header {
+            background: var(--secondary);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .assistant-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .assistant-body {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .assistant-message {
+            max-width: 80%;
+            padding: 12px 15px;
+            border-radius: 18px;
+            font-size: 14px;
+        }
+
+        .assistant-message.bot {
+            background: #f0f0f0;
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+
+        .assistant-message.user {
+            background: var(--primary);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+
+        .assistant-input {
+            padding: 15px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            gap: 10px;
+        }
+
+        .assistant-input input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #E5E5E5;
+            border-radius: 50px;
+            font-size: 14px;
+        }
+
+        .assistant-input button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .assistant-input button:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--secondary);
+            color: white;
+            padding: 60px 0 0;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: #CCCCCC;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding: 30px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #999;
+            font-size: 14px;
+        }
+
+        /* Authentication Page Styles */
+        #auth-page {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .auth-container {
+            display: flex;
+            background: var(--white);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            min-height: 600px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .auth-left {
+            flex: 1;
+            background: linear-gradient(135deg, rgba(44, 44, 44, 0.9) 0%, rgba(139, 69, 19, 0.8) 100%), url('https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80') no-repeat center center;
+            background-size: cover;
+            color: white;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .auth-left h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .auth-left p {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+
+        .features-list {
+            list-style: none;
+            margin-top: 30px;
+        }
+
+        .features-list li {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .features-list i {
+            color: var(--primary);
+            font-size: 18px;
+        }
+
+        .auth-right {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .auth-tab {
+            padding: 15px 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border-bottom: 3px solid transparent;
+        }
+
+        .auth-tab.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .password-input {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--gray);
+            cursor: pointer;
+        }
+
+        .phone-input {
+            display: flex;
+            gap: 10px;
+        }
+
+        .country-code {
+            width: 100px;
+            flex-shrink: 0;
+        }
+
+        .phone-number {
+            flex: 1;
+        }
+
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .forgot-password {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .forgot-password:hover {
+            color: var(--primary-dark);
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-google {
+            background: white;
+            color: var(--secondary);
+            border: 1px solid #E5E5E5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-google:hover {
+            background: #f5f5f5;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 25px 0;
+            color: var(--gray);
+        }
+
+        .divider::before, .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #E5E5E5;
+        }
+
+        .divider span {
+            padding: 0 15px;
+            font-size: 14px;
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 30px;
+            color: var(--gray);
+        }
+
+        .auth-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .message {
+            padding: 12px 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .message.error {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--error);
+            border: 1px solid rgba(231, 76, 60, 0.2);
+            display: block;
+        }
+
+        .message.success {
+            background: rgba(46, 204, 113, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(46, 204, 113, 0.2);
+            display: block;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(193, 154, 107, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .hero h2 {
+                font-size: 40px;
+            }
+            
+            .search-bar {
+                max-width: 400px;
+            }
+            
+            .booking-form {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-top {
+                flex-wrap: wrap;
+            }
+            
+            .search-bar {
+                order: 3;
+                margin: 15px 0 0;
+                max-width: 100%;
+            }
+            
+            .hero h2 {
+                font-size: 32px;
+            }
+            
+            .hero {
+                height: 500px;
+            }
+            
+            .section-title h2 {
+                font-size: 28px;
+            }
+            
+            .assistant-window {
+                width: 300px;
+            }
+            
+            .auth-container {
+                flex-direction: column;
+            }
+            
+            .auth-left {
+                padding: 30px 20px;
+            }
+            
+            .auth-right {
+                padding: 30px 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h2 {
+                font-size: 28px;
+            }
+            
+            .hero p {
+                font-size: 16px;
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .assistant-window {
+                width: 280px;
+                right: -20px;
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <!-- Landing Page -->
+        <div id="landing-page" class="page active">
+            <!-- Header -->
+            <header>
+                <div class="container">
+                    <div class="header-top">
+                        <div class="logo" id="logo">
+                            <h1>Artisan<span>Pottery</span></h1>
+                        </div>
+                        <div class="search-bar">
+                            <input type="text" placeholder="Search for pottery, artisans, or collections...">
+                            <button><i class="fas fa-search"></i></button>
+                        </div>
+                        <div class="header-actions">
+                            <div class="auth-buttons">
+                                <a href="#" class="login" id="login-link">Login</a>
+                                <a href="#" class="signup" id="signup-link">Sign Up</a>
+                            </div>
+                            <div class="cart-icon">
+                                <i class="fas fa-shopping-bag"></i>
+                                <span class="cart-count">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <nav>
+                    <div class="container">
+                        <ul class="nav-links">
+                            <li><a href="#">Home</a></li>
+                            <li><a href="#">Collections</a></li>
+                            <li><a href="#">Artisans</a></li>
+                            <li><a href="#">Workshops</a></li>
+                            <li><a href="#">Custom Orders</a></li>
+                            <li><a href="#">About</a></li>
+                            <li><a href="#">Contact</a></li>
+                        </ul>
+                    </div>
+                </nav>
+            </header>
+
+            <!-- Hero Section -->
+            <section class="hero">
+                <div class="container">
+                    <div class="hero-content">
+                        <h2>Premium Handcrafted Pottery</h2>
+                        <p>Discover exquisite, one-of-a-kind ceramic pieces crafted by master artisans. Each creation tells a story of tradition, skill, and artistic expression.</p>
+                        <a href="#" class="cta-button" id="explore-collections">Explore Collections</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Premium Pottery Section -->
+            <section class="premium-pottery">
+                <div class="container">
+                    <div class="section-title">
+                        <h2>Exclusive Pottery Collection</h2>
+                        <p>Handcrafted masterpieces from renowned artisans across the country</p>
+                    </div>
+                    <div class="products-grid" id="productsContainer">
+                        <!-- Products will be loaded dynamically -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Seller Map Section -->
+            <section class="seller-map">
+                <div class="container">
+                    <div class="section-title">
+                        <h2>Find Artisans Near You</h2>
+                        <p>Connect directly with pottery masters in your area</p>
+                    </div>
+                    <div class="map-container">
+                        <div id="sellerLocationMap"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Delivery Options -->
+            <section class="delivery-options">
+                <div class="container">
+                    <div class="section-title">
+                        <h2>Premium Delivery Services</h2>
+                        <p>We partner with trusted logistics providers to ensure your pottery arrives safely</p>
+                    </div>
+                    <div class="delivery-cards">
+                        <div class="delivery-card">
+                            <div class="delivery-icon">
+                                <i class="fas fa-shipping-fast"></i>
+                            </div>
+                            <h3>Express Delivery</h3>
+                            <p>Get your pottery delivered within 2-3 business days with premium handling and insurance.</p>
+                            <div class="delivery-price">₹299</div>
+                        </div>
+                        <div class="delivery-card">
+                            <div class="delivery-icon">
+                                <i class="fas fa-truck"></i>
+                            </div>
+                            <h3>Standard Delivery</h3>
+                            <p>Economical delivery within 5-7 business days with careful packaging and tracking.</p>
+                            <div class="delivery-price">₹149</div>
+                        </div>
+                        <div class="delivery-card">
+                            <div class="delivery-icon">
+                                <i class="fas fa-gift"></i>
+                            </div>
+                            <h3>Free Delivery</h3>
+                            <p>Complimentary delivery on orders above ₹5000. Delivered within 7-10 business days.</p>
+                            <div class="delivery-price">FREE</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AI Assistant -->
+            <div class="ai-assistant">
+                <div class="assistant-toggle" id="assistantToggle">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="assistant-window" id="assistantWindow">
+                    <div class="assistant-header">
+                        <h3><i class="fas fa-robot"></i> Pottery Assistant</h3>
+                        <button class="assistant-close" id="assistantClose">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="assistant-body">
+                        <div class="assistant-message bot">
+                            Hello! I'm your pottery assistant. I can help you find the perfect ceramic piece, connect with artisans, or answer any questions about our collections.
+                        </div>
+                        <div class="assistant-message user">
+                            I'm looking for a handcrafted vase for my living room.
+                        </div>
+                        <div class="assistant-message bot">
+                            I can recommend several beautiful vases from our collection. Would you prefer traditional or contemporary designs?
+                        </div>
+                    </div>
+                    <div class="assistant-input">
+                        <input type="text" placeholder="Ask about pottery...">
+                        <button><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer>
+                <div class="container">
+                    <div class="footer-content">
+                        <div class="footer-column">
+                            <h3>Artisan Pottery</h3>
+                            <p>Your gateway to premium handcrafted ceramics. Connecting you with master artisans and their exquisite creations.</p>
+                        </div>
+                        <div class="footer-column">
+                            <h3>Quick Links</h3>
+                            <ul class="footer-links">
+                                <li><a href="#">Home</a></li>
+                                <li><a href="#">Collections</a></li>
+                                <li><a href="#">Artisans</a></li>
+                                <li><a href="#">Workshops</a></li>
+                                <li><a href="#">Contact Us</a></li>
+                            </ul>
+                        </div>
+                        <div class="footer-column">
+                            <h3>Customer Service</h3>
+                            <ul class="footer-links">
+                                <li><a href="#">Help Center</a></li>
+                                <li><a href="#">Returns & Refunds</a></li>
+                                <li><a href="#">Shipping Info</a></li>
+                                <li><a href="#">Track Your Order</a></li>
+                                <li><a href="#">Privacy Policy</a></li>
+                            </ul>
+                        </div>
+                        <div class="footer-column">
+                            <h3>Contact Info</h3>
+                            <ul class="footer-links">
+                                <li><i class="fas fa-map-marker-alt"></i> 123 Artisan Lane, Jaipur, India</li>
+                                <li><i class="fas fa-phone"></i> +91 98765 43210</li>
+                                <li><i class="fas fa-envelope"></i> support@artisanpottery.com</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="footer-bottom">
+                        <p>&copy; 2023 Artisan Pottery. All rights reserved.</p>
+                    </div>
+                </div>
+            </footer>
+        </div>
+
+        <!-- Authentication Page -->
+        <div id="auth-page" class="page">
+            <div class="auth-container">
+                <div class="auth-left">
+                    <h2>Discover Premium Pottery</h2>
+                    <p>Join our community of pottery enthusiasts and master artisans. Experience the beauty of handcrafted ceramics with modern convenience.</p>
+                    
+                    <ul class="features-list">
+                        <li><i class="fas fa-check-circle"></i> Premium handcrafted pottery</li>
+                        <li><i class="fas fa-check-circle"></i> Direct connection with artisans</li>
+                        <li><i class="fas fa-check-circle"></i> Secure booking system</li>
+                        <li><i class="fas fa-check-circle"></i> Real-time seller notifications</li>
+                        <li><i class="fas fa-check-circle"></i> Premium delivery options</li>
+                    </ul>
+                </div>
+                
+                <div class="auth-right">
+                    <div class="logo" id="auth-logo">
+                        <h1>Artisan<span>Pottery</span></h1>
+                    </div>
+                    
+                    <button class="back-button" id="auth-back-button">
+                        <i class="fas fa-arrow-left"></i> Back to Home
+                    </button>
+                    
+                    <div class="auth-tabs">
+                        <div class="auth-tab active" data-tab="login">Login</div>
+                        <div class="auth-tab" data-tab="signup">Sign Up</div>
+                    </div>
+                    
+                    <div id="message" class="message"></div>
+                    
+                    <div class="loading" id="loading">
+                        <div class="loading-spinner"></div>
+                        <p>Processing your request...</p>
+                    </div>
+                    
+                    <!-- Login Form -->
+                    <form id="loginForm" class="auth-form active">
+                        <div class="form-group">
+                            <label for="loginEmail">Email Address</label>
+                            <input type="email" id="loginEmail" class="form-control" placeholder="Enter your email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="loginPassword">Password</label>
+                            <div class="password-input">
+                                <input type="password" id="loginPassword" class="form-control" placeholder="Enter your password" required>
+                                <button type="button" class="password-toggle" id="loginPasswordToggle">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-options">
+                            <div class="remember-me">
+                                <input type="checkbox" id="rememberMe">
+                                <label for="rememberMe">Remember me</label>
+                            </div>
+                            <a href="#" class="forgot-password" id="forgotPassword">Forgot Password?</a>
+                        </div>
+                        
+                        <button type="submit" class="btn" id="loginBtn">Login</button>
+                        
+                        <div class="divider">
+                            <span>or continue with</span>
+                        </div>
+                        
+                        <button type="button" class="btn btn-google" id="googleLoginBtn">
+                            <i class="fab fa-google"></i> Google
+                        </button>
+                        
+                        <div class="auth-footer">
+                            Don't have an account? <a href="#" id="switchToSignup">Sign up</a>
+                        </div>
+                    </form>
+                    
+                    <!-- Signup Form -->
+                    <form id="signupForm" class="auth-form">
+                        <div class="form-group">
+                            <label for="signupName">Full Name</label>
+                            <input type="text" id="signupName" class="form-control" placeholder="Enter your full name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="signupEmail">Email Address</label>
+                            <input type="email" id="signupEmail" class="form-control" placeholder="Enter your email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="signupPhone">Phone Number</label>
+                            <div class="phone-input">
+                                <select id="countryCode" class="form-control country-code">
+                                    <option value="+91">+91 (IN)</option>
+                                    <option value="+1">+1 (US)</option>
+                                    <option value="+44">+44 (UK)</option>
+                                    <option value="+61">+61 (AU)</option>
+                                </select>
+                                <input type="tel" id="signupPhone" class="form-control phone-number" placeholder="Phone number" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="signupPassword">Password</label>
+                            <div class="password-input">
+                                <input type="password" id="signupPassword" class="form-control" placeholder="Create a password" required>
+                                <button type="button" class="password-toggle" id="signupPasswordToggle">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <small style="color: var(--gray); margin-top: 5px; display: block;">Password must be at least 6 characters</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="confirmPassword">Confirm Password</label>
+                            <div class="password-input">
+                                <input type="password" id="confirmPassword" class="form-control" placeholder="Confirm your password" required>
+                                <button type="button" class="password-toggle" id="confirmPasswordToggle">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="remember-me">
+                                <input type="checkbox" id="agreeTerms" required>
+                                <label for="agreeTerms">I agree to the <a href="#" style="color: var(--primary);">Terms of Service</a> and <a href="#" style="color: var(--primary);">Privacy Policy</a></label>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn" id="signupBtn">Create Account</button>
+                        
+                        <div class="divider">
+                            <span>or continue with</span>
+                        </div>
+                        
+                        <button type="button" class="btn btn-google" id="googleSignupBtn">
+                            <i class="fab fa-google"></i> Google
+                        </button>
+                        
+                        <div class="auth-footer">
+                            Already have an account? <a href="#" id="switchToLogin">Login</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div class="modal" id="bookingModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Book Your Pottery</h2>
+                <button class="modal-close" id="bookingModalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="booking-form">
+                    <div class="form-group">
+                        <label for="customerName">Full Name</label>
+                        <input type="text" id="customerName" class="form-control" placeholder="Enter your full name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="customerEmail">Email Address</label>
+                        <input type="email" id="customerEmail" class="form-control" placeholder="Enter your email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="customerPhone">Phone Number</label>
+                        <input type="tel" id="customerPhone" class="form-control" placeholder="Enter your phone number" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="deliveryAddress">Delivery Address</label>
+                        <textarea id="deliveryAddress" class="form-control" placeholder="Enter your complete address" rows="3" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="deliveryDate">Preferred Delivery Date</label>
+                        <input type="date" id="deliveryDate" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="deliveryService">Delivery Service</label>
+                        <select id="deliveryService" class="form-control" required>
+                            <option value="">Select delivery option</option>
+                            <option value="express">Express Delivery (2-3 days) - ₹299</option>
+                            <option value="standard">Standard Delivery (5-7 days) - ₹149</option>
+                            <option value="free">Free Delivery (7-10 days) - FREE</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label for="specialInstructions">Special Instructions</label>
+                        <textarea id="specialInstructions" class="form-control" placeholder="Any special requests or instructions for the artisan" rows="3"></textarea>
+                    </div>
+                </div>
+                
+                <div class="booking-summary">
+                    <h3>Order Summary</h3>
+                    <div class="summary-item">
+                        <span id="summaryProductName">Product Name</span>
+                        <span id="summaryProductPrice">₹0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Delivery</span>
+                        <span id="summaryDeliveryPrice">₹0</span>
+                    </div>
+                    <div class="summary-total">
+                        <span>Total</span>
+                        <span id="summaryTotalPrice">₹0</span>
+                    </div>
+                </div>
+                
+                <button class="submit-booking" id="submitBooking">Confirm Booking</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC4wGDrRHs4gQN6p8Q9X7VqY9t8d4Jk8Xw",
+            authDomain: "artisan-pottery.firebaseapp.com",
+            projectId: "artisan-pottery",
+            storageBucket: "artisan-pottery.appspot.com",
+            messagingSenderId: "123456789012",
+            appId: "1:123456789012:web:abcdef1234567890"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Page Navigation
+        const pages = document.querySelectorAll('.page');
+        const logo = document.getElementById('logo');
+        const authLogo = document.getElementById('auth-logo');
+        const loginLink = document.getElementById('login-link');
+        const signupLink = document.getElementById('signup-link');
+        const exploreCollections = document.getElementById('explore-collections');
+        const authBackButton = document.getElementById('auth-back-button');
+
+        function showPage(pageId) {
+            pages.forEach(page => {
+                page.classList.remove('active');
+            });
+            const targetPage = document.getElementById(pageId);
+            targetPage.classList.add('active');
+            
+            // Initialize maps when landing page is shown
+            if (pageId === 'landing-page') {
+                setTimeout(() => {
+                    initSellerLocationMap();
+                    loadProducts();
+                }, 100);
+            }
+        }
+
+        logo.addEventListener('click', () => showPage('landing-page'));
+        authLogo.addEventListener('click', () => showPage('landing-page'));
+        loginLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage('auth-page');
+        });
+        signupLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage('auth-page');
+        });
+        exploreCollections.addEventListener('click', (e) => {
+            e.preventDefault();
+            // Scroll to products section
+            document.querySelector('.premium-pottery').scrollIntoView({ behavior: 'smooth' });
+        });
+        authBackButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage('landing-page');
+        });
+
+        // Authentication Functionality
+        const loginForm = document.getElementById('loginForm');
+        const signupForm = document.getElementById('signupForm');
+        const loginTab = document.querySelector('[data-tab="login"]');
+        const signupTab = document.querySelector('[data-tab="signup"]');
+        const switchToSignup = document.getElementById('switchToSignup');
+        const switchToLogin = document.getElementById('switchToLogin');
+        const messageDiv = document.getElementById('message');
+        const loadingDiv = document.getElementById('loading');
+        const loginPasswordToggle = document.getElementById('loginPasswordToggle');
+        const signupPasswordToggle = document.getElementById('signupPasswordToggle');
+        const confirmPasswordToggle = document.getElementById('confirmPasswordToggle');
+        const googleLoginBtn = document.getElementById('googleLoginBtn');
+        const googleSignupBtn = document.getElementById('googleSignupBtn');
+        const forgotPasswordLink = document.getElementById('forgotPassword');
+
+        // Tab Switching
+        loginTab.addEventListener('click', () => switchAuthTab('login'));
+        signupTab.addEventListener('click', () => switchAuthTab('signup'));
+        switchToSignup.addEventListener('click', (e) => {
+            e.preventDefault();
+            switchAuthTab('signup');
+        });
+        switchToLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            switchAuthTab('login');
+        });
+
+        function switchAuthTab(tab) {
+            if (tab === 'login') {
+                loginTab.classList.add('active');
+                signupTab.classList.remove('active');
+                loginForm.classList.add('active');
+                signupForm.classList.remove('active');
+            } else {
+                loginTab.classList.remove('active');
+                signupTab.classList.add('active');
+                loginForm.classList.remove('active');
+                signupForm.classList.add('active');
+            }
+            hideMessage();
+        }
+
+        // Password Toggle
+        function setupPasswordToggle(toggleBtn, passwordField) {
+            toggleBtn.addEventListener('click', () => {
+                const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordField.setAttribute('type', type);
+                toggleBtn.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+            });
+        }
+
+        setupPasswordToggle(loginPasswordToggle, document.getElementById('loginPassword'));
+        setupPasswordToggle(signupPasswordToggle, document.getElementById('signupPassword'));
+        setupPasswordToggle(confirmPasswordToggle, document.getElementById('confirmPassword'));
+
+        // Show Message
+        function showMessage(message, type) {
+            messageDiv.textContent = message;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+        }
+
+        function hideMessage() {
+            messageDiv.style.display = 'none';
+        }
+
+        // Show/Hide Loading
+        function showLoading() {
+            loadingDiv.style.display = 'block';
+        }
+
+        function hideLoading() {
+            loadingDiv.style.display = 'none';
+        }
+
+        // Form Validation
+        function validateSignupForm() {
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const phone = document.getElementById('signupPhone').value.trim();
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const agreeTerms = document.getElementById('agreeTerms').checked;
+
+            if (name.length < 2) {
+                showMessage('Please enter a valid name', 'error');
+                return false;
+            }
+
+            if (!isValidEmail(email)) {
+                showMessage('Please enter a valid email address', 'error');
+                return false;
+            }
+
+            if (!isValidPhone(phone)) {
+                showMessage('Please enter a valid phone number', 'error');
+                return false;
+            }
+
+            if (password.length < 6) {
+                showMessage('Password must be at least 6 characters', 'error');
+                return false;
+            }
+
+            if (password !== confirmPassword) {
+                showMessage('Passwords do not match', 'error');
+                return false;
+            }
+
+            if (!agreeTerms) {
+                showMessage('Please agree to the Terms of Service and Privacy Policy', 'error');
+                return false;
+            }
+
+            return true;
+        }
+
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        function isValidPhone(phone) {
+            const phoneRegex = /^\d{10}$/;
+            return phoneRegex.test(phone);
+        }
+
+        // Login with Email/Password
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                showMessage('Please fill in all fields', 'error');
+                return;
+            }
+
+            showLoading();
+            
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Signed in
+                    const user = userCredential.user;
+                    showMessage('Login successful!', 'success');
+                    
+                    // Update user data in Firestore if needed
+                    updateUserData(user);
+                    
+                    // Redirect to landing page after a short delay
+                    setTimeout(() => {
+                        showPage('landing-page');
+                    }, 1500);
+                })
+                .catch((error) => {
+                    hideLoading();
+                    const errorCode = error.code;
+                    let errorMessage = 'An error occurred during login';
+                    
+                    if (errorCode === 'auth/user-not-found') {
+                        errorMessage = 'No account found with this email';
+                    } else if (errorCode === 'auth/wrong-password') {
+                        errorMessage = 'Incorrect password';
+                    } else if (errorCode === 'auth/invalid-email') {
+                        errorMessage = 'Invalid email address';
+                    } else if (errorCode === 'auth/too-many-requests') {
+                        errorMessage = 'Too many failed attempts. Please try again later';
+                    }
+                    
+                    showMessage(errorMessage, 'error');
+                });
+        });
+
+        // Signup with Email/Password
+        signupForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            if (!validateSignupForm()) {
+                return;
+            }
+
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const countryCode = document.getElementById('countryCode').value;
+            const phone = document.getElementById('signupPhone').value.trim();
+            const password = document.getElementById('signupPassword').value;
+
+            showLoading();
+
+            auth.createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Signed up
+                    const user = userCredential.user;
+                    
+                    // Save user data to Firestore
+                    return db.collection('users').doc(user.uid).set({
+                        name: name,
+                        email: email,
+                        phone: countryCode + phone,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                })
+                .then(() => {
+                    showMessage('Account created successfully!', 'success');
+                    
+                    // Redirect to landing page after a short delay
+                    setTimeout(() => {
+                        showPage('landing-page');
+                    }, 1500);
+                })
+                .catch((error) => {
+                    hideLoading();
+                    const errorCode = error.code;
+                    let errorMessage = 'An error occurred during signup';
+                    
+                    if (errorCode === 'auth/email-already-in-use') {
+                        errorMessage = 'An account with this email already exists';
+                    } else if (errorCode === 'auth/weak-password') {
+                        errorMessage = 'Password is too weak';
+                    } else if (errorCode === 'auth/invalid-email') {
+                        errorMessage = 'Invalid email address';
+                    }
+                    
+                    showMessage(errorMessage, 'error');
+                });
+        });
+
+        // Google Authentication
+        function signInWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            provider.addScope('profile');
+            provider.addScope('email');
+            
+            showLoading();
+            
+            auth.signInWithPopup(provider)
+                .then((result) => {
+                    // This gives you a Google Access Token
+                    const credential = result.credential;
+                    const token = credential.accessToken;
+                    
+                    // The signed-in user info
+                    const user = result.user;
+                    
+                    // Check if user exists in Firestore
+                    const userRef = db.collection('users').doc(user.uid);
+                    
+                    userRef.get().then((doc) => {
+                        if (doc.exists) {
+                            // User exists, update last login
+                            userRef.update({
+                                lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                        } else {
+                            // User doesn't exist, create new document
+                            userRef.set({
+                                name: user.displayName,
+                                email: user.email,
+                                phone: user.phoneNumber || '',
+                                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                                lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                        }
+                        
+                        showMessage('Login successful!', 'success');
+                        
+                        // Redirect to landing page after a short delay
+                        setTimeout(() => {
+                            showPage('landing-page');
+                        }, 1500);
+                    });
+                })
+                .catch((error) => {
+                    hideLoading();
+                    const errorCode = error.code;
+                    let errorMessage = 'An error occurred during Google authentication';
+                    
+                    if (errorCode === 'auth/popup-closed-by-user') {
+                        errorMessage = 'Authentication cancelled';
+                    } else if (errorCode === 'auth/popup-blocked') {
+                        errorMessage = 'Popup was blocked by your browser. Please allow popups for this site';
+                    }
+                    
+                    showMessage(errorMessage, 'error');
+                });
+        }
+
+        googleLoginBtn.addEventListener('click', signInWithGoogle);
+        googleSignupBtn.addEventListener('click', signInWithGoogle);
+
+        // Forgot Password
+        forgotPasswordLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            
+            if (!email) {
+                showMessage('Please enter your email address to reset password', 'error');
+                return;
+            }
+            
+            if (!isValidEmail(email)) {
+                showMessage('Please enter a valid email address', 'error');
+                return;
+            }
+            
+            showLoading();
+            
+            auth.sendPasswordResetEmail(email)
+                .then(() => {
+                    hideLoading();
+                    showMessage('Password reset email sent! Check your inbox.', 'success');
+                })
+                .catch((error) => {
+                    hideLoading();
+                    const errorCode = error.code;
+                    let errorMessage = 'An error occurred while sending reset email';
+                    
+                    if (errorCode === 'auth/user-not-found') {
+                        errorMessage = 'No account found with this email';
+                    } else if (errorCode === 'auth/invalid-email') {
+                        errorMessage = 'Invalid email address';
+                    }
+                    
+                    showMessage(errorMessage, 'error');
+                });
+        });
+
+        // Update user data in Firestore
+        function updateUserData(user) {
+            const userRef = db.collection('users').doc(user.uid);
+            
+            userRef.get().then((doc) => {
+                if (doc.exists) {
+                    // Update last login
+                    userRef.update({
+                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+            });
+        }
+
+        // Check if user is already logged in
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // User is signed in
+                console.log('User is signed in:', user);
+            }
+        });
+
+        // Initialize Seller Location Map
+        function initSellerLocationMap() {
+            // Check if map is already initialized
+            if (window.sellerLocationMap) {
+                window.sellerLocationMap.remove();
+            }
+            
+            const map = L.map('sellerLocationMap').setView([26.9124, 75.7873], 10); // Jaipur coordinates
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            // Add sample artisan markers
+            const artisans = [
+                { name: 'Rajesh Pottery Studio', lat: 26.9124, lng: 75.7873, type: 'pottery' },
+                { name: 'Meera Ceramic Arts', lat: 26.9224, lng: 75.7973, type: 'ceramics' },
+                { name: 'Traditional Clay Crafts', lat: 26.9024, lng: 75.7773, type: 'traditional' },
+                { name: 'Modern Pottery House', lat: 26.9324, lng: 75.8073, type: 'modern' }
+            ];
+            
+            artisans.forEach(artisan => {
+                const iconColor = getIconColor(artisan.type);
+                
+                const marker = L.marker([artisan.lat, artisan.lng])
+                    .addTo(map)
+                    .bindPopup(`
+                        <div style="text-align: center;">
+                            <h3>${artisan.name}</h3>
+                            <p>${getArtisanType(artisan.type)}</p>
+                            <button class="btn btn-primary" style="margin-top: 10px; padding: 5px 10px; font-size: 12px;">
+                                View Products
+                            </button>
+                        </div>
+                    `);
+            });
+            
+            // Add user location marker
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    const userLat = position.coords.latitude;
+                    const userLng = position.coords.longitude;
+                    
+                    L.marker([userLat, userLng])
+                        .addTo(map)
+                        .bindPopup('Your Location')
+                        .openPopup();
+                });
+            }
+            
+            // Store map reference
+            window.sellerLocationMap = map;
+        }
+
+        function getIconColor(type) {
+            const colors = {
+                pottery: 'brown',
+                ceramics: 'red',
+                traditional: 'green',
+                modern: 'blue'
+            };
+            return colors[type] || 'gray';
+        }
+
+        function getArtisanType(type) {
+            const types = {
+                pottery: 'Traditional Pottery',
+                ceramics: 'Ceramic Arts',
+                traditional: 'Traditional Crafts',
+                modern: 'Modern Designs'
+            };
+            return types[type] || 'Pottery Artisan';
+        }
+
+        // Load Products from Firestore
+        function loadProducts() {
+            const productsContainer = document.getElementById('productsContainer');
+            productsContainer.innerHTML = '';
+            
+            db.collection('pottery').get()
+                .then((querySnapshot) => {
+                    if (querySnapshot.empty) {
+                        // If no products, show sample products
+                        loadSampleProducts();
+                        return;
+                    }
+                    
+                    querySnapshot.forEach((doc) => {
+                        const product = doc.data();
+                        const productId = doc.id;
+                        
+                        const productCard = createProductCard(product, productId);
+                        productsContainer.appendChild(productCard);
+                    });
+                    
+                    setupBookNowButtons();
+                })
+                .catch((error) => {
+                    console.error('Error loading products: ', error);
+                    loadSampleProducts();
+                });
+        }
+
+        // Create Product Card
+        function createProductCard(product, productId) {
+            const productCard = document.createElement('div');
+            productCard.className = 'product-card';
+            productCard.setAttribute('data-product', productId);
+            
+            productCard.innerHTML = `
+                <div class="product-image">
+                    <img src="${product.image || 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80'}" alt="${product.name}">
+                    <span class="product-badge">${product.badge || 'Premium'}</span>
+                </div>
+                <div class="product-info">
+                    <h3>${product.name}</h3>
+                    <div class="product-seller">
+                        <div class="seller-avatar"></div>
+                        <span>${product.artisan || 'Master Artisan'}</span>
+                    </div>
+                    <div class="product-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>${product.location || 'Jaipur, Rajasthan'}</span>
+                    </div>
+                    <div class="product-price">
+                        <span class="price">₹${product.price}</span>
+                        <button class="book-now" data-product='${JSON.stringify(product)}'>
+                            Book Now
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            return productCard;
+        }
+
+        // Load Sample Products if no products in database
+        function loadSampleProducts() {
+            const productsContainer = document.getElementById('productsContainer');
+            
+            const sampleProducts = [
+                {
+                    id: 1,
+                    name: 'Handcrafted Terracotta Vase',
+                    price: 4500,
+                    artisan: 'Rajesh Pottery Studio',
+                    location: 'Jaipur, Rajasthan',
+                    badge: 'Premium',
+                    image: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80'
+                },
+                {
+                    id: 2,
+                    name: 'Blue Pottery Platter',
+                    price: 3200,
+                    artisan: 'Meera Ceramic Arts',
+                    location: 'Jaipur, Rajasthan',
+                    badge: 'Traditional',
+                    image: 'https://images.unsplash.com/photo-1549289524-06cf8837ace5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80'
+                },
+                {
+                    id: 3,
+                    name: 'Ceramic Tea Set',
+                    price: 6800,
+                    artisan: 'Traditional Clay Crafts',
+                    location: 'Jaipur, Rajasthan',
+                    badge: 'Luxury',
+                    image: 'https://images.unsplash.com/photo-1576585234347-9f5c0e960a2f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80'
+                },
+                {
+                    id: 4,
+                    name: 'Hand-Painted Ceramic Bowl',
+                    price: 2500,
+                    artisan: 'Modern Pottery House',
+                    location: 'Jaipur, Rajasthan',
+                    badge: 'Artisanal',
+                    image: 'https://images.unsplash.com/photo-1577985057584-707fba5a8668?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80'
+                },
+                {
+                    id: 5,
+                    name: 'Traditional Water Pot',
+                    price: 3800,
+                    artisan: 'Rajesh Pottery Studio',
+                    location: 'Jaipur, Rajasthan',
+                    badge: 'Heritage',
+                    image: 'https://images.unsplash.com/photo-1588693380314-7b06a9826a6e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80'
+                },
+                {
+                    id: 6,
+                    name: 'Contemporary Ceramic Sculpture',
+                    price: 12000,
+                    artisan: 'Modern Pottery House',
+                    location: 'Jaipur, Rajasthan',
+                    badge: 'Exclusive',
+                    image: 'https://images.unsplash.com/photo-1578911372313-3e1d64555656?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80'
+                }
+            ];
+            
+            sampleProducts.forEach(product => {
+                const productCard = createProductCard(product, product.id);
+                productsContainer.appendChild(productCard);
+            });
+            
+            setupBookNowButtons();
+        }
+
+        // Setup Book Now Buttons
+        function setupBookNowButtons() {
+            const bookNowButtons = document.querySelectorAll('.book-now');
+            
+            bookNowButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const productData = JSON.parse(button.getAttribute('data-product'));
+                    openBookingModal(productData);
+                });
+            });
+        }
+
+        // Booking Modal Functionality
+        const bookingModal = document.getElementById('bookingModal');
+        const bookingModalClose = document.getElementById('bookingModalClose');
+        const deliveryServiceSelect = document.getElementById('deliveryService');
+        const submitBookingBtn = document.getElementById('submitBooking');
+        let currentProduct = null;
+
+        bookingModalClose.addEventListener('click', () => {
+            bookingModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        });
+
+        deliveryServiceSelect.addEventListener('change', updateBookingSummary);
+
+        function openBookingModal(product) {
+            currentProduct = product;
+            
+            // Set product details in modal
+            document.getElementById('summaryProductName').textContent = product.name;
+            document.getElementById('summaryProductPrice').textContent = `₹${product.price}`;
+            
+            // Set default delivery price
+            updateBookingSummary();
+            
+            // Show modal
+            bookingModal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function updateBookingSummary() {
+            const deliveryService = deliveryServiceSelect.value;
+            let deliveryPrice = 0;
+            
+            switch(deliveryService) {
+                case 'express':
+                    deliveryPrice = 299;
+                    break;
+                case 'standard':
+                    deliveryPrice = 149;
+                    break;
+                case 'free':
+                    deliveryPrice = 0;
+                    break;
+                default:
+                    deliveryPrice = 0;
+            }
+            
+            document.getElementById('summaryDeliveryPrice').textContent = `₹${deliveryPrice}`;
+            
+            const totalPrice = currentProduct.price + deliveryPrice;
+            document.getElementById('summaryTotalPrice').textContent = `₹${totalPrice}`;
+        }
+
+        // Submit Booking
+        submitBookingBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            // Get form data
+            const customerName = document.getElementById('customerName').value;
+            const customerEmail = document.getElementById('customerEmail').value;
+            const customerPhone = document.getElementById('customerPhone').value;
+            const deliveryAddress = document.getElementById('deliveryAddress').value;
+            const deliveryDate = document.getElementById('deliveryDate').value;
+            const deliveryService = document.getElementById('deliveryService').value;
+            const specialInstructions = document.getElementById('specialInstructions').value;
+            
+            // Basic validation
+            if (!customerName || !customerEmail || !customerPhone || !deliveryAddress || !deliveryDate || !deliveryService) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            // Calculate delivery price
+            let deliveryPrice = 0;
+            switch(deliveryService) {
+                case 'express':
+                    deliveryPrice = 299;
+                    break;
+                case 'standard':
+                    deliveryPrice = 149;
+                    break;
+                case 'free':
+                    deliveryPrice = 0;
+                    break;
+            }
+            
+            const totalPrice = currentProduct.price + deliveryPrice;
+            
+            // Create booking object
+            const bookingData = {
+                product: currentProduct,
+                customer: {
+                    name: customerName,
+                    email: customerEmail,
+                    phone: customerPhone,
+                    address: deliveryAddress
+                },
+                delivery: {
+                    service: deliveryService,
+                    price: deliveryPrice,
+                    date: deliveryDate,
+                    instructions: specialInstructions
+                },
+                totalPrice: totalPrice,
+                status: 'pending',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
+            // Save booking to Firestore
+            db.collection('bookings').add(bookingData)
+                .then((docRef) => {
+                    console.log('Booking saved with ID: ', docRef.id);
+                    
+                    // Send WhatsApp notification to seller
+                    sendSellerNotification(bookingData);
+                    
+                    // Integrate with delivery service
+                    integrateWithDeliveryService(bookingData);
+                    
+                    // Show success message
+                    alert('Booking confirmed! The artisan has been notified and will contact you soon.');
+                    
+                    // Close modal
+                    bookingModal.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                    
+                    // Reset form
+                    document.getElementById('customerName').value = '';
+                    document.getElementById('customerEmail').value = '';
+                    document.getElementById('customerPhone').value = '';
+                    document.getElementById('deliveryAddress').value = '';
+                    document.getElementById('deliveryDate').value = '';
+                    document.getElementById('deliveryService').value = '';
+                    document.getElementById('specialInstructions').value = '';
+                })
+                .catch((error) => {
+                    console.error('Error saving booking: ', error);
+                    alert('There was an error processing your booking. Please try again.');
+                });
+        });
+
+        // Send WhatsApp Notification to Seller
+        function sendSellerNotification(bookingData) {
+            // In a real implementation, you would have the seller's phone number
+            // For demo purposes, we'll use a placeholder
+            const sellerPhone = '+919876543210'; // This would come from the product data
+            
+            // Create message
+            const message = `New Pottery Booking!
+            
+Product: ${bookingData.product.name}
+Customer: ${bookingData.customer.name}
+Phone: ${bookingData.customer.phone}
+Email: ${bookingData.customer.email}
+Address: ${bookingData.customer.address}
+Total: ₹${bookingData.totalPrice}
+Delivery: ${bookingData.delivery.service} (${bookingData.delivery.date})
+            
+Please contact the customer to confirm details.`;
+            
+            // Encode message for URL
+            const encodedMessage = encodeURIComponent(message);
+            
+            // Create WhatsApp URL
+            const whatsappURL = `https://wa.me/${sellerPhone}?text=${encodedMessage}`;
+            
+            // In a real implementation, you would send this via a server
+            // For demo, we'll just log it
+            console.log('WhatsApp Notification URL:', whatsappURL);
+            
+            // In a production environment, you would use a server-side service
+            // to send the actual WhatsApp message
+        }
+
+        // Integrate with Delivery Service
+        function integrateWithDeliveryService(bookingData) {
+            // This is a mock implementation of delivery service integration
+            // In a real application, you would use the actual API of the delivery service
+            
+            const deliveryServiceData = {
+                pickup_address: "123 Artisan Lane, Jaipur, Rajasthan", // Seller's address
+                delivery_address: bookingData.customer.address,
+                package_details: {
+                    description: bookingData.product.name,
+                    weight: "2 kg",
+                    dimensions: "30x30x30 cm",
+                    value: bookingData.product.price
+                },
+                customer: {
+                    name: bookingData.customer.name,
+                    phone: bookingData.customer.phone,
+                    email: bookingData.customer.email
+                },
+                delivery_type: bookingData.delivery.service,
+                preferred_delivery_date: bookingData.delivery.date
+            };
+            
+            // Mock API call to delivery service
+            console.log('Sending to delivery service:', deliveryServiceData);
+            
+            // In a real implementation, you would use fetch or axios to call the API
+            // Example:
+            /*
+            fetch('https://api.delivery-service.com/create-shipment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer YOUR_API_KEY'
+                },
+                body: JSON.stringify(deliveryServiceData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Delivery service response:', data);
+                // Save tracking information to Firestore
+                return db.collection('bookings').doc(bookingId).update({
+                    trackingId: data.tracking_id,
+                    deliveryStatus: 'scheduled'
+                });
+            })
+            .catch(error => {
+                console.error('Error with delivery service:', error);
+            });
+            */
+        }
+
+        // AI Assistant Toggle
+        const assistantToggle = document.getElementById('assistantToggle');
+        const assistantWindow = document.getElementById('assistantWindow');
+        const assistantClose = document.getElementById('assistantClose');
+
+        assistantToggle.addEventListener('click', () => {
+            assistantWindow.style.display = 'flex';
+        });
+
+        assistantClose.addEventListener('click', () => {
+            assistantWindow.style.display = 'none';
+        });
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize map and load products
+            initSellerLocationMap();
+            loadProducts();
+        });
+    </script>
+</body>
+</html>
