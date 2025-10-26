@@ -100,6 +100,11 @@
             cursor: pointer;
         }
 
+        .logo-image {
+            height: 50px;
+            width: auto;
+        }
+
         .logo h1 {
             font-size: 32px;
             color: var(--luxury-gold);
@@ -831,7 +836,8 @@
             <header class="luxury-header">
                 <div class="container">
                     <div class="header-top">
-                        <div class="logo" id="logo">
+                        <div class="logo">
+                            <img src="logo.png" alt="LuxeDecor Logo" class="logo-image">
                             <h1>Luxe<span>Decor</span></h1>
                         </div>
                         <nav class="luxury-nav">
@@ -1090,16 +1096,16 @@
                             </ul>
                         </div>
                         <div class="footer-column">
-                            <h3>Contact</h3>
+                            <h3>Contact Info</h3>
                             <ul class="footer-links">
-                                <li><i class="fas fa-map-marker-alt"></i> 123 Luxury Lane, Mumbai, India</li>
-                                <li><i class="fas fa-phone"></i> +91 98765 43210</li>
-                                <li><i class="fas fa-envelope"></i> concierge@luxedecor.com</li>
+                                <li><i class="fas fa-map-marker-alt"></i> Tarakeswar, India</li>
+                                <li><i class="fas fa-phone"></i> +91 9064703308</li>
+                                <li><i class="fas fa-envelope"></i> visionaryinnovators05@gmail.com</li>
                             </ul>
                         </div>
                     </div>
                     <div class="footer-bottom">
-                        <p>&copy; 2023 LuxeDecor. All rights reserved. Crafted with excellence.</p>
+                        <p>&copy; 2025 LuxeDecor. All rights reserved. Crafted with excellence.</p>
                     </div>
                 </div>
             </footer>
@@ -1112,12 +1118,13 @@
     <script>
         // Firebase Configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyC4wGDrRHs4gQN6p8Q9X7VqY9t8d4Jk8Xw",
-            authDomain: "luxedecor-premium.firebaseapp.com",
-            projectId: "luxedecor-premium",
-            storageBucket: "luxedecor-premium.appspot.com",
-            messagingSenderId: "123456789012",
-            appId: "1:123456789012:web:abcdef1234567890"
+            apiKey: "AIzaSyBSUaOWX7giwjq31T4ExHjZkpu2BLZJRQM",
+            authDomain: "login-page-a394f.firebaseapp.com",
+            projectId: "login-page-a394f",
+            storageBucket: "login-page-a394f.firebasestorage.app",
+            messagingSenderId: "605712065355",
+            appId: "1:605712065355:web:8019336951dc5a3dee7ece",
+            measurementId: "G-R4JBKP5KNW"
         };
 
         // Initialize Firebase
@@ -1571,139 +1578,6 @@ Thank you for being part of LuxeDecor!`;
             });
             */
         }
-    </script>
-
-    <!-- Python Backend Simulation (This would be in a separate file in production) -->
-    <script>
-        // This section simulates what the Python backend would do
-        // In production, this would be a separate Flask/FastAPI application
-
-        /*
-        # Python Backend Code (Flask Example)
-        
-        from flask import Flask, request, jsonify
-        from twilio.rest import Client
-        import requests
-        import os
-        
-        app = Flask(__name__)
-        
-        # WhatsApp Business API Configuration
-        TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID')
-        TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN')
-        TWILIO_WHATSAPP_NUMBER = os.getenv('TWILIO_WHATSAPP_NUMBER')
-        
-        # Courier API Configuration
-        BLUEDART_API_KEY = os.getenv('BLUEDART_API_KEY')
-        DELHIVERY_API_KEY = os.getenv('DELHIVERY_API_KEY')
-        
-        # Initialize Twilio client
-        client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-        
-        @app.route('/api/send-notification', methods=['POST'])
-        def send_whatsapp_notification():
-            try:
-                data = request.json
-                
-                # Extract booking information
-                seller_phone = data['product']['sellerPhone']
-                customer_name = data['customer']['name']
-                product_name = data['product']['name']
-                product_price = data['product']['price']
-                delivery_address = data['delivery']['address']
-                delivery_method = data['delivery']['method']
-                
-                # Create message template
-                message = f"""🎉 *New Booking Alert!*
-        
-        *Product:* {product_name}
-        *Price:* ₹{product_price:,}
-        *Customer:* {customer_name}
-        *Phone:* {data['customer']['phone']}
-        *Email:* {data['customer']['email']}
-        *Delivery Address:* {delivery_address}
-        *Delivery Method:* {delivery_method}
-        
-        Please contact the customer within 24 hours to confirm the order and discuss delivery details.
-        
-        Thank you for being part of LuxeDecor!"""
-                
-                # Send WhatsApp message using Twilio
-                message = client.messages.create(
-                    body=message,
-                    from_=f'whatsapp:{TWILIO_WHATSAPP_NUMBER}',
-                    to=f'whatsapp:{seller_phone}'
-                )
-                
-                # Create courier shipment
-                create_courier_shipment(data)
-                
-                return jsonify({
-                    'success': True,
-                    'message_id': message.sid,
-                    'status': 'Notification sent successfully'
-                })
-                
-            except Exception as e:
-                return jsonify({
-                    'success': False,
-                    'error': str(e)
-                }), 500
-        
-        def create_courier_shipment(booking_data):
-            # BlueDart API Integration
-            if booking_data['delivery']['method'] == 'bluedart':
-                bluedart_data = {
-                    'customer_name': booking_data['customer']['name'],
-                    'customer_phone': booking_data['customer']['phone'],
-                    'customer_address': booking_data['delivery']['address'],
-                    'seller_name': booking_data['product']['sellerName'],
-                    'seller_address': booking_data['product']['sellerLocation'],
-                    'product_name': booking_data['product']['name'],
-                    'product_value': booking_data['product']['price'],
-                    'special_instructions': booking_data['delivery']['instructions']
-                }
-                
-                # BlueDart API call would go here
-                # response = requests.post(
-                #     'https://bluedart-api.com/shipment/create',
-                #     headers={'Authorization': f'Bearer {BLUEDART_API_KEY}'},
-                #     json=bluedart_data
-                # )
-                
-                print(f"BlueDart shipment created for {booking_data['product']['name']}")
-            
-            # Delhivery API Integration
-            elif booking_data['delivery']['method'] == 'delhivery':
-                delhivery_data = {
-                    'name': booking_data['customer']['name'],
-                    'phone': booking_data['customer']['phone'],
-                    'add': booking_data['delivery']['address'],
-                    'pin': extract_pincode(booking_data['delivery']['address']),
-                    'order': f"LUXE-{booking_data['timestamp']}",
-                    'products_desc': booking_data['product']['name'],
-                    'cod_amount': '0',  # Free delivery
-                    'weight': '2.5'  # Estimated weight in kg
-                }
-                
-                # Delhivery API call would go here
-                # response = requests.post(
-                #     'https://delhivery.com/api/create_order',
-                #     headers={'Authorization': f'Bearer {DELHIVERY_API_KEY}'},
-                #     json=delhivery_data
-                # )
-                
-                print(f"Delhivery shipment created for {booking_data['product']['name']}")
-        
-        def extract_pincode(address):
-            # Simple pincode extraction (would be more robust in production)
-            import re
-            pincode_match = re.search(r'\b\d{6}\b', address)
-            return pincode_match.group() if pincode_match else '110001'
-        
-        if __name__ == '__main__':
-            app.run(debug=True, port=5000)
-        */
     </script>
 </body>
 </html>

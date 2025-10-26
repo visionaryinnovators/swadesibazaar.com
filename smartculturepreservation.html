@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AgriSphere AI | Premium Agricultural Intelligence Platform</title>
+    <title>Smart Cultural Preservation AI | AgriSphere AI</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #52796f;
-            --primary-light: #84a98c;
-            --secondary: #386641;
-            --accent: #6a994e;
+            --primary: #00ff88;
+            --primary-light: #80ffc2;
+            --secondary: #ff00aa;
+            --accent: #7700ff;
             --dark: #0a0a1a;
             --darker: #050510;
             --light: #f8f9fa;
@@ -41,7 +41,7 @@
 
         /* Glowing Elements */
         .glow {
-            position: absolute;
+            position: fixed;
             width: 300px;
             height: 300px;
             border-radius: 50%;
@@ -189,11 +189,11 @@
 
         /* Hero Section */
         .hero {
-            background: linear-gradient(rgba(5, 5, 16, 0.85), rgba(5, 5, 16, 0.9)), url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80');
+            background: linear-gradient(rgba(5, 5, 16, 0.85), rgba(5, 5, 16, 0.9)), url('https://images.unsplash.com/photo-1574269909862-7e1d70bb8078?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2076&q=80');
             background-size: cover;
             background-position: center;
             color: white;
-            padding: 8rem 0;
+            padding: 6rem 0;
             text-align: center;
             position: relative;
         }
@@ -214,13 +214,6 @@
             max-width: 800px;
             margin: 0 auto 2.5rem;
             opacity: 0.9;
-        }
-
-        .hero-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
-            margin-top: 2rem;
         }
 
         /* Features Section */
@@ -315,95 +308,153 @@
             margin-bottom: 1.5rem;
         }
 
-        .feature-link {
-            color: var(--primary);
-            font-weight: 600;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: var(--transition);
-        }
-
-        .feature-link:hover {
-            color: var(--primary-light);
-            gap: 10px;
-            text-shadow: 0 0 10px var(--primary);
-        }
-
-        /* Dashboard Preview */
-        .dashboard-preview {
-            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(119, 0, 255, 0.1));
-            color: white;
+        /* Demo Section */
+        .demo-section {
+            background: rgba(10, 10, 26, 0.5);
             padding: 5rem 0;
-            margin: 5rem 0;
-            position: relative;
-            overflow: hidden;
             border-top: 1px solid rgba(0, 255, 136, 0.1);
             border-bottom: 1px solid rgba(0, 255, 136, 0.1);
         }
 
-        .dashboard-content {
+        .demo-container {
             display: flex;
-            align-items: center;
             gap: 3rem;
+            align-items: center;
         }
 
-        .dashboard-text {
+        .demo-content {
             flex: 1;
         }
 
-        .dashboard-text h2 {
+        .demo-content h2 {
             font-size: 2.5rem;
             margin-bottom: 1.5rem;
             color: var(--primary);
             text-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
         }
 
-        .dashboard-text p {
+        .demo-content p {
             margin-bottom: 2rem;
             font-size: 1.1rem;
             opacity: 0.9;
         }
 
-        .dashboard-image {
+        .demo-interface {
             flex: 1;
             background: rgba(10, 10, 26, 0.7);
             border-radius: 15px;
             overflow: hidden;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 30px rgba(0, 255, 136, 0.2);
             border: 1px solid rgba(0, 255, 136, 0.1);
-        }
-
-        .dashboard-image img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-
-        /* Stats Section */
-        .stats {
+            height: 500px;
             display: flex;
-            justify-content: space-around;
+            flex-direction: column;
+        }
+
+        .demo-header {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            padding: 1rem;
             text-align: center;
-            margin: 4rem 0;
+            font-weight: bold;
         }
 
-        .stat-item {
+        .demo-body {
+            flex: 1;
             padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
         }
 
-        .stat-number {
+        .demo-option {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid rgba(0, 255, 136, 0.1);
+        }
+
+        .demo-option:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
+        }
+
+        .demo-option.active {
+            background: rgba(0, 255, 136, 0.1);
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+        }
+
+        .demo-result {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 10px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            border: 1px solid rgba(0, 255, 136, 0.1);
+        }
+
+        .demo-result i {
             font-size: 3rem;
-            font-weight: 700;
             color: var(--primary);
-            display: block;
-            text-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+            margin-bottom: 1rem;
+            text-shadow: 0 0 15px var(--primary);
         }
 
-        .stat-label {
-            color: var(--gray);
-            font-size: 1.1rem;
+        /* Process Section */
+        .process-steps {
+            display: flex;
+            justify-content: space-between;
+            margin: 4rem 0;
+            position: relative;
+        }
+
+        .process-steps::before {
+            content: '';
+            position: absolute;
+            top: 40px;
+            left: 10%;
+            right: 10%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            z-index: 0;
+        }
+
+        .process-step {
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            flex: 1;
+        }
+
+        .step-number {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 1.8rem;
+            font-weight: bold;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+        }
+
+        .step-content h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .step-content p {
+            color: rgba(248, 249, 250, 0.7);
         }
 
         /* Testimonials */
@@ -606,7 +657,7 @@
 
         /* Responsive Design */
         @media (max-width: 992px) {
-            .dashboard-content {
+            .demo-container {
                 flex-direction: column;
             }
             
@@ -616,6 +667,15 @@
             
             nav ul {
                 gap: 1rem;
+            }
+            
+            .process-steps {
+                flex-direction: column;
+                gap: 2rem;
+            }
+            
+            .process-steps::before {
+                display: none;
             }
         }
 
@@ -638,15 +698,9 @@
                 font-size: 1.1rem;
             }
             
-            .hero-buttons {
-                flex-direction: column;
-                align-items: center;
+            .features-grid {
+                grid-template-columns: 1fr;
             }
-            
-            .stats {
-                flex-direction: column;
-            }
-            
         }
     </style>
 </head>
@@ -666,11 +720,11 @@
                 </div>
                 <nav>
                     <ul>
-                        <li><a href="#features">Solutions</a></li>
-                        <li><a href="#dashboard">Dashboard</a></li>
-                        <li><a href="#testimonials">Testimonials</a></li>
-                        <li><a href="#about">About</a></li>
-                        <li><a href="#contact">Contact</a></li>
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">Solutions</a></li>
+                        <li><a href="#">Dashboard</a></li>
+                        <li><a href="#">About</a></li>
+                        <li><a href="#">Contact</a></li>
                     </ul>
                 </nav>
                 <div class="auth-buttons">
@@ -684,191 +738,190 @@
     <!-- Hero Section -->
     <section class="hero">
         <div class="container">
-            <h2>Revolutionizing Agriculture with AI Intelligence</h2>
-            <p>An integrated platform connecting farmers, businesses, and communities through cutting-edge AI solutions for sustainable agriculture and rural development.</p>
+            <h2>Smart Cultural Preservation AI</h2>
+            <p>Preserving cultural heritage through artificial intelligence. Record, analyze, and share local folklore, songs, rituals, and crafts with interactive digital tutorials for education and tourism.</p>
             <div class="hero-buttons">
-                <a href="#" class="btn btn-primary">Explore Solutions</a>
+                <a href="#" class="btn btn-primary">Start Preserving Culture</a>
                 <a href="#" class="btn btn-outline">Watch Demo</a>
             </div>
         </div>
     </section>
 
     <!-- Features Section -->
-    <section class="container" id="features">
+    <section class="container">
         <div class="section-title">
-            <h2>Our Innovative Solutions</h2>
+            <h2>How It Works</h2>
         </div>
         <div class="features-grid">
-            <!-- Crop Swap Feature -->
+            <!-- Feature 1 -->
             <div class="feature-card">
                 <div class="feature-icon">
-                    <i class="fas fa-exchange-alt"></i>
+                    <i class="fas fa-record-vinyl"></i>
                 </div>
                 <div class="feature-content">
-                    <h3>AI-Powered Crop Swap</h3>
-                    <p>Digitally swap surplus crops or seeds with neighbors instead of selling at low prices. AI predicts needs, optimal routes, and minimizes wastage.</p>
-                    <a href="agswap.html" class="feature-link">Explore <i class="fas fa-arrow-right"></i></a>
+                    <h3>Cultural Recording</h3>
+                    <p>AI-powered tools to record and digitize local folklore, songs, rituals, and traditional crafts with high fidelity.</p>
                 </div>
             </div>
 
-            <!-- Repair Assistant Feature -->
+            <!-- Feature 2 -->
             <div class="feature-card">
                 <div class="feature-icon">
-                    <i class="fas fa-tools"></i>
+                    <i class="fas fa-brain"></i>
                 </div>
                 <div class="feature-content">
-                    <h3>Digital Micro-Repair Assistant</h3>
-                    <p>AI app teaches villagers to repair tools, motors, or machines step by step via AR or animations. Scan broken tools for instant repair guidance.</p>
-                    <a href="microrepair.html" class="feature-link">Explore <i class="fas fa-arrow-right"></i></a>
+                    <h3>AI Analysis</h3>
+                    <p>Advanced algorithms analyze cultural patterns, identify unique elements, and categorize content for preservation.</p>
                 </div>
             </div>
 
-            <!-- Waste-to-Resource Feature -->
+            <!-- Feature 3 -->
             <div class="feature-card">
                 <div class="feature-icon">
-                    <i class="fas fa-recycle"></i>
+                    <i class="fas fa-graduation-cap"></i>
                 </div>
                 <div class="feature-content">
-                    <h3>Hyperlocal Waste-to-Resource Map</h3>
-                    <p>AI maps local garbage, unused materials, and suggests ways to convert them into energy, compost, or craft materials.</p>
-                    <a href="hyperlocalewaste.html" class="feature-link">Explore <i class="fas fa-arrow-right"></i></a>
+                    <h3>Interactive Tutorials</h3>
+                    <p>Generate step-by-step digital tutorials that teach traditional crafts and rituals to new generations.</p>
                 </div>
             </div>
 
-            <!-- Water Sharing Feature -->
+            <!-- Feature 4 -->
             <div class="feature-card">
                 <div class="feature-icon">
-                    <i class="fas fa-tint"></i>
+                    <i class="fas fa-globe"></i>
                 </div>
                 <div class="feature-content">
-                    <h3>Dynamic Water Sharing Platform</h3>
-                    <p>In water-scarce areas, digitally share water from wells or ponds. AI predicts needs and optimizes availability.</p>
-                    <a href="dynamicwater.html" class="feature-link">Explore <i class="fas fa-arrow-right"></i></a>
-                </div>
-            </div>
-
-            <!-- Cultural Preservation Feature -->
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-monument"></i>
-                </div>
-                <div class="feature-content">
-                    <h3>Smart Cultural Preservation AI</h3>
-                    <p>AI records local folklore, songs, rituals, crafts, then generates interactive digital tutorials for education and tourism.</p>
-                    <a href="smartculturepreservation.html" class="feature-link">Explore <i class="fas fa-arrow-right"></i></a>
-                </div>
-            </div>
-
-            <!-- Emergency Transport Feature -->
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-ambulance"></i>
-                </div>
-                <div class="feature-content">
-                    <h3>AI-Powered Emergency Micro-Transport</h3>
-                    <p>Coordinates local vehicles, predicts fastest routes, and alerts drivers during emergencies in areas lacking ambulances.</p>
-                    <a href="transport.html" class="feature-link">Explore <i class="fas fa-arrow-right"></i></a>
-                </div>
-            </div>
-
-            <!-- Energy Harvesting Feature -->
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-solar-panel"></i>
-                </div>
-                <div class="feature-content">
-                    <h3>Personal Energy Harvesting Tracker</h3>
-                    <p>Simulates solar, wind, or human energy collection. AI suggests how to maximize energy usage & storage for each household.</p>
-                    <a href="personalenergyhervesting.html" class="feature-link">Explore <i class="fas fa-arrow-right"></i></a>
+                    <h3>Global Access</h3>
+                    <p>Share preserved cultural heritage with the world through immersive digital experiences for tourism and education.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Dashboard Preview -->
-    <section class="dashboard-preview" id="dashboard">
+    <!-- Demo Section -->
+    <section class="demo-section">
         <div class="container">
-            <div class="dashboard-content">
-                <div class="dashboard-text">
-                    <h2>Unified Agricultural Intelligence Dashboard</h2>
-                    <p>Our integrated platform brings all agricultural solutions together in one seamless interface. Monitor crop swaps, resource allocation, repair requests, and energy harvesting from a single dashboard.</p>
-                    <p>AI-powered insights help you make data-driven decisions for maximum efficiency and sustainability.</p>
-                    <a href="#" class="btn btn-primary">Experience Dashboard</a>
+            <div class="demo-container">
+                <div class="demo-content">
+                    <h2>Experience Cultural Preservation AI</h2>
+                    <p>Try our interactive demo to see how AI can transform cultural preservation. Select a cultural element to explore how our technology works.</p>
+                    <p>The AI analyzes patterns, creates digital representations, and generates educational content automatically.</p>
+                    <a href="#" class="btn btn-primary">Get Full Access</a>
                 </div>
-                <div class="dashboard-image">
-                    <!-- Placeholder for dashboard image -->
-                    <div style="background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(119, 0, 255, 0.2)); height: 300px; display: flex; align-items: center; justify-content: center; color: white; position: relative;">
-                        <i class="fas fa-chart-line" style="font-size: 5rem; color: var(--primary); text-shadow: 0 0 20px var(--primary);"></i>
-                        <div style="position: absolute; top: 20px; left: 20px; color: var(--primary); font-weight: bold;">Live Analytics</div>
-                        <div style="position: absolute; bottom: 20px; right: 20px; color: var(--secondary); font-weight: bold;">AI Predictions</div>
+                <div class="demo-interface">
+                    <div class="demo-header">
+                        Cultural Preservation AI Demo
+                    </div>
+                    <div class="demo-body">
+                        <div class="demo-option active" data-content="folklore">
+                            <h3>Folklore & Stories</h3>
+                            <p>Record and analyze traditional stories and oral histories</p>
+                        </div>
+                        <div class="demo-option" data-content="music">
+                            <h3>Traditional Music</h3>
+                            <p>Capture and preserve traditional songs and musical patterns</p>
+                        </div>
+                        <div class="demo-option" data-content="crafts">
+                            <h3>Traditional Crafts</h3>
+                            <p>Document and teach traditional crafting techniques</p>
+                        </div>
+                        <div class="demo-option" data-content="rituals">
+                            <h3>Cultural Rituals</h3>
+                            <p>Record and analyze traditional ceremonies and rituals</p>
+                        </div>
+                        <div class="demo-result" id="demo-result">
+                            <i class="fas fa-record-vinyl"></i>
+                            <h3>Folklore Analysis</h3>
+                            <p>AI is analyzing story patterns, character archetypes, and cultural motifs from recorded folklore.</p>
+                            <div class="progress-bar" style="width: 100%; height: 10px; background: rgba(255,255,255,0.2); border-radius: 5px; margin-top: 1rem;">
+                                <div style="width: 75%; height: 100%; background: var(--primary); border-radius: 5px;"></div>
+                            </div>
+                            <p style="margin-top: 0.5rem;">75% Analysis Complete</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Stats Section -->
+    <!-- Process Section -->
     <section class="container">
-        <div class="stats">
-            <div class="stat-item">
-                <span class="stat-number">15K+</span>
-                <span class="stat-label">Farmers Connected</span>
+        <div class="section-title">
+            <h2>The Preservation Process</h2>
+        </div>
+        <div class="process-steps">
+            <div class="process-step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3>Record</h3>
+                    <p>Use our mobile app to record cultural elements with high-quality audio and video.</p>
+                </div>
             </div>
-            <div class="stat-item">
-                <span class="stat-number">42%</span>
-                <span class="stat-label">Reduction in Food Waste</span>
+            <div class="process-step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3>Analyze</h3>
+                    <p>AI algorithms process and analyze the cultural content, identifying patterns and unique elements.</p>
+                </div>
             </div>
-            <div class="stat-item">
-                <span class="stat-number">78%</span>
-                <span class="stat-label">Cost Savings</span>
+            <div class="process-step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3>Generate</h3>
+                    <p>Create interactive tutorials, 3D models, and educational content automatically.</p>
+                </div>
             </div>
-            <div class="stat-item">
-                <span class="stat-number">96%</span>
-                <span class="stat-label">User Satisfaction</span>
+            <div class="process-step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h3>Share</h3>
+                    <p>Distribute preserved culture through digital platforms for education and tourism.</p>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- Testimonials -->
-    <section class="testimonials" id="testimonials">
+    <section class="testimonials">
         <div class="container">
             <div class="section-title">
-                <h2>Success Stories</h2>
+                <h2>Cultural Preservation Success Stories</h2>
             </div>
             <div class="testimonial-grid">
                 <div class="testimonial-card">
                     <div class="testimonial-text">
-                        "The crop swap feature transformed how we distribute our surplus. Instead of selling at low prices, we now exchange with neighboring farms, saving money and reducing waste."
+                        "The Cultural Preservation AI helped our community document traditional weaving techniques that were at risk of being lost. Now we have interactive tutorials that teach the next generation."
                     </div>
                     <div class="testimonial-author">
-                        <div class="author-avatar">RK</div>
+                        <div class="author-avatar">MP</div>
                         <div class="author-info">
-                            <h4>Rajesh Kumar</h4>
-                            <p>Farm Owner, Punjab</p>
+                            <h4>Maria Perez</h4>
+                            <p>Cultural Heritage Director, Oaxaca</p>
                         </div>
                     </div>
                 </div>
                 <div class="testimonial-card">
                     <div class="testimonial-text">
-                        "The repair assistant helped our village fix irrigation pumps and farming tools without waiting for technicians. It's like having an expert available 24/7."
+                        "We recorded over 200 traditional songs from our elders. The AI analysis helped us identify patterns and connections we never noticed before. It's like discovering our culture all over again."
                     </div>
                     <div class="testimonial-author">
-                        <div class="author-avatar">SP</div>
+                        <div class="author-avatar">KW</div>
                         <div class="author-info">
-                            <h4>Sunita Patel</h4>
-                            <p>Village Leader, Maharashtra</p>
+                            <h4>Kofi Williams</h4>
+                            <p>Community Leader, Ghana</p>
                         </div>
                     </div>
                 </div>
                 <div class="testimonial-card">
                     <div class="testimonial-text">
-                        "Water sharing during drought season used to cause conflicts. Now with AI predictions, we have a fair system that ensures everyone gets what they need."
+                        "The interactive tutorials generated by the AI have become a valuable resource for our cultural tourism program. Visitors can now learn traditional crafts during their stay."
                     </div>
                     <div class="testimonial-author">
-                        <div class="author-avatar">AM</div>
+                        <div class="author-avatar">AR</div>
                         <div class="author-info">
-                            <h4>Anil Mehta</h4>
-                            <p>Agricultural Business Owner</p>
+                            <h4>Anika Roy</h4>
+                            <p>Tourism Director, Rajasthan</p>
                         </div>
                     </div>
                 </div>
@@ -877,11 +930,11 @@
     </section>
 
     <!-- CTA Section -->
-    <section class="cta" id="contact">
+    <section class="cta">
         <div class="container">
-            <h2>Ready to Transform Your Agricultural Operations?</h2>
-            <p>Join thousands of farmers and businesses already using AgriSphere AI to increase efficiency, reduce waste, and build sustainable communities.</p>
-            <a href="#" class="btn btn-primary">Get Started Today</a>
+            <h2>Start Preserving Your Cultural Heritage Today</h2>
+            <p>Join communities around the world using AI to safeguard their cultural traditions for future generations.</p>
+            <a href="#" class="btn btn-primary">Get Started Now</a>
         </div>
     </section>
 
@@ -912,18 +965,31 @@
                 <div class="footer-column">
                     <h3>Company</h3>
                     <ul class="footer-links">
-                        <li><a href="aboutus.html">About Us</a></li>
-                        <li><a href="ourteam.html">Our Team</a></li>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Our Team</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Press</a></li>
+                        <li><a href="#">Contact</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
-                    <h3>Contact Info</h3>
+                    <h3>Resources</h3>
                     <ul class="footer-links">
-                        <li><i class="fas fa-map-marker-alt"></i> Tarakeswar, India</li>
-                        <li><i class="fas fa-phone"></i> +91 9064703308</li>
-                        <li><i class="fas fa-envelope"></i> visionaryinnovators05@gmail.com</li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Case Studies</a></li>
+                        <li><a href="#">Webinars</a></li>
+                        <li><a href="#">Documentation</a></li>
+                        <li><a href="#">Support</a></li>
                     </ul>
                 </div>
+            </div>
+            <div class="footer-column">
+                <h3>Contact Info</h3>
+                <ul class="footer-links">
+                    <li><i class="fas fa-map-marker-alt"></i> Tarakeswar, India</li>
+                    <li><i class="fas fa-phone"></i> +91 9064703308</li>
+                    <li><i class="fas fa-envelope"></i> visionaryinnovators05@gmail.com</li>
+                </ul>
             </div>
             <div class="copyright">
                 <p>&copy; 2025 AgriSphere AI. All rights reserved.</p>
@@ -932,6 +998,58 @@
     </footer>
 
     <script>
+        // Demo interaction
+        document.querySelectorAll('.demo-option').forEach(option => {
+            option.addEventListener('click', function() {
+                // Remove active class from all options
+                document.querySelectorAll('.demo-option').forEach(opt => {
+                    opt.classList.remove('active');
+                });
+                
+                // Add active class to clicked option
+                this.classList.add('active');
+                
+                // Update demo result based on selection
+                const contentType = this.getAttribute('data-content');
+                const resultElement = document.getElementById('demo-result');
+                
+                let icon, title, description;
+                
+                switch(contentType) {
+                    case 'folklore':
+                        icon = 'fa-record-vinyl';
+                        title = 'Folklore Analysis';
+                        description = 'AI is analyzing story patterns, character archetypes, and cultural motifs from recorded folklore.';
+                        break;
+                    case 'music':
+                        icon = 'fa-music';
+                        title = 'Music Pattern Recognition';
+                        description = 'AI is identifying musical scales, rhythms, and melodic patterns unique to your cultural tradition.';
+                        break;
+                    case 'crafts':
+                        icon = 'fa-hands';
+                        title = 'Craft Technique Documentation';
+                        description = 'AI is analyzing crafting techniques and generating step-by-step instructional content.';
+                        break;
+                    case 'rituals':
+                        icon = 'fa-monument';
+                        title = 'Ritual Pattern Analysis';
+                        description = 'AI is documenting ritual sequences, symbolic elements, and cultural significance.';
+                        break;
+                }
+                
+                resultElement.innerHTML = `
+                    <i class="fas ${icon}"></i>
+                    <h3>${title}</h3>
+                    <p>${description}</p>
+                    <div class="progress-bar" style="width: 100%; height: 10px; background: rgba(255,255,255,0.2); border-radius: 5px; margin-top: 1rem;">
+                        <div style="width: 75%; height: 100%; background: var(--primary); border-radius: 5px;"></div>
+                    </div>
+                    <p style="margin-top: 0.5rem;">75% Analysis Complete</p>
+                `;
+            });
+        });
+
         // Simple script for smooth scrolling
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
@@ -948,37 +1066,6 @@
                     });
                 }
             });
-        });
-
-        // Simple animation on scroll
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        }, observerOptions);
-
-        // Observe feature cards for animation
-        document.querySelectorAll('.feature-card').forEach(card => {
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(20px)';
-            card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-            observer.observe(card);
-        });
-
-        // Observe testimonial cards for animation
-        document.querySelectorAll('.testimonial-card').forEach(card => {
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(20px)';
-            card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-            observer.observe(card);
         });
 
         // Add glowing effect to buttons on hover

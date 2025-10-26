@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pest Detection AI | AgriVision AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #00ff88;
+            --primary-dark: #00cc6a;
+            --secondary: #0a0a0a;
+            --accent: #8B4513;
+            --light: #0f1217;
+            --gray: #a0a0a0;
+            --white: #ffffff;
+            --gold: #ffd700;
+            --error: #ff4d4d;
+            --success: #00ff88;
+            --shadow: 0 10px 30px rgba(0, 255, 136, 0.15);
+            --transition: all 0.3s ease;
+            --glow: 0 0 10px rgba(0, 255, 136, 0.7);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--white);
+            background-color: var(--light);
+            line-height: 1.6;
+            overflow-x: hidden;
+            background: linear-gradient(135deg, #0a0a0a 0%, #0f1217 50%, #0a1a14 100%);
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: rgba(10, 10, 10, 0.9);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .logo h1 {
+            font-size: 28px;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+            text-shadow: var(--glow);
+        }
+
+        .logo span {
+            color: var(--white);
+        }
+
+        .logo .ai-badge {
+            background: var(--gold);
+            color: var(--secondary);
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 5px;
+            font-weight: 700;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+            text-shadow: var(--glow);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--primary);
+            transition: var(--transition);
+            box-shadow: var(--glow);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .language-selector select {
+            padding: 8px 15px;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 5px;
+            background-color: rgba(10, 10, 10, 0.8);
+            font-size: 14px;
+            color: var(--white);
+        }
+
+        .auth-buttons a {
+            text-decoration: none;
+            color: var(--white);
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: var(--transition);
+        }
+
+        .auth-buttons a.login {
+            color: var(--gray);
+        }
+
+        .auth-buttons a.signup {
+            background: var(--primary);
+            color: var(--secondary);
+            font-weight: 600;
+        }
+
+        .auth-buttons a.signup:hover {
+            background: var(--primary-dark);
+            box-shadow: var(--glow);
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            height: 500px;
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1) 0%, rgba(10, 26, 20, 0.9) 100%), url('https://images.unsplash.com/photo-1597848212624-e6d4bd7dae74?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80') no-repeat center center;
+            background-size: cover;
+            color: white;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 50%, rgba(0, 255, 136, 0.1) 0%, transparent 50%);
+            z-index: 1;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-size: 52px;
+            margin-bottom: 20px;
+            line-height: 1.2;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+        }
+
+        .hero p {
+            font-size: 20px;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: var(--primary);
+            color: var(--secondary);
+            padding: 16px 35px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            box-shadow: var(--glow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: 0.5s;
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        .cta-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 255, 136, 0.4);
+        }
+
+        /* Features Section */
+        .features {
+            padding: 100px 0;
+            background-color: transparent;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-title h2 {
+            font-size: 42px;
+            color: var(--white);
+            margin-bottom: 15px;
+            text-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+        }
+
+        .section-title p {
+            color: var(--gray);
+            max-width: 700px;
+            margin: 0 auto;
+            font-size: 18px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+        }
+
+        .feature-card {
+            background: rgba(20, 25, 30, 0.7);
+            border-radius: 15px;
+            padding: 40px 30px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            text-align: center;
+            border: 1px solid rgba(0, 255, 136, 0.1);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 255, 136, 0.2);
+            border-color: var(--primary);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(0, 255, 136, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            font-size: 32px;
+            color: var(--primary);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+        }
+
+        .feature-card h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: var(--white);
+        }
+
+        .feature-card p {
+            color: var(--gray);
+            line-height: 1.8;
+        }
+
+        /* Demo Section */
+        .demo-section {
+            padding: 100px 0;
+            background: linear-gradient(135deg, rgba(15, 18, 23, 0.8) 0%, rgba(10, 26, 20, 0.8) 100%);
+            position: relative;
+        }
+
+        .demo-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(0,255,136,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.5;
+        }
+
+        .demo-container {
+            display: flex;
+            align-items: center;
+            gap: 60px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .demo-visual {
+            flex: 1;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            height: 500px;
+            background: rgba(20, 25, 30, 0.7);
+            position: relative;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .demo-header {
+            padding: 20px;
+            background: rgba(0, 255, 136, 0.1);
+            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+            text-align: center;
+        }
+
+        .demo-content {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .upload-area {
+            border: 2px dashed rgba(0, 255, 136, 0.3);
+            border-radius: 10px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary);
+            background: rgba(0, 255, 136, 0.05);
+        }
+
+        .upload-area i {
+            font-size: 48px;
+            color: var(--primary);
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .analysis-result {
+            background: rgba(30, 35, 40, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            display: none;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .pest-type {
+            background: var(--error);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .confidence {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .treatment-plan {
+            margin-top: 15px;
+        }
+
+        .treatment-plan h4 {
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .demo-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .demo-btn {
+            flex: 1;
+            padding: 12px;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 5px;
+            color: var(--white);
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .demo-btn:hover {
+            background: var(--primary);
+            color: var(--secondary);
+        }
+
+        .demo-content {
+            flex: 1;
+        }
+
+        .demo-content h2 {
+            font-size: 38px;
+            margin-bottom: 20px;
+            color: var(--white);
+            text-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+        }
+
+        .demo-content p {
+            color: var(--gray);
+            margin-bottom: 30px;
+            font-size: 18px;
+            line-height: 1.8;
+        }
+
+        .demo-features {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+
+        .demo-features li {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 16px;
+            color: var(--gray);
+        }
+
+        .demo-features i {
+            color: var(--primary);
+            font-size: 18px;
+            text-shadow: 0 0 5px rgba(0, 255, 136, 0.5);
+        }
+
+        /* How It Works Section */
+        .how-it-works {
+            padding: 100px 0;
+            background-color: transparent;
+        }
+
+        .steps-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .step-card {
+            background: rgba(20, 25, 30, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            border: 1px solid rgba(0, 255, 136, 0.1);
+            backdrop-filter: blur(10px);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .step-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 255, 136, 0.2);
+            border-color: var(--primary);
+        }
+
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background: var(--primary);
+            color: var(--secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0 auto 20px;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+        }
+
+        .step-card h3 {
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: var(--white);
+        }
+
+        .step-card p {
+            color: var(--gray);
+            line-height: 1.6;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 100px 0;
+            background: linear-gradient(135deg, rgba(10, 26, 20, 0.8) 0%, rgba(15, 18, 23, 0.8) 100%);
+            text-align: center;
+        }
+
+        .cta-section h2 {
+            font-size: 42px;
+            margin-bottom: 20px;
+            color: var(--white);
+            text-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+        }
+
+        .cta-section p {
+            color: var(--gray);
+            max-width: 700px;
+            margin: 0 auto 40px;
+            font-size: 18px;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--secondary);
+            color: white;
+            padding: 80px 0 0;
+            border-top: 1px solid rgba(0, 255, 136, 0.2);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: var(--primary);
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .footer-links a {
+            color: #CCCCCC;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+            text-shadow: 0 0 5px rgba(0, 255, 136, 0.5);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding: 30px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #999;
+            font-size: 14px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .hero h1 {
+                font-size: 42px;
+            }
+            
+            .demo-container {
+                flex-direction: column;
+            }
+            
+            .demo-visual {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-top {
+                flex-wrap: wrap;
+            }
+            
+            .nav-links {
+                order: 3;
+                margin-top: 15px;
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .hero h1 {
+                font-size: 36px;
+            }
+            
+            .hero {
+                height: 400px;
+            }
+            
+            .section-title h2 {
+                font-size: 32px;
+            }
+            
+            .features-grid, .steps-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 28px;
+            }
+            
+            .hero p {
+                font-size: 16px;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-top">
+                <div class="logo" id="logo">
+                    <h1>AgriVision<span>AI</span> <span class="ai-badge">PREMIUM</span></h1>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="index.html#features">Features</a></li>
+                    <li><a href="index.html#digital-twin">Digital Twin</a></li>
+                    <li><a href="index.html#ai-assistant">AI Assistant</a></li>
+                    <li><a href="index.html#features-showcase">Solutions</a></li>
+                </ul>
+                <div class="header-actions">
+                    <div class="language-selector">
+                        <select>
+                            <option>English</option>
+                            <option>हिन्दी</option>
+                            <option>தமிழ்</option>
+                            <option>বাংলা</option>
+                            <option>తెలుగు</option>
+                        </select>
+                    </div>
+                    <div class="auth-buttons">
+                        <a href="#" class="login" id="login-link">Login</a>
+                        <a href="#" class="signup" id="signup-link">Sign Up</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Pest Detection AI</h1>
+                <p>Advanced AI-powered pest identification with real-time detection and treatment recommendations to protect your crops.</p>
+                <a href="#demo" class="cta-button">Try Pest Detection Demo</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-title">
+                <h2>Advanced Pest Detection Capabilities</h2>
+                <p>Our AI-powered pest detection system uses advanced computer vision to identify pests with 95% accuracy</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-bug"></i>
+                    </div>
+                    <h3>Real-time Pest Identification</h3>
+                    <p>Instant detection of over 200+ common agricultural pests using advanced computer vision algorithms and deep learning models.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-prescription-bottle"></i>
+                    </div>
+                    <h3>Treatment Recommendations</h3>
+                    <p>Get precise treatment plans with organic and chemical options, dosage recommendations, and application schedules.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <h3>Early Warning System</h3>
+                    <p>Receive alerts before pests become visible to the naked eye, allowing for proactive treatment and damage prevention.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <h3>Multi-Crop Support</h3>
+                    <p>Specialized detection models for over 50 different crops including rice, wheat, corn, cotton, fruits, and vegetables.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h3>Historical Data Analysis</h3>
+                    <p>Track pest patterns over time, identify seasonal trends, and predict future outbreaks based on historical data.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>Mobile Integration</h3>
+                    <p>Capture images directly from your smartphone and get instant analysis, even in areas with limited connectivity.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Demo Section -->
+    <section class="demo-section" id="demo">
+        <div class="container">
+            <div class="demo-container">
+                <div class="demo-visual">
+                    <div class="demo-header">
+                        <h3>Pest Detection Demo</h3>
+                        <p>Upload a plant image to analyze for pests</p>
+                    </div>
+                    <div class="demo-content">
+                        <div class="upload-area" id="uploadArea">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <h4>Upload Plant Image</h4>
+                            <p>Drag & drop or click to upload an image of your crop</p>
+                            <p class="small">Supported formats: JPG, PNG, WEBP (Max 10MB)</p>
+                        </div>
+                        
+                        <div class="analysis-result" id="analysisResult">
+                            <div class="result-header">
+                                <div>
+                                    <h4>Pest Detected</h4>
+                                    <div class="pest-type" id="pestType">Aphids</div>
+                                </div>
+                                <div class="confidence" id="confidence">94% Confidence</div>
+                            </div>
+                            <p id="pestDescription">Aphids are small sap-sucking insects that can cause significant damage to crops by stunting growth and transmitting plant viruses.</p>
+                            
+                            <div class="treatment-plan">
+                                <h4>Recommended Treatment</h4>
+                                <p id="treatmentPlan">Apply neem oil solution (2%) or insecticidal soap. Repeat every 7-10 days until infestation is controlled. Introduce natural predators like ladybugs.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="demo-controls">
+                            <div class="demo-btn" id="sample1">Sample 1: Aphids</div>
+                            <div class="demo-btn" id="sample2">Sample 2: Caterpillars</div>
+                            <div class="demo-btn" id="sample3">Sample 3: Healthy Plant</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="demo-content">
+                    <h2>Try Our Pest Detection AI</h2>
+                    <p>Upload an image of your crops to instantly identify pests and receive treatment recommendations. Our AI analyzes leaf patterns, discoloration, and physical damage to detect over 200 common agricultural pests.</p>
+                    
+                    <ul class="demo-features">
+                        <li><i class="fas fa-check-circle"></i> Instant analysis with 95% accuracy</li>
+                        <li><i class="fas fa-check-circle"></i> Organic and chemical treatment options</li>
+                        <li><i class="fas fa-check-circle"></i> Multi-language support for recommendations</li>
+                        <li><i class="fas fa-check-circle"></i> Historical tracking of pest outbreaks</li>
+                        <li><i class="fas fa-check-circle"></i> Integration with your farm's digital twin</li>
+                    </ul>
+                    
+                    <a href="#" class="cta-button">Get Started with Pest Detection</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works">
+        <div class="container">
+            <div class="section-title">
+                <h2>How Pest Detection AI Works</h2>
+                <p>Our advanced AI system follows a simple yet powerful process to protect your crops</p>
+            </div>
+            <div class="steps-container">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <h3>Image Capture</h3>
+                    <p>Capture clear images of affected plant areas using your smartphone or upload existing photos from drones or cameras.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <h3>AI Analysis</h3>
+                    <p>Our deep learning models analyze the image, identifying pest types, infestation levels, and potential damage.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <h3>Instant Results</h3>
+                    <p>Receive immediate identification with confidence scores and detailed information about the detected pests.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <h3>Treatment Plan</h3>
+                    <p>Get customized treatment recommendations including organic solutions, chemical treatments, and preventive measures.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <h2>Protect Your Crops with AI-Powered Pest Detection</h2>
+            <p>Join thousands of farmers who have reduced crop loss by up to 40% using our advanced pest detection technology.</p>
+            <a href="#" class="cta-button">Start Free Trial</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>AgriVision AI</h3>
+                    <p>Your Farm's Digital Twin, Powered by AI. Revolutionizing agriculture with cutting-edge technology and traditional wisdom.</p>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="index.html#features">Features</a></li>
+                        <li><a href="index.html#digital-twin">Digital Twin</a></li>
+                        <li><a href="index.html#ai-assistant">AI Assistant</a></li>
+                        <li><a href="index.html#features-showcase">Solutions</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>AI Solutions</h3>
+                    <ul class="footer-links">
+                        <li><a href="pest-detection.html">Pest Detection AI</a></li>
+                        <li><a href="smart-irrigation.html">Smart Irrigation AI</a></li>
+                        <li><a href="yield-prediction.html">Yield Prediction AI</a></li>
+                        <li><a href="#">Soil Analysis AI</a></li>
+                        <li><a href="#">Crop Health AI</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contact Info</h3>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-map-marker-alt"></i> Tarakeswar, India</li>
+                        <li><i class="fas fa-phone"></i> +91 9064703308</li>
+                        <li><i class="fas fa-envelope"></i> visionaryinnovators05@gmail.com</li>
+                    </ul>
+                </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 AgriVision AI. All rights reserved. Proudly supporting Atmanirbhar Krishi Bharat.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Demo functionality
+        const uploadArea = document.getElementById('uploadArea');
+        const analysisResult = document.getElementById('analysisResult');
+        const pestType = document.getElementById('pestType');
+        const confidence = document.getElementById('confidence');
+        const pestDescription = document.getElementById('pestDescription');
+        const treatmentPlan = document.getElementById('treatmentPlan');
+        
+        // Sample buttons
+        const sample1 = document.getElementById('sample1');
+        const sample2 = document.getElementById('sample2');
+        const sample3 = document.getElementById('sample3');
+        
+        // Upload area click handler
+        uploadArea.addEventListener('click', () => {
+            // In a real app, this would open a file picker
+            // For demo, we'll simulate an upload
+            simulateAnalysis('Aphids', 94, 
+                'Aphids are small sap-sucking insects that can cause significant damage to crops by stunting growth and transmitting plant viruses.',
+                'Apply neem oil solution (2%) or insecticidal soap. Repeat every 7-10 days until infestation is controlled. Introduce natural predators like ladybugs.'
+            );
+        });
+        
+        // Sample 1: Aphids
+        sample1.addEventListener('click', () => {
+            simulateAnalysis('Aphids', 94, 
+                'Aphids are small sap-sucking insects that can cause significant damage to crops by stunting growth and transmitting plant viruses.',
+                'Apply neem oil solution (2%) or insecticidal soap. Repeat every 7-10 days until infestation is controlled. Introduce natural predators like ladybugs.'
+            );
+        });
+        
+        // Sample 2: Caterpillars
+        sample2.addEventListener('click', () => {
+            simulateAnalysis('Caterpillars', 87, 
+                'Caterpillars are the larval stage of butterflies and moths that feed on plant leaves, causing extensive defoliation.',
+                'Apply Bacillus thuringiensis (Bt) or spinosad-based insecticides. Remove by hand if infestation is small. Use pheromone traps for monitoring.'
+            );
+        });
+        
+        // Sample 3: Healthy Plant
+        sample3.addEventListener('click', () => {
+            pestType.textContent = 'No Pests Detected';
+            pestType.style.background = 'var(--success)';
+            confidence.textContent = '98% Confidence';
+            pestDescription.textContent = 'Your plant appears healthy with no signs of pest infestation. Continue with regular monitoring and maintenance.';
+            treatmentPlan.textContent = 'No treatment needed at this time. Continue regular care and monitoring. Consider preventive measures like companion planting.';
+            analysisResult.style.display = 'block';
+            
+            // Scroll to results
+            analysisResult.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+        
+        // Function to simulate analysis
+        function simulateAnalysis(type, conf, description, treatment) {
+            pestType.textContent = type;
+            pestType.style.background = 'var(--error)';
+            confidence.textContent = conf + '% Confidence';
+            pestDescription.textContent = description;
+            treatmentPlan.textContent = treatment;
+            analysisResult.style.display = 'block';
+            
+            // Scroll to results
+            analysisResult.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        
+        // Add drag and drop functionality
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = 'var(--primary)';
+            uploadArea.style.background = 'rgba(0, 255, 136, 0.1)';
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.borderColor = 'rgba(0, 255, 136, 0.3)';
+            uploadArea.style.background = 'transparent';
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = 'rgba(0, 255, 136, 0.3)';
+            uploadArea.style.background = 'transparent';
+            
+            // In a real app, this would process the dropped file
+            // For demo, we'll use a random pest type
+            const pests = ['Aphids', 'Whiteflies', 'Caterpillars', 'Spider Mites', 'Thrips'];
+            const randomPest = pests[Math.floor(Math.random() * pests.length)];
+            const randomConfidence = 80 + Math.floor(Math.random() * 15);
+            
+            simulateAnalysis(
+                randomPest, 
+                randomConfidence,
+                `${randomPest} are common agricultural pests that can cause significant damage to crops if not treated promptly.`,
+                'Apply appropriate organic or chemical treatment based on the specific pest. Monitor plants regularly and consider integrated pest management strategies.'
+            );
+        });
+        
+        // Add glowing effect to feature icons on hover
+        const featureIcons = document.querySelectorAll('.feature-icon');
+        featureIcons.forEach(icon => {
+            icon.addEventListener('mouseenter', () => {
+                icon.style.boxShadow = '0 0 20px rgba(0, 255, 136, 0.7)';
+            });
+            
+            icon.addEventListener('mouseleave', () => {
+                icon.style.boxShadow = '0 0 15px rgba(0, 255, 136, 0.3)';
+            });
+        });
+    </script>
+</body>
+</html>

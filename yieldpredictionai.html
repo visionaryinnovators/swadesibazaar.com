@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yield Prediction AI | AgriVision AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #00ff88;
+            --primary-dark: #00cc6a;
+            --secondary: #0a0a0a;
+            --accent: #8B4513;
+            --light: #0f1217;
+            --gray: #a0a0a0;
+            --white: #ffffff;
+            --gold: #ffd700;
+            --error: #ff4d4d;
+            --success: #00ff88;
+            --shadow: 0 10px 30px rgba(0, 255, 136, 0.15);
+            --transition: all 0.3s ease;
+            --glow: 0 0 10px rgba(0, 255, 136, 0.7);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--white);
+            background-color: var(--light);
+            line-height: 1.6;
+            overflow-x: hidden;
+            background: linear-gradient(135deg, #0a0a0a 0%, #0f1217 50%, #0a1a14 100%);
+            min-height: 100vh;
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: rgba(10, 10, 10, 0.9);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .logo-image {
+            height: 40px;
+            width: auto;
+        }
+
+        .logo-text {
+            font-size: 28px;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+            text-shadow: var(--glow);
+            font-weight: 700;
+        }
+
+        .logo span {
+            color: var(--white);
+        }
+
+        .logo .ai-badge {
+            background: var(--gold);
+            color: var(--secondary);
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 5px;
+            font-weight: 700;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+            text-shadow: var(--glow);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--primary);
+            transition: var(--transition);
+            box-shadow: var(--glow);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .auth-buttons a {
+            text-decoration: none;
+            color: var(--white);
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: var(--transition);
+        }
+
+        .auth-buttons a.login {
+            color: var(--gray);
+        }
+
+        .auth-buttons a.signup {
+            background: var(--primary);
+            color: var(--secondary);
+            font-weight: 600;
+        }
+
+        .auth-buttons a.signup:hover {
+            background: var(--primary-dark);
+            box-shadow: var(--glow);
+        }
+
+        /* Hero Section */
+        .feature-hero {
+            position: relative;
+            height: 500px;
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1) 0%, rgba(10, 26, 20, 0.9) 100%), url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2832&q=80') no-repeat center center;
+            background-size: cover;
+            color: white;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .feature-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 50%, rgba(0, 255, 136, 0.1) 0%, transparent 50%);
+            z-index: 1;
+        }
+
+        .feature-hero-content {
+            max-width: 800px;
+            z-index: 2;
+        }
+
+        .feature-hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            line-height: 1.2;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+        }
+
+        .feature-hero p {
+            font-size: 20px;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: var(--primary);
+            color: var(--secondary);
+            padding: 16px 35px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            box-shadow: var(--glow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: 0.5s;
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        .cta-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 255, 136, 0.4);
+        }
+
+        /* Feature Overview */
+        .feature-overview {
+            padding: 100px 0;
+            background-color: transparent;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-title h2 {
+            font-size: 42px;
+            color: var(--white);
+            margin-bottom: 15px;
+            text-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+        }
+
+        .section-title p {
+            color: var(--gray);
+            max-width: 700px;
+            margin: 0 auto;
+            font-size: 18px;
+        }
+
+        .overview-container {
+            display: flex;
+            align-items: center;
+            gap: 60px;
+        }
+
+        .overview-visual {
+            flex: 1;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            height: 500px;
+            background: url('https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2864&q=80') no-repeat center center;
+            background-size: cover;
+            position: relative;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+        }
+
+        .overlay-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: 600;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+
+        .overview-content {
+            flex: 1;
+        }
+
+        .overview-content h2 {
+            font-size: 38px;
+            margin-bottom: 20px;
+            color: var(--white);
+            text-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+        }
+
+        .overview-content p {
+            color: var(--gray);
+            margin-bottom: 30px;
+            font-size: 18px;
+            line-height: 1.8;
+        }
+
+        .feature-list {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+
+        .feature-list li {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 16px;
+            color: var(--gray);
+        }
+
+        .feature-list i {
+            color: var(--primary);
+            font-size: 18px;
+            text-shadow: 0 0 5px rgba(0, 255, 136, 0.5);
+        }
+
+        /* Capabilities Section */
+        .capabilities {
+            padding: 100px 0;
+            background: linear-gradient(135deg, rgba(15, 18, 23, 0.8) 0%, rgba(10, 26, 20, 0.8) 100%);
+            position: relative;
+        }
+
+        .capabilities::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(0,255,136,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.5;
+        }
+
+        .capabilities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .capability-card {
+            background: rgba(20, 25, 30, 0.7);
+            border-radius: 15px;
+            padding: 40px 30px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            text-align: center;
+            border: 1px solid rgba(0, 255, 136, 0.1);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .capability-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+        }
+
+        .capability-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 255, 136, 0.2);
+            border-color: var(--primary);
+        }
+
+        .capability-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(0, 255, 136, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            font-size: 32px;
+            color: var(--primary);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+        }
+
+        .capability-card h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: var(--white);
+        }
+
+        .capability-card p {
+            color: var(--gray);
+            line-height: 1.8;
+        }
+
+        /* Demo Section */
+        .demo-section {
+            padding: 100px 0;
+            background-color: transparent;
+        }
+
+        .demo-container {
+            display: flex;
+            align-items: center;
+            gap: 60px;
+        }
+
+        .demo-content {
+            flex: 1;
+        }
+
+        .demo-content h2 {
+            font-size: 38px;
+            margin-bottom: 20px;
+            color: var(--white);
+            text-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+        }
+
+        .demo-content p {
+            color: var(--gray);
+            margin-bottom: 30px;
+            font-size: 18px;
+            line-height: 1.8;
+        }
+
+        .demo-visual {
+            flex: 1;
+            background: rgba(20, 25, 30, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .prediction-chart {
+            height: 300px;
+            background: linear-gradient(135deg, rgba(20, 25, 30, 0.9) 0%, rgba(10, 26, 20, 0.9) 100%);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: flex-end;
+            padding: 20px;
+        }
+
+        .chart-bar {
+            flex: 1;
+            background: var(--primary);
+            margin: 0 5px;
+            border-radius: 5px 5px 0 0;
+            position: relative;
+            transition: all 0.5s ease;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+
+        .chart-bar:hover {
+            transform: scaleY(1.05);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.8);
+        }
+
+        .chart-bar::after {
+            content: attr(data-value);
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--white);
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .chart-labels {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 10px;
+        }
+
+        .chart-label {
+            color: var(--gray);
+            font-size: 12px;
+            text-align: center;
+            flex: 1;
+        }
+
+        .prediction-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .prediction-controls select {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 5px;
+            background: rgba(30, 35, 40, 0.8);
+            color: var(--white);
+            font-size: 16px;
+        }
+
+        .prediction-controls button {
+            background: var(--primary);
+            color: var(--secondary);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+
+        .prediction-controls button:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
+        }
+
+        /* Benefits Section */
+        .benefits {
+            padding: 100px 0;
+            background: linear-gradient(135deg, rgba(10, 26, 20, 0.8) 0%, rgba(15, 18, 23, 0.8) 100%);
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .benefit-card {
+            background: rgba(20, 25, 30, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: 1px solid rgba(0, 255, 136, 0.1);
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+
+        .benefit-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 255, 136, 0.2);
+            border-color: var(--primary);
+        }
+
+        .benefit-icon {
+            font-size: 40px;
+            color: var(--primary);
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+
+        .benefit-card h3 {
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: var(--white);
+        }
+
+        .benefit-card p {
+            color: var(--gray);
+            line-height: 1.8;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 100px 0;
+            background-color: transparent;
+            text-align: center;
+        }
+
+        .cta-section h2 {
+            font-size: 42px;
+            margin-bottom: 20px;
+            color: var(--white);
+            text-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+        }
+
+        .cta-section p {
+            color: var(--gray);
+            max-width: 700px;
+            margin: 0 auto 40px;
+            font-size: 18px;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--secondary);
+            color: white;
+            padding: 80px 0 0;
+            border-top: 1px solid rgba(0, 255, 136, 0.2);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: var(--primary);
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .footer-links a {
+            color: #CCCCCC;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+            text-shadow: 0 0 5px rgba(0, 255, 136, 0.5);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding: 30px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #999;
+            font-size: 14px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .feature-hero h1 {
+                font-size: 42px;
+            }
+            
+            .overview-container, .demo-container {
+                flex-direction: column;
+            }
+            
+            .overview-visual, .demo-visual {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-top {
+                flex-wrap: wrap;
+            }
+            
+            .nav-links {
+                order: 3;
+                margin-top: 15px;
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .feature-hero h1 {
+                font-size: 36px;
+            }
+            
+            .feature-hero {
+                height: 400px;
+            }
+            
+            .section-title h2 {
+                font-size: 32px;
+            }
+            
+            .capabilities-grid, .benefits-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .feature-hero h1 {
+                font-size: 28px;
+            }
+            
+            .feature-hero p {
+                font-size: 16px;
+            }
+            
+            .capabilities-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-top">
+                <div class="logo">
+                    <a href="index.html">
+                        <img src="logo.png" alt="AgriVision AI Logo" class="logo-image">
+                    </a>
+                    <div class="logo-text">AgriVision AI</div>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="index.html#features">Features</a></li>
+                    <li><a href="index.html#digital-twin">Digital Twin</a></li>
+                    <li><a href="index.html#ai-assistant">AI Assistant</a></li>
+                    <li><a href="index.html#features-showcase">Solutions</a></li>
+                </ul>
+                <div class="header-actions">
+                    <div class="auth-buttons">
+                        <a href="#" class="login">Login</a>
+                        <a href="#" class="signup">Sign Up</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Feature Hero Section -->
+    <section class="feature-hero">
+        <div class="container">
+            <div class="feature-hero-content">
+                <h1>Yield Prediction AI</h1>
+                <p>Advanced AI algorithms that accurately forecast crop yields, optimize harvest timing, and maximize profitability for your farm.</p>
+                <a href="#" class="cta-button">Start Yield Prediction</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Feature Overview -->
+    <section class="feature-overview">
+        <div class="container">
+            <div class="overview-container">
+                <div class="overview-visual">
+                    <div class="overlay-content">
+                        AI-Powered Yield Prediction Visualization
+                    </div>
+                </div>
+                <div class="overview-content">
+                    <h2>Predict Your Harvest with 95% Accuracy</h2>
+                    <p>Our Yield Prediction AI combines satellite imagery, weather data, soil analysis, and historical patterns to deliver precise yield forecasts for your specific crops and conditions.</p>
+                    
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check-circle"></i> Accurate yield forecasting with machine learning</li>
+                        <li><i class="fas fa-check-circle"></i> Real-time growth stage analysis</li>
+                        <li><i class="fas fa-check-circle"></i> Market trend integration for better planning</li>
+                        <li><i class="fas fa-check-circle"></i> Optimal harvest timing recommendations</li>
+                        <li><i class="fas fa-check-circle"></i> Profitability analysis and risk assessment</li>
+                    </ul>
+                    
+                    <a href="#" class="cta-button">Create Your Yield Prediction Model</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Capabilities Section -->
+    <section class="capabilities">
+        <div class="container">
+            <div class="section-title">
+                <h2>AI-Powered Capabilities</h2>
+                <p>Our Yield Prediction AI delivers comprehensive insights for smarter farming decisions</p>
+            </div>
+            <div class="capabilities-grid">
+                <div class="capability-card">
+                    <div class="capability-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Accurate Yield Forecasting</h3>
+                    <p>Machine learning algorithms analyze multiple data sources to predict crop yields with up to 95% accuracy, helping you plan harvests and manage resources efficiently.</p>
+                </div>
+                <div class="capability-card">
+                    <div class="capability-icon">
+                        <i class="fas fa-seedling"></i>
+                    </div>
+                    <h3>Growth Stage Analysis</h3>
+                    <p>Monitor and analyze crop development stages in real-time, identifying potential issues before they impact your final yield.</p>
+                </div>
+                <div class="capability-card">
+                    <div class="capability-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h3>Market Trend Integration</h3>
+                    <p>Combine yield predictions with current market trends and pricing data to optimize your sales strategy and maximize profits.</p>
+                </div>
+                <div class="capability-card">
+                    <div class="capability-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <h3>Harvest Timing Optimization</h3>
+                    <p>AI algorithms determine the perfect harvest window based on crop maturity, weather forecasts, and market conditions.</p>
+                </div>
+                <div class="capability-card">
+                    <div class="capability-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <h3>Profitability Analysis</h3>
+                    <p>Calculate potential profits based on predicted yields, input costs, and market prices to make informed business decisions.</p>
+                </div>
+                <div class="capability-card">
+                    <div class="capability-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h3>Risk Assessment</h3>
+                    <p>Identify potential risks to your yield from weather events, pests, or diseases and receive mitigation recommendations.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Demo Section -->
+    <section class="demo-section">
+        <div class="container">
+            <div class="demo-container">
+                <div class="demo-content">
+                    <h2>See Yield Prediction in Action</h2>
+                    <p>Our interactive demo shows how the Yield Prediction AI analyzes your farm data to generate accurate forecasts. Select your crop and see the predicted yield based on current conditions.</p>
+                    
+                    <div style="margin-bottom: 30px;">
+                        <h3 style="margin-bottom: 15px; color: var(--white);">How It Works:</h3>
+                        <ul class="feature-list">
+                            <li><i class="fas fa-satellite"></i> Satellite imagery analysis</li>
+                            <li><i class="fas fa-cloud-sun"></i> Weather pattern integration</li>
+                            <li><i class="fas fa-vial"></i> Soil condition assessment</li>
+                            <li><i class="fas fa-history"></i> Historical data comparison</li>
+                        </ul>
+                    </div>
+                    
+                    <a href="#" class="cta-button">Try Full Demo</a>
+                </div>
+                <div class="demo-visual">
+                    <h3 style="text-align: center; margin-bottom: 20px;">Yield Prediction Forecast</h3>
+                    <div class="prediction-chart" id="prediction-chart">
+                        <div class="chart-bar" data-value="3.2t" style="height: 40%;"></div>
+                        <div class="chart-bar" data-value="4.1t" style="height: 55%;"></div>
+                        <div class="chart-bar" data-value="4.8t" style="height: 70%;"></div>
+                        <div class="chart-bar" data-value="4.5t" style="height: 65%;"></div>
+                        <div class="chart-bar" data-value="5.2t" style="height: 80%; background: var(--gold);"></div>
+                    </div>
+                    <div class="chart-labels">
+                        <div class="chart-label">Last Year</div>
+                        <div class="chart-label">Season 1</div>
+                        <div class="chart-label">Season 2</div>
+                        <div class="chart-label">Industry Avg</div>
+                        <div class="chart-label">AI Prediction</div>
+                    </div>
+                    
+                    <div class="prediction-controls">
+                        <select id="crop-select">
+                            <option value="wheat">Wheat</option>
+                            <option value="rice">Rice</option>
+                            <option value="corn">Corn</option>
+                            <option value="soybean">Soybean</option>
+                            <option value="cotton">Cotton</option>
+                        </select>
+                        <button id="update-prediction">Update Prediction</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section class="benefits">
+        <div class="container">
+            <div class="section-title">
+                <h2>Key Benefits</h2>
+                <p>How Yield Prediction AI transforms your farming operations</p>
+            </div>
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <h3>Increased Profitability</h3>
+                    <p>Make data-driven decisions that optimize inputs, reduce waste, and maximize your return on investment.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Risk Mitigation</h3>
+                    <p>Identify potential yield-reducing factors early and take preventive measures to protect your harvest.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <h3>Better Planning</h3>
+                    <p>Accurate yield forecasts help you plan labor, storage, transportation, and marketing activities more effectively.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <h3>Improved Contracts</h3>
+                    <p>Negotiate better prices and contracts with buyers by providing reliable yield estimates.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <h2>Ready to Predict Your Harvest?</h2>
+            <p>Join thousands of farmers who are already using AgriVision AI's Yield Prediction to maximize their harvests and profits.</p>
+            <a href="#" class="cta-button">Start Your Yield Prediction Today</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>AgriVision AI</h3>
+                    <p>Your Farm's Digital Twin, Powered by AI. Revolutionizing agriculture with cutting-edge technology and traditional wisdom.</p>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="index.html#features">Features</a></li>
+                        <li><a href="index.html#digital-twin">Digital Twin</a></li>
+                        <li><a href="index.html#ai-assistant">AI Assistant</a></li>
+                        <li><a href="#">Blog</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>AI Solutions</h3>
+                    <ul class="footer-links">
+                        <li><a href="pest-detection.html">Pest Detection AI</a></li>
+                        <li><a href="smart-irrigation.html">Smart Irrigation AI</a></li>
+                        <li><a href="yield-prediction.html">Yield Prediction AI</a></li>
+                        <li><a href="#">Soil Analysis AI</a></li>
+                        <li><a href="#">Crop Health AI</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contact Info</h3>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-map-marker-alt"></i> Tarakeswar, India</li>
+                        <li><i class="fas fa-phone"></i> +91 9064703308</li>
+                        <li><i class="fas fa-envelope"></i> visionaryinnovators05@gmail.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 AgriVision AI. All rights reserved. Proudly supporting Atmanirbhar Krishi Bharat.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Interactive prediction chart
+        const cropSelect = document.getElementById('crop-select');
+        const updateButton = document.getElementById('update-prediction');
+        const chartBars = document.querySelectorAll('.chart-bar');
+        
+        // Data for different crops
+        const cropData = {
+            wheat: [3.2, 4.1, 4.8, 4.5, 5.2],
+            rice: [4.5, 5.2, 5.8, 5.5, 6.3],
+            corn: [5.0, 6.2, 7.1, 6.8, 7.8],
+            soybean: [2.5, 3.1, 3.6, 3.4, 4.0],
+            cotton: [2.8, 3.5, 4.2, 4.0, 4.7]
+        };
+        
+        // Update chart based on selected crop
+        function updateChart() {
+            const selectedCrop = cropSelect.value;
+            const data = cropData[selectedCrop];
+            
+            chartBars.forEach((bar, index) => {
+                // Calculate height based on data (assuming max value is 8 tons)
+                const height = (data[index] / 8) * 100;
+                bar.style.height = `${height}%`;
+                bar.setAttribute('data-value', `${data[index]}t`);
+                
+                // Reset color
+                bar.style.background = 'var(--primary)';
+                
+                // Highlight prediction bar
+                if (index === 4) {
+                    bar.style.background = 'var(--gold)';
+                }
+            });
+        }
+        
+        // Add event listeners
+        updateButton.addEventListener('click', updateChart);
+        cropSelect.addEventListener('change', updateChart);
+        
+        // Add hover effects to capability cards
+        const capabilityCards = document.querySelectorAll('.capability-card');
+        capabilityCards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-10px)';
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+            });
+        });
+        
+        // Add glowing effect to icons on hover
+        const capabilityIcons = document.querySelectorAll('.capability-icon');
+        capabilityIcons.forEach(icon => {
+            icon.addEventListener('mouseenter', () => {
+                icon.style.boxShadow = '0 0 20px rgba(0, 255, 136, 0.7)';
+            });
+            
+            icon.addEventListener('mouseleave', () => {
+                icon.style.boxShadow = '0 0 15px rgba(0, 255, 136, 0.3)';
+            });
+        });
+        
+        // Add animation to chart bars on page load
+        window.addEventListener('load', () => {
+            chartBars.forEach(bar => {
+                bar.style.transform = 'scaleY(0)';
+                bar.style.transition = 'transform 1s ease';
+                
+                setTimeout(() => {
+                    bar.style.transform = 'scaleY(1)';
+                }, 500);
+            });
+        });
+    </script>
+</body>
+</html>

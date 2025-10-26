@@ -89,21 +89,24 @@
             align-items: center;
         }
 
-        .luxury-logo {
+        .logo {
             display: flex;
             align-items: center;
             gap: 10px;
             cursor: pointer;
         }
 
-        .luxury-logo h1 {
-            font-size: 28px;
-            color: var(--luxury-gold);
-            letter-spacing: -0.5px;
+        .logo-icon {
+            height: 50px;
+            width: auto;
+            border-radius: 5px;
         }
 
-        .luxury-logo span {
-            color: var(--white);
+        .logo-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--luxury-gold);
         }
 
         .luxury-nav {
@@ -172,6 +175,19 @@
             background: none;
             border: none;
             color: var(--luxury-gold);
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--luxury-gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--luxury-dark);
+            font-weight: 600;
             cursor: pointer;
         }
 
@@ -869,8 +885,12 @@
             <header class="luxury-header">
                 <div class="container">
                     <div class="luxury-header-top">
-                        <div class="luxury-logo" id="luxury-logo">
-                            <h1>Artisan<span>Luxe</span></h1>
+                        <div class="logo" id="luxury-logo">
+                            <a href="index.html">
+                                <!-- Using a placeholder logo from a reliable source -->
+                                <img src="logo.png" alt="Artisan Luxe Logo" class="logo-icon">
+                            </a>
+                            <div class="logo-text">Artisan Luxe</div>
                         </div>
                         <nav class="luxury-nav">
                             <a href="#">Home</a>
@@ -1207,14 +1227,14 @@
                         <div class="footer-column">
                             <h3>Contact Info</h3>
                             <ul class="footer-links">
-                                <li><i class="fas fa-map-marker-alt"></i> Heritage Lane, Jaipur, India</li>
-                                <li><i class="fas fa-phone"></i> +91 98765 43210</li>
-                                <li><i class="fas fa-envelope"></i> concierge@artisanluxe.com</li>
+                                <li><i class="fas fa-map-marker-alt"></i> Tarakeswar, India</li>
+                                <li><i class="fas fa-phone"></i> +91 9064703308</li>
+                                <li><i class="fas fa-envelope"></i> visionaryinnovators05@gmail.com</li>
                             </ul>
                         </div>
                     </div>
                     <div class="footer-bottom">
-                        <p>&copy; 2023 Artisan Luxe. All rights reserved. Crafted with passion for heritage.</p>
+                        <p>&copy; 2025 Artisan Luxe. All rights reserved. Crafted with passion for heritage.</p>
                     </div>
                 </div>
             </footer>
@@ -1227,12 +1247,13 @@
     <script>
         // Firebase Configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyC4wGDrRHs4gQN6p8Q9X7VqY9t8d4Jk8Xw",
-            authDomain: "artisan-luxe.firebaseapp.com",
-            projectId: "artisan-luxe",
-            storageBucket: "artisan-luxe.appspot.com",
-            messagingSenderId: "123456789012",
-            appId: "1:123456789012:web:abcdef1234567890"
+            apiKey: "AIzaSyBSUaOWX7giwjq31T4ExHjZkpu2BLZJRQM",
+            authDomain: "login-page-a394f.firebaseapp.com",
+            projectId: "login-page-a394f",
+            storageBucket: "login-page-a394f.firebasestorage.app",
+            messagingSenderId: "605712065355",
+            appId: "1:605712065355:web:8019336951dc5a3dee7ece",
+            measurementId: "G-R4JBKP5KNW"
         };
 
         // Initialize Firebase

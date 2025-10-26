@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Amazing Team</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            perspective: 1000px;
+        }
+
+        .logo-container {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+        }
+
+        .logo {
+            height: 50px;
+            width: auto;
+            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .header {
+            margin-bottom: 60px;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+            color: #d1d1e0;
+            line-height: 1.6;
+        }
+
+        .team-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+        }
+
+        .row {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .card-container {
+            width: 280px;
+            height: 380px;
+            perspective: 1000px;
+        }
+
+        .card {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+        }
+
+        .card.flipped, .card:hover {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+        }
+
+        .card-front {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card-back {
+            background: linear-gradient(135deg, #0f3460, #1a1a2e);
+            color: white;
+            transform: rotateY(180deg);
+            overflow-y: auto;
+            text-align: left;
+        }
+
+        .profile-img {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #ff7e5f, #feb47b);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2.5rem;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .profile-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .profile-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #ff7e5f, #feb47b);
+            border-radius: 50%;
+            font-weight: bold;
+        }
+
+        .name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .role {
+            font-size: 1.1rem;
+            color: #a8a8c5;
+            margin-bottom: 15px;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .social-icons a {
+            color: #fff;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .social-icons a:hover {
+            color: #ff7e5f;
+            transform: translateY(-3px);
+        }
+
+        .card-back h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #ff7e5f;
+            border-bottom: 2px solid rgba(255, 126, 95, 0.3);
+            padding-bottom: 5px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .card-back p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #d1d1e0;
+            margin-bottom: 15px;
+        }
+
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .skill {
+            background: rgba(255, 126, 95, 0.2);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            border: 1px solid rgba(255, 126, 95, 0.3);
+        }
+
+        .top-row .card-container:nth-child(1) .card-front {
+            background: linear-gradient(135deg, #1a1a2e, #0f3460);
+        }
+
+        .top-row .card-container:nth-child(2) .card-front {
+            background: linear-gradient(135deg, #1a1a2e, #533483);
+        }
+
+        .top-row .card-container:nth-child(3) .card-front {
+            background: linear-gradient(135deg, #1a1a2e, #0f3460);
+        }
+
+        .mid-row .card-container:nth-child(1) .card-front {
+            background: linear-gradient(135deg, #1a1a2e, #533483);
+        }
+
+        .mid-row .card-container:nth-child(2) .card-front {
+            background: linear-gradient(135deg, #1a1a2e, #0f3460);
+        }
+
+        .mentor-row .card-container .card-front {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .mentor-row .card-container .card-front .name {
+            background: linear-gradient(to right, #ffd700, #ffec8b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .mentor-row .card-container .card-front .role {
+            color: #ffd700;
+        }
+
+        .flip-instruction {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #a8a8c5;
+            opacity: 0.7;
+        }
+
+        .graphic-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.15;
+        }
+
+        .graphic-element {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 126, 95, 0.1);
+            animation: float 15s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+            }
+            100% {
+                transform: translateY(-1000px) rotate(720deg);
+            }
+        }
+
+        @media (max-width: 992px) {
+            .row {
+                gap: 30px;
+            }
+            
+            .card-container {
+                width: 250px;
+                height: 350px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .logo-container {
+                position: relative;
+                top: 0;
+                left: 0;
+                text-align: center;
+                margin-bottom: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2.8rem;
+            }
+            
+            .row {
+                gap: 20px;
+            }
+            
+            .card-container {
+                width: 220px;
+                height: 320px;
+            }
+            
+            .flip-instruction {
+                display: block;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .row {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .card-container {
+                width: 280px;
+                height: 380px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="graphic-bg" id="graphicBg"></div>
+    
+    <div class="logo-container">
+        <img src="logo.png" alt="Company Logo" class="logo">
+    </div>
+    
+    <div class="container">
+        <div class="header">
+            <h1>Our Amazing Team</h1>
+            <p>Meet the talented individuals behind our success. Hover over the cards to learn more about each team member.</p>
+        </div>
+        
+        <div class="team-section">
+            <!-- Top Row - 3 Members -->
+            <div class="row top-row">
+                <div class="card-container">
+                    <div class="card">
+                        <div class="card-front">
+                            <div class="profile-img">
+                                <img src="abhinaba.jpg" alt="Abhinaba Roy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div class="profile-placeholder" style="display:none;">AR</div>
+                            </div>
+                            <h2 class="name">Abhinaba Roy</h2>
+                            <p class="role">Fullstack Developer & Designer</p>
+                            <div class="social-icons">
+                                <a href="#"><i class="fab fa-linkedin"></i></a>
+                                <a href="#"><i class="fab fa-github"></i></a>
+                                <a href="#"><i class="fab fa-twitter"></i></a>
+                            </div>
+                            <p class="flip-instruction">Hover to flip</p>
+                        </div>
+                        <div class="card-back">
+                            <h3>About Abhinaba</h3>
+                            <p>Abhinaba is our main fullstack developer and designer, responsible for creating both the frontend and backend of our applications. He also collects data and concepts, and contributes innovative ideas to our projects.</p>
+                            <h3>Skills</h3>
+                            <div class="skills">
+                                <span class="skill">Python</span>
+                                <span class="skill">Django</span>
+                                <span class="skill">Database Design</span>
+                                <span class="skill">API Development</span>
+                                <span class="skill">System Architecture</span>
+                                <span class="skill">JavaScript</span>
+                                <span class="skill">React</span>
+                                <span class="skill">Node.js</span>
+                                <span class="skill">SQL</span>
+                                <span class="skill">UI/UX Design</span>
+                                <span class="skill">Data Analysis</span>
+                                <span class="skill">Data Visualization</span>
+                                <span class="skill">Concept Development</span>
+                            </div>
+                            <h3>Experience</h3>
+                            <p>Previously worked on multiple web development projects, specializing in creating seamless user experiences from concept to implementation and also worked in other python Data Science And Machine Learning Projects</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-container">
+                    <div class="card">
+                        <div class="card-front">
+                            <div class="profile-img">
+                                <img src="saikat.jpg" alt="Saikat De" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div class="profile-placeholder" style="display:none;">SD</div>
+                            </div>
+                            <h2 class="name">Saikat De</h2>
+                            <p class="role">Backend Developer & Designer</p>
+                            <div class="social-icons">
+                                <a href="#"><i class="fab fa-linkedin"></i></a>
+                                <a href="#"><i class="fab fa-github"></i></a>
+                                <a href="#"><i class="fab fa-stack-overflow"></i></a>
+                            </div>
+                            <p class="flip-instruction">Hover to flip</p>
+                        </div>
+                        <div class="card-back">
+                            <h3>About Saikat</h3>
+                            <p>Saikat is our main backend developer who ensures our applications run smoothly and efficiently. He also contributes to design decisions and brings innovative ideas to the table.</p>
+                            <h3>Skills</h3>
+                            <div class="skills">
+                                <span class="skill">Python</span>
+                                <span class="skill">Django</span>
+                                <span class="skill">Database Design</span>
+                                <span class="skill">API Development</span>
+                                <span class="skill">System Architecture</span>
+                                <span class="skill">Concept Ideation</span>
+                            </div>
+                            <h3>Experience</h3>
+                            <p>Has extensive experience in building robust backend systems and collaborating with frontend developers to create cohesive applications.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-container">
+                    <div class="card">
+                        <div class="card-front">
+                            <div class="profile-img">
+                                <img src="shruti.jpg" alt="Shruti Mandal" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div class="profile-placeholder" style="display:none;">SM</div>
+                            </div>
+                            <h2 class="name">Shruti Mandal</h2>
+                            <p class="role">Lead Designer</p>
+                            <div class="social-icons">
+                                <a href="#"><i class="fab fa-linkedin"></i></a>
+                                <a href="#"><i class="fab fa-dribbble"></i></a>
+                                <a href="#"><i class="fab fa-behance"></i></a>
+                            </div>
+                            <p class="flip-instruction">Hover to flip</p>
+                        </div>
+                        <div class="card-back">
+                            <h3>About Shruti</h3>
+                            <p>Shruti is our main designer, responsible for creating visually appealing and user-friendly interfaces. She ensures our applications are both beautiful and functional.</p>
+                            <h3>Skills</h3>
+                            <div class="skills">
+                                <span class="skill">UI/UX Design</span>
+                                <span class="skill">Figma</span>
+                                <span class="skill">Adobe Creative Suite</span>
+                                <span class="skill">Prototyping</span>
+                                <span class="skill">User Research</span>
+                            </div>
+                            <h3>Experience</h3>
+                            <p>Has designed interfaces for various digital products, focusing on creating intuitive user experiences that align with business goals.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Middle Row - 2 Members -->
+            <div class="row mid-row">
+                <div class="card-container">
+                    <div class="card">
+                        <div class="card-front">
+                            <div class="profile-img">
+                                <img src="anindya.jpg" alt="Anindya Koley" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div class="profile-placeholder" style="display:none;">AK</div>
+                            </div>
+                            <h2 class="name">Anindya Koley</h2>
+                            <p class="role">Data Specialist</p>
+                            <div class="social-icons">
+                                <a href="#"><i class="fab fa-linkedin"></i></a>
+                                <a href="#"><i class="fab fa-kaggle"></i></a>
+                                <a href="#"><i class="fas fa-database"></i></a>
+                            </div>
+                            <p class="flip-instruction">Hover to flip</p>
+                        </div>
+                        <div class="card-back">
+                            <h3>About Anindya</h3>
+                            <p>Anindya is our main data collector and analyst, responsible for gathering, organizing, and interpreting data to inform our project decisions and strategies.</p>
+                            <h3>Skills</h3>
+                            <div class="skills">
+                                <span class="skill">Data Collection</span>
+                                <span class="skill">Data Analysis</span>
+                                <span class="skill">Data Visualization</span>
+                            </div>
+                            <h3>Experience</h3>
+                            <p>Has worked on multiple data-driven projects, specializing in transforming raw data into actionable insights that drive project success.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-container">
+                    <div class="card">
+                        <div class="card-front">
+                            <div class="profile-img">
+                                <img src="rounak.jpg" alt="Rounak Roy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div class="profile-placeholder" style="display:none;">RR</div>
+                            </div>
+                            <h2 class="name">Rounak Roy</h2>
+                            <p class="role">Designer</p>
+                            <div class="social-icons">
+                                <a href="#"><i class="fab fa-linkedin"></i></a>
+                                <a href="#"><i class="fab fa-dribbble"></i></a>
+                                <a href="#"><i class="fab fa-behance"></i></a>
+                            </div>
+                            <p class="flip-instruction">Hover to flip</p>
+                        </div>
+                        <div class="card-back">
+                            <h3>About Rounak</h3>
+                            <p>Rounak is a talented designer who works alongside our lead designer to create visually compelling interfaces and user experiences for our applications.</p>
+                            <h3>Skills</h3>
+                            <div class="skills">
+                                <span class="skill">Graphic Design</span>
+                                <span class="skill">UI Design</span>
+                                <span class="skill">Adobe Creative Suite</span>
+                                <span class="skill">Typography</span>
+                                <span class="skill">Color Theory</span>
+                                <span class="skill">Layout Design</span>
+                            </div>
+                            <h3>Experience</h3>
+                            <p>Has contributed to various design projects, bringing creative solutions to complex design challenges and enhancing the visual appeal of our products.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Mentor Row -->
+            <h1 style="margin-top: 40px; margin-bottom: 20px;">Our Mentor</h1>
+            <div class="row mentor-row">
+                <div class="card-container">
+                    <div class="card">
+                        <div class="card-front">
+                            <div class="profile-img">
+                                <img src="amrita-mam.jpg" alt="Amrita Nath Sen" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div class="profile-placeholder" style="display:none;">AS</div>
+                            </div>
+                            <h2 class="name">Amrita Nath Sen</h2>
+                            <p class="role">English Teacher & Project Visionary</p>
+                            <div class="social-icons">
+                                <a href="#"><i class="fab fa-linkedin"></i></a>
+                                <a href="#"><i class="fas fa-globe"></i></a>
+                                <a href="#"><i class="fas fa-book"></i></a>
+                            </div>
+                            <p class="flip-instruction">Hover to flip</p>
+                        </div>
+                        <div class="card-back">
+                            <h3>About Amrita</h3>
+                            <p>Amrita is an experienced English teacher who conceived the original idea for this project. She provides guidance on communication, content strategy, and helps bridge the gap between technical implementation and user understanding.</p>
+                            <h3>Expertise</h3>
+                            <div class="skills">
+                                <span class="skill">English Literature</span>
+                                <span class="skill">Communication</span>
+                                <span class="skill">Content Strategy</span>
+                                <span class="skill">Creative Writing</span>
+                                <span class="skill">Educational Methodology</span>
+                                <span class="skill">Project Vision</span>
+                            </div>
+                            <h3>Background</h3>
+                            <p>With over 15 years of teaching experience, Amrita brings a unique perspective to our team, ensuring our project communicates effectively with its intended audience and stays true to its original educational purpose.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Create animated background elements
+        const graphicBg = document.getElementById('graphicBg');
+        for (let i = 0; i < 20; i++) {
+            const element = document.createElement('div');
+            element.classList.add('graphic-element');
+            
+            const size = Math.random() * 100 + 50;
+            element.style.width = `${size}px`;
+            element.style.height = `${size}px`;
+            
+            element.style.left = `${Math.random() * 100}%`;
+            element.style.top = `${Math.random() * 100 + 100}%`;
+            
+            element.style.animationDuration = `${Math.random() * 20 + 10}s`;
+            element.style.animationDelay = `${Math.random() * 5}s`;
+            
+            graphicBg.appendChild(element);
+        }
+
+        // Add click functionality for mobile devices
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+            card.addEventListener('click', function() {
+                if (window.innerWidth <= 768) {
+                    this.classList.toggle('flipped');
+                }
+            });
+        });
+
+        // Image loading fallback
+        document.addEventListener('DOMContentLoaded', function() {
+            const profileImages = document.querySelectorAll('.profile-img img');
+            profileImages.forEach(img => {
+                // Check if image loaded successfully
+                if (img.complete && img.naturalHeight === 0) {
+                    img.style.display = 'none';
+                    const placeholder = img.nextElementSibling;
+                    if (placeholder && placeholder.classList.contains('profile-placeholder')) {
+                        placeholder.style.display = 'flex';
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

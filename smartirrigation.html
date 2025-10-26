@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Irrigation AI | AgriVision AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #00ff88;
+            --primary-dark: #00cc6a;
+            --secondary: #0a0a0a;
+            --accent: #8B4513;
+            --light: #0f1217;
+            --gray: #a0a0a0;
+            --white: #ffffff;
+            --gold: #ffd700;
+            --error: #ff4d4d;
+            --success: #00ff88;
+            --shadow: 0 10px 30px rgba(0, 255, 136, 0.15);
+            --transition: all 0.3s ease;
+            --glow: 0 0 10px rgba(0, 255, 136, 0.7);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--white);
+            background-color: var(--light);
+            line-height: 1.6;
+            overflow-x: hidden;
+            background: linear-gradient(135deg, #0a0a0a 0%, #0f1217 50%, #0a1a14 100%);
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: rgba(10, 10, 10, 0.9);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .logo-image {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background-color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--secondary);
+            font-weight: bold;
+            font-size: 20px;
+            box-shadow: var(--glow);
+        }
+
+        .logo-text {
+            font-size: 28px;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+            text-shadow: var(--glow);
+            font-family: 'Playfair Display', serif;
+        }
+
+        .logo-text span {
+            color: var(--white);
+        }
+
+        .logo .ai-badge {
+            background: var(--gold);
+            color: var(--secondary);
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 5px;
+            font-weight: 700;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+            text-shadow: var(--glow);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--primary);
+            transition: var(--transition);
+            box-shadow: var(--glow);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .language-selector select {
+            padding: 8px 15px;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 5px;
+            background-color: rgba(10, 10, 10, 0.8);
+            font-size: 14px;
+            color: var(--white);
+        }
+
+        .auth-buttons a {
+            text-decoration: none;
+            color: var(--white);
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: var(--transition);
+        }
+
+        .auth-buttons a.login {
+            color: var(--gray);
+        }
+
+        .auth-buttons a.signup {
+            background: var(--primary);
+            color: var(--secondary);
+            font-weight: 600;
+        }
+
+        .auth-buttons a.signup:hover {
+            background: var(--primary-dark);
+            box-shadow: var(--glow);
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            height: 500px;
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1) 0%, rgba(10, 26, 20, 0.9) 100%), url('https://images.unsplash.com/photo-1620749378798-5d0f0500077a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80') no-repeat center center;
+            background-size: cover;
+            color: white;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 50%, rgba(0, 255, 136, 0.1) 0%, transparent 50%);
+            z-index: 1;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            z-index: 2;
+        }
+
+        .hero h2 {
+            font-size: 52px;
+            margin-bottom: 20px;
+            line-height: 1.2;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+        }
+
+        .hero p {
+            font-size: 20px;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: var(--primary);
+            color: var(--secondary);
+            padding: 16px 35px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            box-shadow: var(--glow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: 0.5s;
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        .cta-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 255, 136, 0.4);
+        }
+
+        /* Section Styles */
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-title h2 {
+            font-size: 42px;
+            color: var(--white);
+            margin-bottom: 15px;
+            text-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+        }
+
+        .section-title p {
+            color: var(--gray);
+            max-width: 700px;
+            margin: 0 auto;
+            font-size: 18px;
+        }
+
+        section {
+            padding: 100px 0;
+        }
+
+        /* Features Section */
+        .features {
+            background-color: transparent;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+        }
+
+        .feature-card {
+            background: rgba(20, 25, 30, 0.7);
+            border-radius: 15px;
+            padding: 40px 30px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            text-align: center;
+            border: 1px solid rgba(0, 255, 136, 0.1);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 255, 136, 0.2);
+            border-color: var(--primary);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(0, 255, 136, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            font-size: 32px;
+            color: var(--primary);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+        }
+
+        .feature-card h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: var(--white);
+        }
+
+        .feature-card p {
+            color: var(--gray);
+            line-height: 1.8;
+        }
+
+        /* Dashboard Section */
+        .dashboard {
+            background: linear-gradient(135deg, rgba(15, 18, 23, 0.8) 0%, rgba(10, 26, 20, 0.8) 100%);
+            position: relative;
+        }
+
+        .dashboard::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(0,255,136,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.5;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .dashboard-card {
+            background: rgba(20, 25, 30, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: 1px solid rgba(0, 255, 136, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 255, 136, 0.2);
+            border-color: var(--primary);
+        }
+
+        .dashboard-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .dashboard-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 255, 136, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--primary);
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+        }
+
+        .dashboard-content h3 {
+            font-size: 22px;
+            margin-bottom: 5px;
+            color: var(--white);
+        }
+
+        .dashboard-content p {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .dashboard-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary);
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+            margin-bottom: 10px;
+        }
+
+        .dashboard-status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .status-optimal {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--primary);
+        }
+
+        .status-warning {
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+        }
+
+        .status-critical {
+            background: rgba(255, 77, 77, 0.2);
+            color: var(--error);
+        }
+
+        /* Irrigation Schedule */
+        .irrigation-schedule {
+            background-color: transparent;
+        }
+
+        .schedule-container {
+            background: rgba(20, 25, 30, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0, 255, 136, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .schedule-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .schedule-header h3 {
+            font-size: 24px;
+            color: var(--white);
+        }
+
+        .schedule-controls {
+            display: flex;
+            gap: 15px;
+        }
+
+        .control-btn {
+            background: rgba(0, 255, 136, 0.1);
+            color: var(--primary);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .control-btn:hover {
+            background: var(--primary);
+            color: var(--secondary);
+            box-shadow: var(--glow);
+        }
+
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .schedule-card {
+            background: rgba(30, 35, 40, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: var(--transition);
+            border: 1px solid rgba(0, 255, 136, 0.1);
+        }
+
+        .schedule-card.active {
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+        }
+
+        .schedule-day {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--white);
+        }
+
+        .schedule-time {
+            font-size: 14px;
+            color: var(--gray);
+            margin-bottom: 15px;
+        }
+
+        .schedule-status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Drought Prediction */
+        .drought-prediction {
+            background: linear-gradient(135deg, rgba(10, 26, 20, 0.8) 0%, rgba(15, 18, 23, 0.8) 100%);
+        }
+
+        .prediction-container {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .prediction-chart {
+            flex: 1;
+            background: rgba(20, 25, 30, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0, 255, 136, 0.1);
+            backdrop-filter: blur(10px);
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray);
+            font-size: 18px;
+        }
+
+        .prediction-content {
+            flex: 1;
+        }
+
+        .prediction-content h3 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: var(--white);
+        }
+
+        .prediction-content p {
+            color: var(--gray);
+            margin-bottom: 30px;
+            line-height: 1.8;
+        }
+
+        .prediction-alert {
+            background: rgba(255, 77, 77, 0.1);
+            border: 1px solid rgba(255, 77, 77, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .alert-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .alert-icon {
+            color: var(--error);
+            font-size: 20px;
+        }
+
+        .alert-header h4 {
+            color: var(--error);
+            font-size: 18px;
+        }
+
+        .alert-content p {
+            color: var(--gray);
+            margin-bottom: 0;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1) 0%, rgba(10, 26, 20, 0.9) 100%);
+            text-align: center;
+        }
+
+        .cta-section h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: var(--white);
+        }
+
+        .cta-section p {
+            color: var(--gray);
+            max-width: 700px;
+            margin: 0 auto 30px;
+            font-size: 18px;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--secondary);
+            color: white;
+            padding: 80px 0 0;
+            border-top: 1px solid rgba(0, 255, 136, 0.2);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: var(--primary);
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .footer-links a {
+            color: #CCCCCC;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+            text-shadow: 0 0 5px rgba(0, 255, 136, 0.5);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding: 30px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #999;
+            font-size: 14px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .hero h2 {
+                font-size: 42px;
+            }
+            
+            .prediction-container {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-top {
+                flex-wrap: wrap;
+            }
+            
+            .nav-links {
+                order: 3;
+                margin-top: 15px;
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .hero h2 {
+                font-size: 36px;
+            }
+            
+            .hero {
+                height: 400px;
+            }
+            
+            .section-title h2 {
+                font-size: 32px;
+            }
+            
+            .features-grid, .dashboard-grid, .schedule-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .schedule-header {
+                flex-direction: column;
+                gap: 20px;
+                align-items: flex-start;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h2 {
+                font-size: 28px;
+            }
+            
+            .hero p {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-top">
+                <div class="logo">
+                    <a href="index.html" style="text-decoration: none; display: flex; align-items: center; gap: 10px;">
+                        <div class="logo-image">AV</div>
+                        <div class="logo-text">Agri<span>Vision</span></div>
+                    </a>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="index.html#features">Features</a></li>
+                    <li><a href="index.html#digital-twin">Digital Twin</a></li>
+                    <li><a href="index.html#ai-assistant">AI Assistant</a></li>
+                    <li><a href="index.html#features-showcase">Solutions</a></li>
+                </ul>
+                <div class="header-actions">
+                    <div class="language-selector">
+                        <select>
+                            <option>English</option>
+                            <option>हिन्दी</option>
+                            <option>தமிழ்</option>
+                            <option>বাংলা</option>
+                            <option>తెలుగు</option>
+                        </select>
+                    </div>
+                    <div class="auth-buttons">
+                        <a href="#" class="login" id="login-link">Login</a>
+                        <a href="#" class="signup" id="signup-link">Sign Up</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h2>Smart Irrigation AI</h2>
+                <p>Optimize water usage with AI-powered irrigation that adapts to soil conditions, weather forecasts, and crop needs in real-time.</p>
+                <a href="#" class="cta-button">Activate Smart Irrigation</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <div class="section-title">
+                <h2>Intelligent Water Management</h2>
+                <p>Our AI-driven irrigation system combines multiple data sources to deliver precise watering exactly when and where needed</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-tint"></i>
+                    </div>
+                    <h3>Soil Moisture Monitoring</h3>
+                    <p>Real-time soil sensors measure moisture at different depths and locations across your fields, providing accurate data for irrigation decisions.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-cloud-sun"></i>
+                    </div>
+                    <h3>Weather Integration</h3>
+                    <p>AI analyzes local weather forecasts, humidity, temperature, and evapotranspiration rates to adjust irrigation schedules automatically.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <h3>Water Usage Optimization</h3>
+                    <p>Reduce water consumption by up to 40% while maintaining optimal crop health through precision watering based on actual plant needs.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h3>Automated Scheduling</h3>
+                    <p>Set it and forget it. The AI creates and adjusts irrigation schedules based on crop type, growth stage, and environmental conditions.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h3>Drought Prediction</h3>
+                    <p>Advanced algorithms analyze historical patterns and current conditions to predict drought risks weeks in advance.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>Mobile Control</h3>
+                    <p>Monitor and control your irrigation system from anywhere using our mobile app with real-time alerts and manual override options.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dashboard Section -->
+    <section class="dashboard">
+        <div class="container">
+            <div class="section-title">
+                <h2>Irrigation Dashboard</h2>
+                <p>Real-time monitoring of your farm's water management system</p>
+            </div>
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <div class="dashboard-header">
+                        <div class="dashboard-icon">
+                            <i class="fas fa-tint"></i>
+                        </div>
+                        <div class="dashboard-content">
+                            <h3>Soil Moisture</h3>
+                            <p>Field A - Wheat</p>
+                        </div>
+                    </div>
+                    <div class="dashboard-value">68%</div>
+                    <div class="dashboard-status status-optimal">Optimal</div>
+                </div>
+                <div class="dashboard-card">
+                    <div class="dashboard-header">
+                        <div class="dashboard-icon">
+                            <i class="fas fa-cloud-rain"></i>
+                        </div>
+                        <div class="dashboard-content">
+                            <h3>Rain Forecast</h3>
+                            <p>Next 24 hours</p>
+                        </div>
+                    </div>
+                    <div class="dashboard-value">30%</div>
+                    <div class="dashboard-status status-warning">Light Rain Expected</div>
+                </div>
+                <div class="dashboard-card">
+                    <div class="dashboard-header">
+                        <div class="dashboard-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="dashboard-content">
+                            <h3>Water Saved</h3>
+                            <p>This Month</p>
+                        </div>
+                    </div>
+                    <div class="dashboard-value">12,500L</div>
+                    <div class="dashboard-status status-optimal">35% Reduction</div>
+                </div>
+                <div class="dashboard-card">
+                    <div class="dashboard-header">
+                        <div class="dashboard-icon">
+                            <i class="fas fa-temperature-high"></i>
+                        </div>
+                        <div class="dashboard-content">
+                            <h3>Evapotranspiration</h3>
+                            <p>Current Rate</p>
+                        </div>
+                    </div>
+                    <div class="dashboard-value">4.2mm/day</div>
+                    <div class="dashboard-status status-optimal">Normal</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Irrigation Schedule -->
+    <section class="irrigation-schedule">
+        <div class="container">
+            <div class="section-title">
+                <h2>Smart Irrigation Schedule</h2>
+                <p>AI-generated watering plan optimized for current conditions</p>
+            </div>
+            <div class="schedule-container">
+                <div class="schedule-header">
+                    <h3>Weekly Irrigation Plan</h3>
+                    <div class="schedule-controls">
+                        <button class="control-btn">Pause All</button>
+                        <button class="control-btn">Optimize Now</button>
+                        <button class="control-btn">Manual Override</button>
+                    </div>
+                </div>
+                <div class="schedule-grid">
+                    <div class="schedule-card active">
+                        <div class="schedule-day">Today</div>
+                        <div class="schedule-time">6:00 - 7:30 AM</div>
+                        <div class="schedule-status status-optimal">Scheduled</div>
+                    </div>
+                    <div class="schedule-card">
+                        <div class="schedule-day">Tuesday</div>
+                        <div class="schedule-time">5:45 - 7:15 AM</div>
+                        <div class="schedule-status status-optimal">Scheduled</div>
+                    </div>
+                    <div class="schedule-card">
+                        <div class="schedule-day">Wednesday</div>
+                        <div class="schedule-time">SKIPPED</div>
+                        <div class="schedule-status status-warning">Rain Expected</div>
+                    </div>
+                    <div class="schedule-card">
+                        <div class="schedule-day">Thursday</div>
+                        <div class="schedule-time">6:15 - 7:45 AM</div>
+                        <div class="schedule-status status-optimal">Scheduled</div>
+                    </div>
+                    <div class="schedule-card">
+                        <div class="schedule-day">Friday</div>
+                        <div class="schedule-time">6:00 - 7:30 AM</div>
+                        <div class="schedule-status status-optimal">Scheduled</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Drought Prediction -->
+    <section class="drought-prediction">
+        <div class="container">
+            <div class="section-title">
+                <h2>Drought Prediction & Water Reserve</h2>
+                <p>AI-powered early warning system for water scarcity</p>
+            </div>
+            <div class="prediction-container">
+                <div class="prediction-chart">
+                    [Drought Risk Visualization Chart]
+                    <div style="text-align: center;">
+                        <div style="font-size: 24px; color: var(--primary); margin-bottom: 10px;">Low Risk</div>
+                        <div style="font-size: 14px; color: var(--gray);">Next 30 Days</div>
+                    </div>
+                </div>
+                <div class="prediction-content">
+                    <h3>Water Security Analysis</h3>
+                    <p>Based on current soil moisture levels, weather patterns, and historical data, your farm is at LOW RISK of water stress over the next 30 days.</p>
+                    <p>The AI has detected a 70% probability of average rainfall in your region during the upcoming monsoon season, which should replenish groundwater levels.</p>
+                    
+                    <div class="prediction-alert">
+                        <div class="alert-header">
+                            <div class="alert-icon">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </div>
+                            <h4>Water Conservation Tip</h4>
+                        </div>
+                        <div class="alert-content">
+                            <p>Consider implementing mulching in Field B to reduce evaporation. This could save an estimated 5,000 liters of water per week during peak summer months.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <h2>Ready to Transform Your Irrigation System?</h2>
+            <p>Join thousands of farmers who have reduced water usage by 30-40% while improving crop yields with our AI-powered Smart Irrigation system.</p>
+            <a href="#" class="cta-button">Start Your Free Trial</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>AgriVision AI</h3>
+                    <p>Your Farm's Digital Twin, Powered by AI. Revolutionizing agriculture with cutting-edge technology and traditional wisdom.</p>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="index.html#features">Features</a></li>
+                        <li><a href="index.html#digital-twin">Digital Twin</a></li>
+                        <li><a href="index.html#ai-assistant">AI Assistant</a></li>
+                        <li><a href="#">Blog</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>AI Solutions</h3>
+                    <ul class="footer-links">
+                        <li><a href="pest-detection.html">Pest Detection AI</a></li>
+                        <li><a href="smart-irrigation.html">Smart Irrigation AI</a></li>
+                        <li><a href="yield-prediction.html">Yield Prediction AI</a></li>
+                        <li><a href="#">Soil Analysis AI</a></li>
+                        <li><a href="#">Crop Health AI</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contact Info</h3>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-map-marker-alt"></i> Tarakeswar, India</li>
+                        <li><i class="fas fa-phone"></i> +91 9064703308</li>
+                        <li><i class="fas fa-envelope"></i> visionaryinnovators05@gmail.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 AgriVision AI. All rights reserved. Proudly supporting Atmanirbhar Krishi Bharat.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Interactive elements for the Smart Irrigation page
+        
+        // Update dashboard values periodically (simulated)
+        function updateDashboard() {
+            const moistureValue = document.querySelector('.dashboard-card:nth-child(1) .dashboard-value');
+            const savedWaterValue = document.querySelector('.dashboard-card:nth-child(3) .dashboard-value');
+            
+            // Simulate real-time updates
+            const randomMoisture = 65 + Math.floor(Math.random() * 10);
+            const randomSaved = 12000 + Math.floor(Math.random() * 2000);
+            
+            moistureValue.textContent = `${randomMoisture}%`;
+            savedWaterValue.textContent = `${randomSaved.toLocaleString()}L`;
+        }
+        
+        // Update every 10 seconds
+        setInterval(updateDashboard, 10000);
+        
+        // Schedule card interactions
+        const scheduleCards = document.querySelectorAll('.schedule-card');
+        scheduleCards.forEach(card => {
+            card.addEventListener('click', () => {
+                scheduleCards.forEach(c => c.classList.remove('active'));
+                card.classList.add('active');
+            });
+        });
+        
+        // Control button functionality
+        const controlButtons = document.querySelectorAll('.control-btn');
+        controlButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const action = button.textContent;
+                alert(`Irrigation system: ${action} command sent.`);
+                
+                if (action === 'Pause All') {
+                    document.querySelectorAll('.schedule-status').forEach(status => {
+                        if (status.textContent === 'Scheduled') {
+                            status.textContent = 'Paused';
+                            status.className = 'schedule-status status-warning';
+                        }
+                    });
+                } else if (action === 'Optimize Now') {
+                    alert('AI is recalculating the optimal irrigation schedule based on latest data...');
+                    // In a real app, this would trigger an API call to recalculate the schedule
+                }
+            });
+        });
+        
+        // Language selector
+        const languageSelector = document.querySelector('.language-selector select');
+        languageSelector.addEventListener('change', () => {
+            const selectedLanguage = languageSelector.value;
+            alert(`Language changed to ${selectedLanguage}. The interface would update to ${selectedLanguage} in a production app.`);
+        });
+        
+        // Add glowing effect to feature icons on hover
+        const featureIcons = document.querySelectorAll('.feature-icon');
+        featureIcons.forEach(icon => {
+            icon.addEventListener('mouseenter', () => {
+                icon.style.boxShadow = '0 0 20px rgba(0, 255, 136, 0.7)';
+            });
+            
+            icon.addEventListener('mouseleave', () => {
+                icon.style.boxShadow = '0 0 15px rgba(0, 255, 136, 0.3)';
+            });
+        });
+    </script>
+</body>
+</html>

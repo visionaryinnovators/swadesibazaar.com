@@ -72,13 +72,19 @@
             cursor: pointer;
         }
 
-        .logo h1 {
+        .logo-image {
+            height: 40px;
+            width: auto;
+        }
+
+        .logo-text {
+            font-family: 'Playfair Display', serif;
             font-size: 28px;
             color: var(--primary);
             letter-spacing: -0.5px;
         }
 
-        .logo span {
+        .logo-text span {
             color: var(--secondary);
         }
 
@@ -792,9 +798,10 @@
                     <i class="fas fa-bars"></i>
                 </button>
                 <div class="logo">
-                    <a href="index.html" style="text-decoration: none;">
-                        <h1>Swa<span>Desi</span> Bazaar</h1>
+                    <a href="index.html">
+                        <img src="logo.png" alt="SwaDesi Bazaar Logo" class="logo-image">
                     </a>
+                    <div class="logo-text">Swa<span>Desi</span> Bazaar</div>
                 </div>
                 <div class="search-bar">
                     <input type="text" placeholder="Search for beauty parlors, services, or locations...">
@@ -840,7 +847,7 @@
     <div class="mobile-nav" id="mobileNav">
         <div class="mobile-nav-header">
             <div class="logo">
-                <h1>Swa<span>Desi</span> Bazaar</h1>
+                <div class="logo-text">Swa<span>Desi</span> Bazaar</div>
             </div>
             <button class="mobile-nav-close" id="mobileNavClose">
                 <i class="fas fa-times"></i>
@@ -1005,9 +1012,9 @@
                 <div class="footer-column">
                     <h3>Contact Info</h3>
                     <ul class="footer-links">
-                        <li><i class="fas fa-map-marker-alt"></i> 123 Local Market, New Delhi, India</li>
-                        <li><i class="fas fa-phone"></i> +91 98765 43210</li>
-                        <li><i class="fas fa-envelope"></i> support@swadesibazaar.com</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Tarakeswar, India</li>
+                        <li><i class="fas fa-phone"></i> +91 9064703308</li>
+                        <li><i class="fas fa-envelope"></i> visionaryinnovators05@gmail.com</li>
                     </ul>
                 </div>
             </div>

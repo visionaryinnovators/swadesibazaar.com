@@ -97,13 +97,30 @@
             cursor: pointer;
         }
 
-        .logo h1 {
+        .logo-image {
+            height: 50px;
+            width: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-image img {
+            height: 100%;
+            width: auto;
+            max-width: 150px;
+            object-fit: contain;
+        }
+
+        .logo-text {
+            font-family: 'Playfair Display', serif;
             font-size: 28px;
             color: var(--luxury-gold);
             letter-spacing: -0.5px;
+            font-weight: 700;
         }
 
-        .logo span {
+        .logo-text span {
             color: var(--white);
         }
 
@@ -1054,7 +1071,11 @@
                 <div class="container">
                     <div class="header-top">
                         <div class="logo" id="logo">
-                            <h1>Luxe<span>Grocer</span></h1>
+                            <div class="logo-image">
+                                <!-- Logo image with fallback text -->
+                                <img src="logo.png" alt="SwaDesi Bazaar Logo">
+                            </div>
+                            <div class="logo-text">SwaDesi<span> Bazaar</span></div>
                         </div>
                         <div class="search-bar">
                             <input type="text" placeholder="Search for premium groceries, organic products...">
@@ -1601,6 +1622,14 @@
                         <p><strong>Estimated Delivery:</strong> Today by 3:00 PM</p>
                         <p><strong>Delivery Address:</strong> 123 Luxury Lane, Bandra West, Mumbai</p>
                     </div>
+                    <div class="footer-column">
+                        <h3>Contact Info</h3>
+                        <ul class="footer-links">
+                            <li><i class="fas fa-map-marker-alt"></i> Tarakeswar, India</li>
+                            <li><i class="fas fa-phone"></i> +91 9064703308</li>
+                            <li><i class="fas fa-envelope"></i> visionaryinnovators05@gmail.com</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1612,12 +1641,13 @@
     <script>
         // Firebase Configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyC4wGDrRHs4gQN6p8Q9X7VqY9t8d4Jk8Xw",
-            authDomain: "luxegrocer.firebaseapp.com",
-            projectId: "luxegrocer",
-            storageBucket: "luxegrocer.appspot.com",
-            messagingSenderId: "123456789012",
-            appId: "1:123456789012:web:abcdef1234567890"
+            apiKey: "AIzaSyBSUaOWX7giwjq31T4ExHjZkpu2BLZJRQM",
+            authDomain: "login-page-a394f.firebaseapp.com",
+            projectId: "login-page-a394f",
+            storageBucket: "login-page-a394f.firebasestorage.app",
+            messagingSenderId: "605712065355",
+            appId: "1:605712065355:web:8019336951dc5a3dee7ece",
+            measurementId: "G-R4JBKP5KNW"
         };
 
         // Initialize Firebase

@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AgriSphere AI | Premium Agricultural Intelligence Platform</title>
+    <title>Emergency Transport AI | AgriSphere AI</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #52796f;
-            --primary-light: #84a98c;
-            --secondary: #386641;
-            --accent: #6a994e;
+            --primary: #ff3366;
+            --primary-light: #ff6b99;
+            --secondary: #3366ff;
+            --accent: #00cc99;
             --dark: #0a0a1a;
             --darker: #050510;
             --light: #f8f9fa;
@@ -77,8 +77,8 @@
             position: sticky;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 4px 20px rgba(0, 255, 136, 0.1);
-            border-bottom: 1px solid rgba(0, 255, 136, 0.1);
+            box-shadow: 0 4px 20px rgba(255, 51, 102, 0.1);
+            border-bottom: 1px solid rgba(255, 51, 102, 0.1);
         }
 
         .header-content {
@@ -93,11 +93,10 @@
             gap: 10px;
         }
 
-        .logo i {
-            font-size: 2rem;
-            color: var(--primary);
-            text-shadow: 0 0 15px var(--primary);
-            animation: pulse 2s infinite;
+        .logo img {
+            height: 50px;
+            width: auto;
+            filter: drop-shadow(0 0 10px var(--primary));
         }
 
         .logo h1 {
@@ -171,25 +170,25 @@
         }
 
         .btn-primary {
-            background: linear-gradient(90deg, var(--primary), var(--accent));
-            color: var(--dark);
-            box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: var(--light);
+            box-shadow: 0 0 20px rgba(255, 51, 102, 0.5);
         }
 
         .btn-outline:hover {
             background: var(--primary);
             color: var(--dark);
-            box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+            box-shadow: 0 0 15px rgba(255, 51, 102, 0.5);
         }
 
         .btn-primary:hover {
             transform: translateY(-3px);
-            box-shadow: 0 0 30px rgba(0, 255, 136, 0.8);
+            box-shadow: 0 0 30px rgba(255, 51, 102, 0.8);
         }
 
         /* Hero Section */
         .hero {
-            background: linear-gradient(rgba(5, 5, 16, 0.85), rgba(5, 5, 16, 0.9)), url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80');
+            background: linear-gradient(rgba(5, 5, 16, 0.85), rgba(5, 5, 16, 0.9)), url('https://images.unsplash.com/photo-1581094794329-c8112a89af12?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
             background-size: cover;
             background-position: center;
             color: white;
@@ -206,7 +205,7 @@
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            text-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+            text-shadow: 0 0 20px rgba(255, 51, 102, 0.3);
         }
 
         .hero p {
@@ -235,7 +234,7 @@
             color: var(--primary);
             display: inline-block;
             padding-bottom: 10px;
-            text-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+            text-shadow: 0 0 15px rgba(255, 51, 102, 0.3);
         }
 
         .section-title h2:after {
@@ -265,7 +264,7 @@
             transition: var(--transition);
             height: 100%;
             position: relative;
-            border: 1px solid rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(255, 51, 102, 0.1);
         }
 
         .feature-card::before {
@@ -275,7 +274,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(119, 0, 255, 0.1));
+            background: linear-gradient(135deg, rgba(255, 51, 102, 0.1), rgba(51, 102, 255, 0.1));
             z-index: -1;
             opacity: 0;
             transition: opacity 0.3s ease;
@@ -283,7 +282,7 @@
 
         .feature-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 255, 136, 0.2);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 51, 102, 0.2);
         }
 
         .feature-card:hover::before {
@@ -291,7 +290,7 @@
         }
 
         .feature-icon {
-            background: linear-gradient(135deg, var(--primary), var(--accent));
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
             font-size: 2.5rem;
             padding: 1.5rem;
@@ -307,7 +306,7 @@
             font-size: 1.5rem;
             margin-bottom: 1rem;
             color: var(--primary);
-            text-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
+            text-shadow: 0 0 10px rgba(255, 51, 102, 0.2);
         }
 
         .feature-content p {
@@ -315,32 +314,16 @@
             margin-bottom: 1.5rem;
         }
 
-        .feature-link {
-            color: var(--primary);
-            font-weight: 600;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: var(--transition);
-        }
-
-        .feature-link:hover {
-            color: var(--primary-light);
-            gap: 10px;
-            text-shadow: 0 0 10px var(--primary);
-        }
-
         /* Dashboard Preview */
         .dashboard-preview {
-            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(119, 0, 255, 0.1));
+            background: linear-gradient(135deg, rgba(255, 51, 102, 0.1), rgba(51, 102, 255, 0.1));
             color: white;
             padding: 5rem 0;
             margin: 5rem 0;
             position: relative;
             overflow: hidden;
-            border-top: 1px solid rgba(0, 255, 136, 0.1);
-            border-bottom: 1px solid rgba(0, 255, 136, 0.1);
+            border-top: 1px solid rgba(255, 51, 102, 0.1);
+            border-bottom: 1px solid rgba(255, 51, 102, 0.1);
         }
 
         .dashboard-content {
@@ -357,7 +340,7 @@
             font-size: 2.5rem;
             margin-bottom: 1.5rem;
             color: var(--primary);
-            text-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+            text-shadow: 0 0 15px rgba(255, 51, 102, 0.3);
         }
 
         .dashboard-text p {
@@ -371,14 +354,68 @@
             background: rgba(10, 10, 26, 0.7);
             border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 30px rgba(0, 255, 136, 0.2);
-            border: 1px solid rgba(0, 255, 136, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 30px rgba(255, 51, 102, 0.2);
+            border: 1px solid rgba(255, 51, 102, 0.1);
         }
 
         .dashboard-image img {
             width: 100%;
             height: auto;
             display: block;
+        }
+
+        /* How It Works */
+        .how-it-works {
+            padding: 5rem 0;
+        }
+
+        .steps {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 3rem;
+            position: relative;
+        }
+
+        .steps::before {
+            content: '';
+            position: absolute;
+            top: 40px;
+            left: 10%;
+            width: 80%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            z-index: 0;
+        }
+
+        .step {
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            flex: 1;
+        }
+
+        .step-number {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 1.8rem;
+            font-weight: bold;
+            box-shadow: 0 0 20px rgba(255, 51, 102, 0.5);
+        }
+
+        .step-content h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .step-content p {
+            color: rgba(248, 249, 250, 0.7);
         }
 
         /* Stats Section */
@@ -398,7 +435,7 @@
             font-weight: 700;
             color: var(--primary);
             display: block;
-            text-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+            text-shadow: 0 0 15px rgba(255, 51, 102, 0.3);
         }
 
         .stat-label {
@@ -410,8 +447,8 @@
         .testimonials {
             background: rgba(10, 10, 26, 0.5);
             padding: 5rem 0;
-            border-top: 1px solid rgba(0, 255, 136, 0.1);
-            border-bottom: 1px solid rgba(0, 255, 136, 0.1);
+            border-top: 1px solid rgba(255, 51, 102, 0.1);
+            border-bottom: 1px solid rgba(255, 51, 102, 0.1);
         }
 
         .testimonial-grid {
@@ -427,13 +464,13 @@
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             position: relative;
-            border: 1px solid rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(255, 51, 102, 0.1);
             transition: var(--transition);
         }
 
         .testimonial-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 255, 136, 0.1);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(255, 51, 102, 0.1);
         }
 
         .testimonial-card:before {
@@ -463,7 +500,7 @@
             width: 50px;
             height: 50px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             display: flex;
             align-items: center;
             justify-content: center;
@@ -474,7 +511,7 @@
 
         .author-info h4 {
             color: var(--primary);
-            text-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
+            text-shadow: 0 0 10px rgba(255, 51, 102, 0.2);
         }
 
         .author-info p {
@@ -484,7 +521,7 @@
 
         /* CTA Section */
         .cta {
-            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(119, 0, 255, 0.1));
+            background: linear-gradient(135deg, rgba(255, 51, 102, 0.1), rgba(51, 102, 255, 0.1));
             color: white;
             padding: 5rem 0;
             text-align: center;
@@ -495,7 +532,7 @@
         .cta h2 {
             font-size: 2.5rem;
             margin-bottom: 1.5rem;
-            text-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+            text-shadow: 0 0 15px rgba(255, 51, 102, 0.3);
         }
 
         .cta p {
@@ -510,7 +547,7 @@
             background: var(--darker);
             color: white;
             padding: 4rem 0 2rem;
-            border-top: 1px solid rgba(0, 255, 136, 0.1);
+            border-top: 1px solid rgba(255, 51, 102, 0.1);
         }
 
         .footer-content {
@@ -617,6 +654,15 @@
             nav ul {
                 gap: 1rem;
             }
+            
+            .steps {
+                flex-direction: column;
+                gap: 2rem;
+            }
+            
+            .steps::before {
+                display: none;
+            }
         }
 
         @media (max-width: 768px) {
@@ -646,7 +692,6 @@
             .stats {
                 flex-direction: column;
             }
-            
         }
     </style>
 </head>
@@ -661,15 +706,15 @@
         <div class="container">
             <div class="header-content">
                 <div class="logo">
-                    <i class="fas fa-seedling"></i>
-                    <h1>AgriSphere AI</h1>
+                    <img src="logo.png" alt="Emergency Transport AI Logo">
+                    <h1>Emergency Transport AI</h1>
                 </div>
                 <nav>
                     <ul>
-                        <li><a href="#features">Solutions</a></li>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#how-it-works">How It Works</a></li>
                         <li><a href="#dashboard">Dashboard</a></li>
                         <li><a href="#testimonials">Testimonials</a></li>
-                        <li><a href="#about">About</a></li>
                         <li><a href="#contact">Contact</a></li>
                     </ul>
                 </nav>
@@ -684,11 +729,11 @@
     <!-- Hero Section -->
     <section class="hero">
         <div class="container">
-            <h2>Revolutionizing Agriculture with AI Intelligence</h2>
-            <p>An integrated platform connecting farmers, businesses, and communities through cutting-edge AI solutions for sustainable agriculture and rural development.</p>
+            <h2>AI-Powered Emergency Micro-Transport</h2>
+            <p>Coordinates local vehicles, predicts fastest routes, and alerts drivers during emergencies in areas lacking ambulances. Saving lives through intelligent technology.</p>
             <div class="hero-buttons">
-                <a href="#" class="btn btn-primary">Explore Solutions</a>
-                <a href="#" class="btn btn-outline">Watch Demo</a>
+                <a href="#" class="btn btn-primary">Request Emergency Help</a>
+                <a href="#" class="btn btn-outline">Become a Volunteer Driver</a>
             </div>
         </div>
     </section>
@@ -696,90 +741,116 @@
     <!-- Features Section -->
     <section class="container" id="features">
         <div class="section-title">
-            <h2>Our Innovative Solutions</h2>
+            <h2>Life-Saving Features</h2>
         </div>
         <div class="features-grid">
-            <!-- Crop Swap Feature -->
+            <!-- Feature 1 -->
             <div class="feature-card">
                 <div class="feature-icon">
-                    <i class="fas fa-exchange-alt"></i>
+                    <i class="fas fa-route"></i>
                 </div>
                 <div class="feature-content">
-                    <h3>AI-Powered Crop Swap</h3>
-                    <p>Digitally swap surplus crops or seeds with neighbors instead of selling at low prices. AI predicts needs, optimal routes, and minimizes wastage.</p>
-                    <a href="agswap.html" class="feature-link">Explore <i class="fas fa-arrow-right"></i></a>
+                    <h3>AI Route Optimization</h3>
+                    <p>Our AI analyzes real-time traffic, road conditions, and weather to calculate the fastest possible routes for emergency transport.</p>
                 </div>
             </div>
 
-            <!-- Repair Assistant Feature -->
+            <!-- Feature 2 -->
             <div class="feature-card">
                 <div class="feature-icon">
-                    <i class="fas fa-tools"></i>
+                    <i class="fas fa-car-side"></i>
                 </div>
                 <div class="feature-content">
-                    <h3>Digital Micro-Repair Assistant</h3>
-                    <p>AI app teaches villagers to repair tools, motors, or machines step by step via AR or animations. Scan broken tools for instant repair guidance.</p>
-                    <a href="microrepair.html" class="feature-link">Explore <i class="fas fa-arrow-right"></i></a>
+                    <h3>Vehicle Coordination</h3>
+                    <p>Intelligently coordinates available local vehicles - from cars to motorcycles - to reach emergencies in the shortest time possible.</p>
                 </div>
             </div>
 
-            <!-- Waste-to-Resource Feature -->
+            <!-- Feature 3 -->
             <div class="feature-card">
                 <div class="feature-icon">
-                    <i class="fas fa-recycle"></i>
+                    <i class="fas fa-bell"></i>
                 </div>
                 <div class="feature-content">
-                    <h3>Hyperlocal Waste-to-Resource Map</h3>
-                    <p>AI maps local garbage, unused materials, and suggests ways to convert them into energy, compost, or craft materials.</p>
-                    <a href="hyperlocalewaste.html" class="feature-link">Explore <i class="fas fa-arrow-right"></i></a>
+                    <h3>Smart Alert System</h3>
+                    <p>Automatically alerts nearby volunteer drivers and emergency services when a critical situation is detected.</p>
                 </div>
             </div>
 
-            <!-- Water Sharing Feature -->
+            <!-- Feature 4 -->
             <div class="feature-card">
                 <div class="feature-icon">
-                    <i class="fas fa-tint"></i>
+                    <i class="fas fa-map-marked-alt"></i>
                 </div>
                 <div class="feature-content">
-                    <h3>Dynamic Water Sharing Platform</h3>
-                    <p>In water-scarce areas, digitally share water from wells or ponds. AI predicts needs and optimizes availability.</p>
-                    <a href="dynamicwater.html" class="feature-link">Explore <i class="fas fa-arrow-right"></i></a>
+                    <h3>Real-time Tracking</h3>
+                    <p>Track the location of emergency vehicles in real-time and provide estimated arrival times to those in need.</p>
                 </div>
             </div>
 
-            <!-- Cultural Preservation Feature -->
+            <!-- Feature 5 -->
             <div class="feature-card">
                 <div class="feature-icon">
-                    <i class="fas fa-monument"></i>
+                    <i class="fas fa-first-aid"></i>
                 </div>
                 <div class="feature-content">
-                    <h3>Smart Cultural Preservation AI</h3>
-                    <p>AI records local folklore, songs, rituals, crafts, then generates interactive digital tutorials for education and tourism.</p>
-                    <a href="smartculturepreservation.html" class="feature-link">Explore <i class="fas fa-arrow-right"></i></a>
+                    <h3>Emergency Guidance</h3>
+                    <p>Provides step-by-step first aid instructions to volunteers while en route to the emergency location.</p>
                 </div>
             </div>
 
-            <!-- Emergency Transport Feature -->
+            <!-- Feature 6 -->
             <div class="feature-card">
                 <div class="feature-icon">
-                    <i class="fas fa-ambulance"></i>
+                    <i class="fas fa-network-wired"></i>
                 </div>
                 <div class="feature-content">
-                    <h3>AI-Powered Emergency Micro-Transport</h3>
-                    <p>Coordinates local vehicles, predicts fastest routes, and alerts drivers during emergencies in areas lacking ambulances.</p>
-                    <a href="transport.html" class="feature-link">Explore <i class="fas fa-arrow-right"></i></a>
+                    <h3>Community Network</h3>
+                    <p>Builds a reliable network of volunteer drivers who can be mobilized instantly during emergencies.</p>
                 </div>
             </div>
+        </div>
+    </section>
 
-            <!-- Energy Harvesting Feature -->
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-solar-panel"></i>
+    <!-- How It Works -->
+    <section class="container how-it-works" id="how-it-works">
+        <div class="section-title">
+            <h2>How It Works</h2>
+        </div>
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3>Emergency Detected</h3>
+                    <p>Emergency is reported via app, call, or community alert system.</p>
                 </div>
-                <div class="feature-content">
-                    <h3>Personal Energy Harvesting Tracker</h3>
-                    <p>Simulates solar, wind, or human energy collection. AI suggests how to maximize energy usage & storage for each household.</p>
-                    <a href="personalenergyhervesting.html" class="feature-link">Explore <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3>AI Analysis</h3>
+                    <p>AI analyzes location, urgency, and available resources.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3>Driver Alert</h3>
+                    <p>Nearby volunteer drivers are notified and dispatched.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h3>Route Optimization</h3>
+                    <p>Fastest route calculated with real-time traffic updates.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">5</div>
+                <div class="step-content">
+                    <h3>Emergency Response</h3>
+                    <p>Driver reaches location and provides assistance.</p>
                 </div>
             </div>
         </div>
@@ -790,17 +861,17 @@
         <div class="container">
             <div class="dashboard-content">
                 <div class="dashboard-text">
-                    <h2>Unified Agricultural Intelligence Dashboard</h2>
-                    <p>Our integrated platform brings all agricultural solutions together in one seamless interface. Monitor crop swaps, resource allocation, repair requests, and energy harvesting from a single dashboard.</p>
-                    <p>AI-powered insights help you make data-driven decisions for maximum efficiency and sustainability.</p>
-                    <a href="#" class="btn btn-primary">Experience Dashboard</a>
+                    <h2>Real-Time Emergency Dashboard</h2>
+                    <p>Our intelligent dashboard provides a comprehensive view of all active emergencies, available vehicles, and response times. Emergency coordinators can monitor the entire system and make data-driven decisions.</p>
+                    <p>The AI continuously learns from response patterns to improve future emergency handling.</p>
+                    <a href="#" class="btn btn-primary">View Live Dashboard</a>
                 </div>
                 <div class="dashboard-image">
                     <!-- Placeholder for dashboard image -->
-                    <div style="background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(119, 0, 255, 0.2)); height: 300px; display: flex; align-items: center; justify-content: center; color: white; position: relative;">
-                        <i class="fas fa-chart-line" style="font-size: 5rem; color: var(--primary); text-shadow: 0 0 20px var(--primary);"></i>
-                        <div style="position: absolute; top: 20px; left: 20px; color: var(--primary); font-weight: bold;">Live Analytics</div>
-                        <div style="position: absolute; bottom: 20px; right: 20px; color: var(--secondary); font-weight: bold;">AI Predictions</div>
+                    <div style="background: linear-gradient(135deg, rgba(255, 51, 102, 0.2), rgba(51, 102, 255, 0.2)); height: 300px; display: flex; align-items: center; justify-content: center; color: white; position: relative;">
+                        <i class="fas fa-map" style="font-size: 5rem; color: var(--primary); text-shadow: 0 0 20px var(--primary);"></i>
+                        <div style="position: absolute; top: 20px; left: 20px; color: var(--primary); font-weight: bold;">Active Emergencies: 3</div>
+                        <div style="position: absolute; bottom: 20px; right: 20px; color: var(--secondary); font-weight: bold;">Available Vehicles: 12</div>
                     </div>
                 </div>
             </div>
@@ -811,20 +882,20 @@
     <section class="container">
         <div class="stats">
             <div class="stat-item">
-                <span class="stat-number">15K+</span>
-                <span class="stat-label">Farmers Connected</span>
+                <span class="stat-number">2.4K</span>
+                <span class="stat-label">Lives Saved</span>
             </div>
             <div class="stat-item">
-                <span class="stat-number">42%</span>
-                <span class="stat-label">Reduction in Food Waste</span>
+                <span class="stat-number">58%</span>
+                <span class="stat-label">Faster Response</span>
             </div>
             <div class="stat-item">
-                <span class="stat-number">78%</span>
-                <span class="stat-label">Cost Savings</span>
+                <span class="stat-number">3.7K</span>
+                <span class="stat-label">Volunteer Drivers</span>
             </div>
             <div class="stat-item">
-                <span class="stat-number">96%</span>
-                <span class="stat-label">User Satisfaction</span>
+                <span class="stat-number">24/7</span>
+                <span class="stat-label">Active Service</span>
             </div>
         </div>
     </section>
@@ -838,37 +909,37 @@
             <div class="testimonial-grid">
                 <div class="testimonial-card">
                     <div class="testimonial-text">
-                        "The crop swap feature transformed how we distribute our surplus. Instead of selling at low prices, we now exchange with neighboring farms, saving money and reducing waste."
+                        "When my father had a heart attack in our remote village, the emergency transport AI dispatched a volunteer within minutes. They arrived faster than any ambulance could have and saved his life."
                     </div>
                     <div class="testimonial-author">
-                        <div class="author-avatar">RK</div>
+                        <div class="author-avatar">PS</div>
                         <div class="author-info">
-                            <h4>Rajesh Kumar</h4>
-                            <p>Farm Owner, Punjab</p>
+                            <h4>Priya Sharma</h4>
+                            <p>Daughter of Patient, Rural Maharashtra</p>
                         </div>
                     </div>
                 </div>
                 <div class="testimonial-card">
                     <div class="testimonial-text">
-                        "The repair assistant helped our village fix irrigation pumps and farming tools without waiting for technicians. It's like having an expert available 24/7."
+                        "As a volunteer driver, I've helped transport 7 emergency cases to hospitals. The AI routing is incredibly accurate - it always finds the fastest way even through complicated village roads."
                     </div>
                     <div class="testimonial-author">
-                        <div class="author-avatar">SP</div>
+                        <div class="author-avatar">RS</div>
                         <div class="author-info">
-                            <h4>Sunita Patel</h4>
-                            <p>Village Leader, Maharashtra</p>
+                            <h4>Rahul Singh</h4>
+                            <p>Volunteer Driver, Uttar Pradesh</p>
                         </div>
                     </div>
                 </div>
                 <div class="testimonial-card">
                     <div class="testimonial-text">
-                        "Water sharing during drought season used to cause conflicts. Now with AI predictions, we have a fair system that ensures everyone gets what they need."
+                        "Our village lacked proper ambulance services for years. This system has completely transformed our emergency response capability. In the last 6 months, response times have improved by over 50%."
                     </div>
                     <div class="testimonial-author">
-                        <div class="author-avatar">AM</div>
+                        <div class="author-avatar">AK</div>
                         <div class="author-info">
-                            <h4>Anil Mehta</h4>
-                            <p>Agricultural Business Owner</p>
+                            <h4>Anita Kumar</h4>
+                            <p>Village Health Worker, Bihar</p>
                         </div>
                     </div>
                 </div>
@@ -879,9 +950,12 @@
     <!-- CTA Section -->
     <section class="cta" id="contact">
         <div class="container">
-            <h2>Ready to Transform Your Agricultural Operations?</h2>
-            <p>Join thousands of farmers and businesses already using AgriSphere AI to increase efficiency, reduce waste, and build sustainable communities.</p>
-            <a href="#" class="btn btn-primary">Get Started Today</a>
+            <h2>Join Our Life-Saving Network</h2>
+            <p>Whether you need emergency assistance or want to become a volunteer driver, our AI-powered system is here to help communities in need.</p>
+            <div class="hero-buttons">
+                <a href="#" class="btn btn-primary">Download Emergency App</a>
+                <a href="#" class="btn btn-outline">Register as Volunteer</a>
+            </div>
         </div>
     </section>
 
@@ -890,8 +964,8 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-column">
-                    <h3>AgriSphere AI</h3>
-                    <p>Revolutionizing agriculture through AI-powered solutions for farmers, businesses, and rural communities.</p>
+                    <h3>Emergency Transport AI</h3>
+                    <p>Revolutionizing emergency response in underserved areas through AI-powered vehicle coordination and route optimization.</p>
                     <div class="social-links">
                         <a href="#"><i class="fab fa-facebook-f"></i></a>
                         <a href="#"><i class="fab fa-twitter"></i></a>
@@ -900,33 +974,46 @@
                     </div>
                 </div>
                 <div class="footer-column">
-                    <h3>Solutions</h3>
+                    <h3>Quick Links</h3>
                     <ul class="footer-links">
-                        <li><a href="#">Crop Swap Network</a></li>
-                        <li><a href="#">Repair Assistant</a></li>
-                        <li><a href="#">Waste-to-Resource Map</a></li>
-                        <li><a href="#">Water Sharing Platform</a></li>
-                        <li><a href="#">Cultural Preservation</a></li>
+                        <li><a href="#">Request Help</a></li>
+                        <li><a href="#">Become a Volunteer</a></li>
+                        <li><a href="#">Emergency Resources</a></li>
+                        <li><a href="#">Training Materials</a></li>
+                        <li><a href="#">Community Guidelines</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
-                    <h3>Company</h3>
+                    <h3>Resources</h3>
                     <ul class="footer-links">
-                        <li><a href="aboutus.html">About Us</a></li>
-                        <li><a href="ourteam.html">Our Team</a></li>
+                        <li><a href="#">How It Works</a></li>
+                        <li><a href="#">Safety Protocols</a></li>
+                        <li><a href="#">Driver Training</a></li>
+                        <li><a href="#">Emergency Procedures</a></li>
+                        <li><a href="#">FAQ</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
-                    <h3>Contact Info</h3>
+                    <h3>Contact</h3>
                     <ul class="footer-links">
-                        <li><i class="fas fa-map-marker-alt"></i> Tarakeswar, India</li>
-                        <li><i class="fas fa-phone"></i> +91 9064703308</li>
-                        <li><i class="fas fa-envelope"></i> visionaryinnovators05@gmail.com</li>
+                        <li><a href="#">Emergency Hotline: 1-800-HELP-NOW</a></li>
+                        <li><a href="#">Volunteer Support</a></li>
+                        <li><a href="#">Partnership Inquiries</a></li>
+                        <li><a href="#">Media Relations</a></li>
+                        <li><a href="#">Feedback</a></li>
                     </ul>
                 </div>
             </div>
+            <div class="footer-column">
+                <h3>Contact Info</h3>
+                <ul class="footer-links">
+                    <li><i class="fas fa-map-marker-alt"></i> Tarakeswar, India</li>
+                    <li><i class="fas fa-phone"></i> +91 9064703308</li>
+                    <li><i class="fas fa-envelope"></i> visionaryinnovators05@gmail.com</li>
+                </ul>
+            </div>
             <div class="copyright">
-                <p>&copy; 2025 AgriSphere AI. All rights reserved.</p>
+                <p>&copy; 2025 Emergency Transport AI. All rights reserved. | Part of AgriSphere AI Network</p>
             </div>
         </div>
     </footer>
@@ -981,20 +1068,38 @@
             observer.observe(card);
         });
 
+        // Observe steps for animation
+        document.querySelectorAll('.step').forEach(step => {
+            step.style.opacity = '0';
+            step.style.transform = 'translateY(20px)';
+            step.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            observer.observe(step);
+        });
+
         // Add glowing effect to buttons on hover
         document.querySelectorAll('.btn').forEach(button => {
             button.addEventListener('mouseenter', function() {
-                this.style.boxShadow = '0 0 25px rgba(0, 255, 136, 0.7)';
+                this.style.boxShadow = '0 0 25px rgba(255, 51, 102, 0.7)';
             });
             
             button.addEventListener('mouseleave', function() {
                 if(this.classList.contains('btn-primary')) {
-                    this.style.boxShadow = '0 0 20px rgba(0, 255, 136, 0.5)';
+                    this.style.boxShadow = '0 0 20px rgba(255, 51, 102, 0.5)';
                 } else {
                     this.style.boxShadow = 'none';
                 }
             });
         });
+
+        // Emergency button animation
+        const emergencyBtn = document.querySelector('.btn-primary');
+        if(emergencyBtn && emergencyBtn.textContent.includes('Emergency')) {
+            setInterval(() => {
+                emergencyBtn.style.boxShadow = emergencyBtn.style.boxShadow === '0 0 30px rgba(255, 51, 102, 0.8)' 
+                    ? '0 0 20px rgba(255, 51, 102, 0.5)' 
+                    : '0 0 30px rgba(255, 51, 102, 0.8)';
+            }, 1000);
+        }
     </script>
 </body>
 </html>

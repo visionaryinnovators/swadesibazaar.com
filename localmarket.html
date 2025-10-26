@@ -77,18 +77,23 @@
             align-items: center;
             gap: 10px;
             cursor: pointer;
+            text-decoration: none;
         }
 
-        .logo h1 {
+        .logo-image {
+            height: 50px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .logo-text {
             font-size: 32px;
             background: var(--gold-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             letter-spacing: -0.5px;
-        }
-
-        .logo span {
-            color: var(--white);
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
         }
 
         .search-bar {
@@ -809,9 +814,10 @@
     <header class="premium-header">
         <div class="container">
             <div class="header-top">
-                <div class="logo" id="logo">
-                    <h1>Luxe<span>Local</span></h1>
-                </div>
+                <a href="index.html" class="logo">
+                    <img src="logo.png" alt="LuxeLocal Logo" class="logo-image" onerror="this.style.display='none'">
+                    <div class="logo-text">LuxeLocal</div>
+                </a>
                 <div class="search-bar">
                     <input type="text" placeholder="Search for luxury products, artisans, or categories...">
                     <button><i class="fas fa-search"></i></button>
@@ -1045,12 +1051,13 @@
     <script>
         // Firebase Configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyC4wGDrRHs4gQN6p8Q9X7VqY9t8d4Jk8Xw",
-            authDomain: "luxelocal-premium.firebaseapp.com",
-            projectId: "luxelocal-premium",
-            storageBucket: "luxelocal-premium.appspot.com",
-            messagingSenderId: "123456789012",
-            appId: "1:123456789012:web:abcdef1234567890"
+            apiKey: "AIzaSyBSUaOWX7giwjq31T4ExHjZkpu2BLZJRQM",
+            authDomain: "login-page-a394f.firebaseapp.com",
+            projectId: "login-page-a394f",
+            storageBucket: "login-page-a394f.firebasestorage.app",
+            messagingSenderId: "605712065355",
+            appId: "1:605712065355:web:8019336951dc5a3dee7ece",
+            measurementId: "G-R4JBKP5KNW"
         };
 
         // Initialize Firebase

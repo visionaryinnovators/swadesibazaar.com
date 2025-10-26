@@ -69,6 +69,12 @@
             cursor: pointer;
         }
 
+        .logo-image {
+            height: 50px;
+            width: auto;
+            border-radius: 5px;
+        }
+
         .logo h1 {
             font-size: 28px;
             color: var(--gold);
@@ -773,6 +779,14 @@
             .product-actions {
                 flex-direction: column;
             }
+            
+            .logo h1 {
+                font-size: 22px;
+            }
+            
+            .logo-image {
+                height: 40px;
+            }
         }
     </style>
 </head>
@@ -782,7 +796,8 @@
         <div class="container">
             <div class="header-top">
                 <div class="logo">
-                    <h1>Artisan<span>Forge</span></h1>
+                    <img src="logo.png" alt="Artisan Forge Logo" class="logo-image">
+                    <h1>Artisan <span>Forge</span></h1>
                 </div>
                 <ul class="nav-links">
                     <li><a href="#home">Home</a></li>
@@ -1085,14 +1100,14 @@
                 <div class="footer-column">
                     <h3>Contact Info</h3>
                     <ul class="footer-links">
-                        <li><i class="fas fa-map-marker-alt"></i> 123 Artisan Lane, Jaipur, India</li>
-                        <li><i class="fas fa-phone"></i> +91 98765 43210</li>
-                        <li><i class="fas fa-envelope"></i> info@artisanforge.com</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Tarakeswar, India</li>
+                        <li><i class="fas fa-phone"></i> +91 9064703308</li>
+                        <li><i class="fas fa-envelope"></i> visionaryinnovators05@gmail.com</li>
                     </ul>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2023 Artisan Forge. All rights reserved. | Crafted with precision and passion</p>
+                <p>&copy; 2025 Artisan Forge. All rights reserved. | Crafted with precision and passion</p>
             </div>
         </div>
     </footer>
@@ -1102,13 +1117,14 @@
     <script>
         // Firebase Configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyC4wGDrRHs4gQN6p8Q9X7VqY9t8d4Jk8Xw",
-            authDomain: "artisan-forge.firebaseapp.com",
-            projectId: "artisan-forge",
-            storageBucket: "artisan-forge.appspot.com",
-            messagingSenderId: "123456789012",
-            appId: "1:123456789012:web:abcdef1234567890"
-        };
+            apiKey: "AIzaSyBSUaOWX7giwjq31T4ExHjZkpu2BLZJRQM",
+            authDomain: "login-page-a394f.firebaseapp.com",
+            projectId: "login-page-a394f",
+            storageBucket: "login-page-a394f.firebasestorage.app",
+            messagingSenderId: "605712065355",
+            appId: "1:605712065355:web:8019336951dc5a3dee7ece",
+            measurementId: "G-R4JBKP5KNW"
+        }; 
 
         // Initialize Firebase
         if (typeof firebase === 'undefined') {

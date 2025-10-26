@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waste-to-Resource Map | AgriSphere AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        :root {
+            --primary: #00ff88;
+            --primary-light: #80ffc2;
+            --secondary: #ff00aa;
+            --accent: #7700ff;
+            --dark: #0a0a1a;
+            --darker: #050510;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--darker), var(--dark));
+            color: var(--light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Glowing Elements */
+        .glow {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.15;
+            z-index: -1;
+        }
+
+        .glow-1 {
+            top: 10%;
+            left: 10%;
+            background: radial-gradient(circle, var(--primary), transparent);
+        }
+
+        .glow-2 {
+            bottom: 10%;
+            right: 10%;
+            background: radial-gradient(circle, var(--secondary), transparent);
+        }
+
+        .glow-3 {
+            top: 40%;
+            right: 20%;
+            background: radial-gradient(circle, var(--accent), transparent);
+        }
+
+        /* Header Styles */
+        header {
+            background: rgba(10, 10, 26, 0.8);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 255, 136, 0.1);
+            border-bottom: 1px solid rgba(0, 255, 136, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            font-size: 2rem;
+            color: var(--primary);
+            text-shadow: 0 0 15px var(--primary);
+            animation: pulse 2s infinite;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            position: relative;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+            text-shadow: 0 0 10px var(--primary);
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            color: var(--dark);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: var(--dark);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.8);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(rgba(5, 5, 16, 0.85), rgba(5, 5, 16, 0.9)), url('https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 5rem 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero h2 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            max-width: 800px;
+            margin: 0 auto 2.5rem;
+            opacity: 0.9;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .map-container {
+            flex: 2;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 20px rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.1);
+            height: 600px;
+        }
+
+        #waste-map {
+            height: 100%;
+            width: 100%;
+            border-radius: 15px;
+        }
+
+        .controls-panel {
+            flex: 1;
+            background: rgba(10, 10, 26, 0.7);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 20px rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .panel-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .panel-section h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
+            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+            padding-bottom: 0.5rem;
+        }
+
+        .filter-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .filter-option {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .filter-option:hover {
+            background: rgba(0, 255, 136, 0.1);
+        }
+
+        .filter-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+
+        .waste-type-organic {
+            background-color: #2a6b3c;
+        }
+
+        .waste-type-plastic {
+            background-color: #ff6b6b;
+        }
+
+        .waste-type-metal {
+            background-color: #4d4d4d;
+        }
+
+        .waste-type-glass {
+            background-color: #4dabf7;
+        }
+
+        .waste-type-paper {
+            background-color: #ffd43b;
+        }
+
+        .waste-type-electronic {
+            background-color: #cc5de8;
+        }
+
+        .waste-type-textile {
+            background-color: #f06595;
+        }
+
+        .conversion-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .conversion-option {
+            background: rgba(10, 10, 26, 0.5);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            transition: var(--transition);
+            cursor: pointer;
+            border: 1px solid rgba(0, 255, 136, 0.1);
+        }
+
+        .conversion-option:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), 0 0 10px rgba(0, 255, 136, 0.2);
+        }
+
+        .conversion-icon {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 10px var(--primary);
+        }
+
+        .ai-suggestions {
+            background: rgba(10, 10, 26, 0.7);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 20px rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.1);
+        }
+
+        .ai-suggestions h3 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .suggestion-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .suggestion-card {
+            background: rgba(10, 10, 26, 0.5);
+            border-radius: 10px;
+            padding: 1.5rem;
+            transition: var(--transition);
+            border: 1px solid rgba(0, 255, 136, 0.1);
+        }
+
+        .suggestion-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3), 0 0 10px rgba(0, 255, 136, 0.2);
+        }
+
+        .suggestion-card h4 {
+            color: var(--primary);
+            margin-bottom: 0.8rem;
+            font-size: 1.2rem;
+        }
+
+        .suggestion-card p {
+            color: rgba(248, 249, 250, 0.8);
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .suggestion-stats {
+            display: flex;
+            justify-content: space-between;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 3rem 0;
+        }
+
+        .stat-card {
+            background: rgba(10, 10, 26, 0.7);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), 0 0 10px rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.1);
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3), 0 0 15px rgba(0, 255, 136, 0.2);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            text-shadow: 0 0 10px var(--primary);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+        }
+
+        .stat-label {
+            color: rgba(248, 249, 250, 0.8);
+            font-size: 0.95rem;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--darker);
+            color: white;
+            padding: 4rem 0 2rem;
+            border-top: 1px solid rgba(0, 255, 136, 0.1);
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-column h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .footer-column h3:after {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 3px;
+            background: var(--secondary);
+            bottom: 0;
+            left: 0;
+            box-shadow: 0 0 10px var(--secondary);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-links a {
+            color: #aaa;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+            padding-left: 5px;
+            text-shadow: 0 0 10px var(--primary);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: white;
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            background: var(--primary);
+            color: var(--dark);
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0% {
+                text-shadow: 0 0 10px var(--primary);
+            }
+            50% {
+                text-shadow: 0 0 20px var(--primary), 0 0 30px var(--primary);
+            }
+            100% {
+                text-shadow: 0 0 10px var(--primary);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .hero h2 {
+                font-size: 2.5rem;
+            }
+            
+            nav ul {
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .hero h2 {
+                font-size: 2rem;
+            }
+            
+            .hero p {
+                font-size: 1.1rem;
+            }
+            
+            .conversion-options {
+                grid-template-columns: 1fr;
+            }
+            
+            .suggestion-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Glowing Background Elements -->
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+    <div class="glow glow-3"></div>
+    
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-recycle"></i>
+                    <h1>AgriSphere AI</h1>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">Solutions</a></li>
+                        <li><a href="#" class="active">Waste-to-Resource</a></li>
+                        <li><a href="#">Dashboard</a></li>
+                        <li><a href="#">About</a></li>
+                    </ul>
+                </nav>
+                <div class="auth-buttons">
+                    <a href="#" class="btn btn-outline">Log In</a>
+                    <a href="#" class="btn btn-primary">Sign Up</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h2>Hyperlocal Waste-to-Resource Map</h2>
+            <p>AI-powered mapping of local garbage and unused materials with intelligent suggestions for converting waste into energy, compost, or craft materials.</p>
+            <a href="#map-section" class="btn btn-primary">Explore the Map</a>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Stats Section -->
+        <div class="stats-section">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <div class="stat-number">247</div>
+                <div class="stat-label">Waste Points Mapped</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-recycle"></i>
+                </div>
+                <div class="stat-number">68%</div>
+                <div class="stat-label">Recycling Rate</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <div class="stat-number">42</div>
+                <div class="stat-label">Energy Projects</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-leaf"></i>
+                </div>
+                <div class="stat-number">1.2K</div>
+                <div class="stat-label">Tons Composted</div>
+            </div>
+        </div>
+
+        <!-- Map Section -->
+        <section id="map-section" class="main-content">
+            <div class="map-container">
+                <div id="waste-map"></div>
+            </div>
+            <div class="controls-panel">
+                <div class="panel-section">
+                    <h3>Waste Types</h3>
+                    <div class="filter-options">
+                        <div class="filter-option" data-type="organic">
+                            <div class="filter-color waste-type-organic"></div>
+                            <span>Organic Waste</span>
+                        </div>
+                        <div class="filter-option" data-type="plastic">
+                            <div class="filter-color waste-type-plastic"></div>
+                            <span>Plastic</span>
+                        </div>
+                        <div class="filter-option" data-type="metal">
+                            <div class="filter-color waste-type-metal"></div>
+                            <span>Metal</span>
+                        </div>
+                        <div class="filter-option" data-type="glass">
+                            <div class="filter-color waste-type-glass"></div>
+                            <span>Glass</span>
+                        </div>
+                        <div class="filter-option" data-type="paper">
+                            <div class="filter-color waste-type-paper"></div>
+                            <span>Paper</span>
+                        </div>
+                        <div class="filter-option" data-type="electronic">
+                            <div class="filter-color waste-type-electronic"></div>
+                            <span>E-Waste</span>
+                        </div>
+                        <div class="filter-option" data-type="textile">
+                            <div class="filter-color waste-type-textile"></div>
+                            <span>Textile</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>Conversion Options</h3>
+                    <div class="conversion-options">
+                        <div class="conversion-option" data-conversion="compost">
+                            <div class="conversion-icon">
+                                <i class="fas fa-leaf"></i>
+                            </div>
+                            <div>Compost</div>
+                        </div>
+                        <div class="conversion-option" data-conversion="energy">
+                            <div class="conversion-icon">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <div>Energy</div>
+                        </div>
+                        <div class="conversion-option" data-conversion="recycle">
+                            <div class="conversion-icon">
+                                <i class="fas fa-recycle"></i>
+                            </div>
+                            <div>Recycle</div>
+                        </div>
+                        <div class="conversion-option" data-conversion="craft">
+                            <div class="conversion-icon">
+                                <i class="fas fa-palette"></i>
+                            </div>
+                            <div>Craft</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>AI Analysis</h3>
+                    <div class="ai-analysis">
+                        <p>AI has identified <strong>12 high-potential conversion sites</strong> in your area with estimated value of <strong>$4,200</strong> in recovered materials.</p>
+                        <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Generate Report</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI Suggestions Section -->
+        <section class="ai-suggestions">
+            <h3><i class="fas fa-robot"></i> AI-Powered Conversion Suggestions</h3>
+            <div class="suggestion-list">
+                <div class="suggestion-card">
+                    <h4>Community Composting Hub</h4>
+                    <p>Convert organic waste from 5 nearby locations into high-quality compost for local farms and gardens.</p>
+                    <div class="suggestion-stats">
+                        <span>Potential: 2.5 tons/month</span>
+                        <span>Value: $1,200</span>
+                    </div>
+                </div>
+                <div class="suggestion-card">
+                    <h4>Plastic to 3D Printing Filament</h4>
+                    <p>Transform collected plastic waste into 3D printing filament for local makers and schools.</p>
+                    <div class="suggestion-stats">
+                        <span>Potential: 180 kg/month</span>
+                        <span>Value: $900</span>
+                    </div>
+                </div>
+                <div class="suggestion-card">
+                    <h4>Textile Upcycling Workshop</h4>
+                    <p>Convert textile waste into fashionable accessories and home decor items through community workshops.</p>
+                    <div class="suggestion-stats">
+                        <span>Potential: 80 items/month</span>
+                        <span>Value: $1,500</span>
+                    </div>
+                </div>
+                <div class="suggestion-card">
+                    <h4>Biogas Energy Plant</h4>
+                    <p>Use organic waste to generate biogas for cooking and electricity in the community center.</p>
+                    <div class="suggestion-stats">
+                        <span>Potential: 150 kWh/day</span>
+                        <span>Value: $600</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>AgriSphere AI</h3>
+                    <p>Transforming waste into resources through AI-powered solutions for sustainable communities.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Solutions</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Waste-to-Resource Map</a></li>
+                        <li><a href="#">Crop Swap Network</a></li>
+                        <li><a href="#">Repair Assistant</a></li>
+                        <li><a href="#">Water Sharing Platform</a></li>
+                        <li><a href="#">Cultural Preservation</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Resources</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Case Studies</a></li>
+                        <li><a href="#">Research Papers</a></li>
+                        <li><a href="#">Community Guidelines</a></li>
+                        <li><a href="#">API Documentation</a></li>
+                        <li><a href="#">Support</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contact</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">info@agrisphere.ai</a></li>
+                        <li><a href="#">+1 (555) 123-4567</a></li>
+                        <li><a href="#">Visit Our Office</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Partnerships</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-column">
+                <h3>Contact Info</h3>
+                <ul class="footer-links">
+                    <li><i class="fas fa-map-marker-alt"></i> Tarakeswar, India</li>
+                    <li><i class="fas fa-phone"></i> +91 9064703308</li>
+                    <li><i class="fas fa-envelope"></i> visionaryinnovators05@gmail.com</li>
+                </ul>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 AgriSphere AI. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize the map
+        const map = L.map('waste-map').setView([28.6139, 77.2090], 12); // Default to Delhi
+
+        // Add tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Waste data with coordinates (simulated)
+        const wasteData = [
+            { lat: 28.6139, lng: 77.2090, type: 'organic', amount: 'High', conversion: 'compost' },
+            { lat: 28.6129, lng: 77.2295, type: 'plastic', amount: 'Medium', conversion: 'recycle' },
+            { lat: 28.6049, lng: 77.2190, type: 'metal', amount: 'Low', conversion: 'recycle' },
+            { lat: 28.6239, lng: 77.1990, type: 'glass', amount: 'Medium', conversion: 'recycle' },
+            { lat: 28.6339, lng: 77.1890, type: 'paper', amount: 'High', conversion: 'craft' },
+            { lat: 28.6439, lng: 77.1790, type: 'electronic', amount: 'Low', conversion: 'recycle' },
+            { lat: 28.6539, lng: 77.1690, type: 'textile', amount: 'Medium', conversion: 'craft' },
+            { lat: 28.5939, lng: 77.2390, type: 'organic', amount: 'High', conversion: 'energy' },
+            { lat: 28.5839, lng: 77.2490, type: 'plastic', amount: 'Medium', conversion: 'craft' },
+            { lat: 28.5739, lng: 77.2590, type: 'organic', amount: 'High', conversion: 'compost' }
+        ];
+
+        // Waste type to color mapping
+        const wasteTypeColors = {
+            'organic': '#2a6b3c',
+            'plastic': '#ff6b6b',
+            'metal': '#4d4d4d',
+            'glass': '#4dabf7',
+            'paper': '#ffd43b',
+            'electronic': '#cc5de8',
+            'textile': '#f06595'
+        };
+
+        // Add markers to the map
+        const markers = [];
+        wasteData.forEach(waste => {
+            const marker = L.circleMarker([waste.lat, waste.lng], {
+                color: wasteTypeColors[waste.type],
+                fillColor: wasteTypeColors[waste.type],
+                fillOpacity: 0.7,
+                radius: 10
+            }).addTo(map);
+            
+            marker.bindPopup(`
+                <div style="color: #333;">
+                    <h3 style="margin: 0 0 10px 0; color: ${wasteTypeColors[waste.type]}">${waste.type.charAt(0).toUpperCase() + waste.type.slice(1)} Waste</h3>
+                    <p><strong>Amount:</strong> ${waste.amount}</p>
+                    <p><strong>Suggested Conversion:</strong> ${waste.conversion}</p>
+                    <button class="btn btn-primary" style="margin-top: 10px; padding: 5px 10px; font-size: 0.9rem;">View Details</button>
+                </div>
+            `);
+            
+            markers.push({
+                marker: marker,
+                type: waste.type,
+                conversion: waste.conversion
+            });
+        });
+
+        // Filter functionality
+        document.querySelectorAll('.filter-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const wasteType = this.getAttribute('data-type');
+                
+                // Toggle active state
+                this.classList.toggle('active');
+                
+                // Show/hide markers based on selection
+                markers.forEach(item => {
+                    if (item.type === wasteType) {
+                        if (this.classList.contains('active')) {
+                            item.marker.addTo(map);
+                        } else {
+                            map.removeLayer(item.marker);
+                        }
+                    }
+                });
+            });
+        });
+
+        // Conversion option functionality
+        document.querySelectorAll('.conversion-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const conversionType = this.getAttribute('data-conversion');
+                
+                // Remove active class from all options
+                document.querySelectorAll('.conversion-option').forEach(opt => {
+                    opt.classList.remove('active');
+                });
+                
+                // Add active class to clicked option
+                this.classList.add('active');
+                
+                // Filter markers by conversion type
+                markers.forEach(item => {
+                    if (item.conversion === conversionType) {
+                        item.marker.addTo(map);
+                    } else {
+                        map.removeLayer(item.marker);
+                    }
+                });
+            });
+        });
+
+        // Add glowing effect to buttons on hover
+        document.querySelectorAll('.btn').forEach(button => {
+            button.addEventListener('mouseenter', function() {
+                this.style.boxShadow = '0 0 25px rgba(0, 255, 136, 0.7)';
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                if(this.classList.contains('btn-primary')) {
+                    this.style.boxShadow = '0 0 20px rgba(0, 255, 136, 0.5)';
+                } else {
+                    this.style.boxShadow = 'none';
+                }
+            });
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if(targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if(targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

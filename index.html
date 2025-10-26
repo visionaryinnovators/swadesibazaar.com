@@ -6,6 +6,9 @@
     <title>SwaDesi Bazaar | Your Local Market, Powered by AI</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.min.js"></script>
     
     <style>
         :root {
@@ -20,12 +23,17 @@
             --success: #2ecc71;
             --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
             --transition: all 0.3s ease;
+            --transition-slow: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
 
         body {
@@ -48,13 +56,31 @@
             padding: 0 20px;
         }
 
+        /* 3D Scene Container */
+        .scene-3d {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
         /* Header Styles */
         header {
-            background-color: var(--white);
+            background-color: rgba(255, 255, 255, 0.95);
             box-shadow: var(--shadow);
             position: sticky;
             top: 0;
             z-index: 1000;
+            backdrop-filter: blur(10px);
+            transition: var(--transition);
+        }
+
+        .header-scrolled {
+            background-color: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
         }
 
         .header-top {
@@ -69,6 +95,11 @@
             align-items: center;
             gap: 10px;
             cursor: pointer;
+        }
+
+        .logo img {
+            height: 100px;
+            width: auto;
         }
 
         .logo h1 {
@@ -299,18 +330,69 @@
         /* Hero Section */
         .hero {
             position: relative;
-            height: 600px;
-            background: linear-gradient(135deg, rgba(26, 26, 26, 0.8) 0%, rgba(139, 69, 19, 0.7) 100%), url('https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80') no-repeat center center;
-            background-size: cover;
-            color: white;
-            display: flex;
-            align-items: center;
+            height: 100vh;
+            min-height: 700px;
             overflow: hidden;
         }
 
+        .hero-carousel {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .hero-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .hero-slide.active {
+            opacity: 1;
+        }
+
+        .hero-slide-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+
+        .hero-slide-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .slide-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
         .hero-content {
-            max-width: 600px;
+            position: relative;
             z-index: 2;
+            max-width: 600px;
+            margin-left: 10%;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s ease forwards 0.5s;
         }
 
         .hero h2 {
@@ -337,6 +419,23 @@
             border: none;
             cursor: pointer;
             font-size: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: var(--transition-slow);
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
         }
 
         .cta-button:hover {
@@ -345,15 +444,90 @@
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
 
+        .carousel-nav {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 10;
+        }
+
+        .carousel-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .carousel-dot.active {
+            background: var(--primary);
+            transform: scale(1.2);
+        }
+
+        .carousel-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            z-index: 10;
+            backdrop-filter: blur(5px);
+        }
+
+        .carousel-arrow:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .carousel-arrow.prev {
+            left: 30px;
+        }
+
+        .carousel-arrow.next {
+            right: 30px;
+        }
+
+        /* 3D Product Showcase */
+        .product-showcase-3d {
+            position: absolute;
+            right: 10%;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 400px;
+            height: 400px;
+            z-index: 1;
+        }
+
         /* Features Section */
         .features {
-            padding: 80px 0;
+            padding: 100px 0;
             background-color: var(--white);
+            position: relative;
+            overflow: hidden;
         }
 
         .section-title {
             text-align: center;
             margin-bottom: 50px;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: var(--transition-slow);
+        }
+
+        .section-title.animate {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         .section-title h2 {
@@ -381,10 +555,18 @@
             box-shadow: var(--shadow);
             transition: var(--transition);
             text-align: center;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: var(--transition-slow);
+        }
+
+        .feature-card.animate {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         .feature-card:hover {
-            transform: translateY(-10px);
+            transform: translateY(-10px) scale(1.02);
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
         }
 
@@ -399,6 +581,13 @@
             margin: 0 auto 20px;
             font-size: 28px;
             color: var(--primary);
+            transition: var(--transition);
+        }
+
+        .feature-card:hover .feature-icon {
+            transform: rotateY(180deg);
+            background: var(--primary);
+            color: white;
         }
 
         .feature-card h3 {
@@ -412,8 +601,9 @@
 
         /* Categories Section */
         .categories {
-            padding: 80px 0;
+            padding: 100px 0;
             background-color: var(--light);
+            position: relative;
         }
 
         .categories-grid {
@@ -429,10 +619,18 @@
             overflow: hidden;
             box-shadow: var(--shadow);
             transition: var(--transition);
+            opacity: 0;
+            transform: translateY(30px);
+            transition: var(--transition-slow);
+        }
+
+        .category-card.animate {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         .category-card:hover {
-            transform: translateY(-10px);
+            transform: translateY(-10px) rotateX(5deg);
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
         }
 
@@ -455,6 +653,12 @@
             background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
             color: white;
             padding: 20px;
+            transform: translateY(10px);
+            transition: var(--transition);
+        }
+
+        .category-card:hover .category-overlay {
+            transform: translateY(0);
         }
 
         .category-overlay h3 {
@@ -464,8 +668,9 @@
 
         /* Trending Products */
         .trending {
-            padding: 80px 0;
+            padding: 100px 0;
             background-color: var(--white);
+            position: relative;
         }
 
         .trending-header {
@@ -473,6 +678,14 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 30px;
+            opacity: 0;
+            transform: translateX(-30px);
+            transition: var(--transition-slow);
+        }
+
+        .trending-header.animate {
+            opacity: 1;
+            transform: translateX(0);
         }
 
         .trending-header h2 {
@@ -506,10 +719,18 @@
             box-shadow: var(--shadow);
             transition: var(--transition);
             cursor: pointer;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: var(--transition-slow);
+        }
+
+        .product-card.animate {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         .product-card:hover {
-            transform: translateY(-10px);
+            transform: translateY(-10px) rotateY(5deg);
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
         }
 
@@ -604,13 +825,14 @@
 
         .add-to-cart:hover {
             background: var(--primary-dark);
-            transform: scale(1.1);
+            transform: scale(1.1) rotate(15deg);
         }
 
         /* Local Sellers Section */
         .local-sellers {
-            padding: 80px 0;
+            padding: 100px 0;
             background-color: var(--light);
+            position: relative;
         }
 
         .sellers-container {
@@ -628,10 +850,18 @@
             overflow: hidden;
             box-shadow: var(--shadow);
             transition: var(--transition);
+            opacity: 0;
+            transform: translateX(50px);
+            transition: var(--transition-slow);
+        }
+
+        .seller-card.animate {
+            opacity: 1;
+            transform: translateX(0);
         }
 
         .seller-card:hover {
-            transform: translateY(-10px);
+            transform: translateY(-10px) rotateZ(1deg);
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
         }
 
@@ -782,6 +1012,68 @@
             to { transform: translateX(-50%) translateY(0); opacity: 1; }
         }
 
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Translation Panel */
+        .translation-panel {
+            position: fixed;
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%);
+            background: white;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+            border-radius: 10px 0 0 10px;
+            padding: 15px;
+            z-index: 100;
+            transition: var(--transition);
+        }
+
+        .translation-panel.hidden {
+            transform: translateY(-50%) translateX(100%);
+        }
+
+        .translation-toggle {
+            position: absolute;
+            left: -40px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--primary);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px 0 0 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: -5px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .language-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .language-option {
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .language-option:hover {
+            background: #f5f5f5;
+        }
+
+        .language-option.active {
+            background: var(--primary);
+            color: white;
+        }
+
         /* Responsive Design */
         @media (max-width: 1024px) {
             .hero h2 {
@@ -790,6 +1082,12 @@
             
             .search-bar {
                 max-width: 400px;
+            }
+
+            .product-showcase-3d {
+                width: 300px;
+                height: 300px;
+                right: 5%;
             }
         }
 
@@ -809,7 +1107,8 @@
             }
             
             .hero {
-                height: 500px;
+                height: 80vh;
+                min-height: 600px;
             }
             
             .section-title h2 {
@@ -838,6 +1137,24 @@
             .header-actions .auth-buttons {
                 display: none;
             }
+
+            .product-showcase-3d {
+                display: none;
+            }
+
+            .translation-panel {
+                display: none;
+            }
+
+            .carousel-arrow {
+                display: none;
+            }
+            
+            .hero-content {
+                margin-left: 5%;
+                margin-right: 5%;
+                text-align: center;
+            }
         }
 
         @media (max-width: 480px) {
@@ -865,15 +1182,35 @@
     </style>
 </head>
 <body>
+    <!-- 3D Scene Container -->
+    <div class="scene-3d" id="scene3d"></div>
+
+    <!-- Translation Panel -->
+    <div class="translation-panel" id="translationPanel">
+        <div class="translation-toggle" id="translationToggle">
+            <i class="fas fa-language"></i>
+        </div>
+        <div class="language-options">
+            <div class="language-option active" data-lang="en">English</div>
+            <div class="language-option" data-lang="hi">हिन्दी</div>
+            <div class="language-option" data-lang="ta">தமிழ்</div>
+            <div class="language-option" data-lang="bn">বাংলা</div>
+            <div class="language-option" data-lang="te">తెలుగు</div>
+        </div>
+    </div>
+
     <!-- Header -->
-    <header>
+    <header id="mainHeader">
         <div class="container">
             <div class="header-top">
                 <button class="mobile-menu-btn" id="mobileMenuBtn">
                     <i class="fas fa-bars"></i>
                 </button>
-                <div class="logo" id="logo">
-                    <h1>Swa<span>Desi</span> Bazaar</h1>
+                <div class="logo">
+                    <a href="index.html">
+                        <img src="logo.png" alt="SwaDesi Bazaar Logo">
+                    </a>
+                    <div class="logo-text">SwaDesi Bazaar</div>
                 </div>
                 <div class="search-bar">
                     <input type="text" placeholder="Search for products, artisans, or categories...">
@@ -881,12 +1218,12 @@
                 </div>
                 <div class="header-actions">
                     <div class="language-selector">
-                        <select>
-                            <option>English</option>
-                            <option>हिन्दी</option>
-                            <option>தமிழ்</option>
-                            <option>বাংলা</option>
-                            <option>తెలుగు</option>
+                        <select id="languageSelector">
+                            <option value="en">English</option>
+                            <option value="hi">हिन्दी</option>
+                            <option value="ta">தமிழ்</option>
+                            <option value="bn">বাংলা</option>
+                            <option value="te">తెలుగు</option>
                         </select>
                     </div>
                     <div class="auth-buttons">
@@ -909,7 +1246,7 @@
                     <li><a href="handicrafts.html">Handicrafts</a></li>
                     <li><a href="home-decor.html">Home Decor</a></li>
                     <li><a href="clothing.html">Clothing</a></li>
-                    <li><a href="jewelry.html">Jewelry</a></li>
+                    <li><a href="jewellry.html">Jewelry</a></li>
                     <li><a href="groceries.html">Groceries</a></li>
                     <li><a href="local-markets.html">Local Markets</a></li>
                     <li><a href="artisans.html">Artisans</a></li>
@@ -923,6 +1260,7 @@
     <div class="mobile-nav" id="mobileNav">
         <div class="mobile-nav-header">
             <div class="logo">
+                <img src="logo.png" alt="SwaDesi Bazaar Logo">
                 <h1>Swa<span>Desi</span> Bazaar</h1>
             </div>
             <button class="mobile-nav-close" id="mobileNavClose">
@@ -946,50 +1284,279 @@
 
     <!-- Hero Section -->
     <section class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <h2>Discover Authentic Local Treasures</h2>
-                <p>Connect directly with artisans and sellers in your community. Premium quality, handcrafted products with the convenience of modern e-commerce.</p>
-                <a href="marketplace.html" class="cta-button">Explore Local Sellers</a>
+        <div class="hero-carousel" id="heroCarousel">
+            <!-- Slide 1 -->
+            <div class="hero-slide active">
+                <div class="hero-slide-bg"></div>
+                <div class="hero-slide-image">
+                    <img src="1.png" alt="Discover Authentic Local Treasures" class="slide-image">
+                </div>
+                <div class="hero-content">
+                    <h2 data-translate="hero_title">Discover Authentic Local Treasures</h2>
+                    <p data-translate="hero_description">Connect directly with artisans and sellers in your community. Premium quality, handcrafted products with the convenience of modern e-commerce.</p>
+                    <a href="./marketplace.html" class="cta-button" data-translate="hero_button">Explore Bazaar</a>
+                </div>
+                <div class="product-showcase-3d" id="productShowcase3d"></div>
             </div>
+            
+            <!-- Slide 2 -->
+            <div class="hero-slide">
+                <div class="hero-slide-bg"></div>
+                <div class="hero-slide-image">
+                    <img src="2.png" alt="Support Local Artisans" class="slide-image">
+                </div>
+                <div class="hero-content">
+                    <h2>Support Local Artisans</h2>
+                    <p>Empower traditional craftspeople by purchasing directly from them. Every purchase helps preserve cultural heritage and supports sustainable livelihoods.</p>
+                    <a href="./marketplace.html" class="cta-button" data-translate="hero_button">Explore Bazaar</a>
+                </div>
+            </div>
+            
+            <!-- Slide 3 -->
+            <div class="hero-slide">
+                <div class="hero-slide-bg"></div>
+                <div class="hero-slide-image">
+                    <img src="3.png" alt="Same-Day Local Delivery" class="slide-image">
+                </div>
+                <div class="hero-content">
+                    <h2>Same-Day Local Delivery</h2>
+                    <p>Get your orders delivered on the same day by our network of local delivery partners. Fresh, authentic products right to your doorstep.</p>
+                    <a href="./marketplace.html" class="cta-button" data-translate="hero_button">Explore Bazaar</a>
+                </div>
+            </div>
+            <!-- Slide 4 -->
+            <div class="hero-slide">
+                <div class="hero-slide-bg"></div>
+                <div class="hero-slide-image">
+                    <img src="4.png" alt="Support Local Artisans" class="slide-image">
+                </div>
+                <div class="hero-content">
+                    <h2>Support Local Artisans</h2>
+                    <p>Empower traditional craftspeople by purchasing directly from them. Every purchase helps preserve cultural heritage and supports sustainable livelihoods.</p>
+                    <a href="./marketplace.html" class="cta-button" data-translate="hero_button">Explore Bazaar</a>
+                </div>
+            </div>
+            <!-- Slide 5 -->
+            <div class="hero-slide">
+                <div class="hero-slide-bg"></div>
+                <div class="hero-slide-image">
+                    <img src="5.png" alt="Support Local Artisans" class="slide-image">
+                </div>
+                <div class="hero-content">
+                    <h2>Support Local Artisans</h2>
+                    <p>Empower traditional craftspeople by purchasing directly from them. Every purchase helps preserve cultural heritage and supports sustainable livelihoods.</p>
+                    <a href="./marketplace.html" class="cta-button" data-translate="hero_button">Explore Bazaar</a>
+                </div>
+            </div>
+            <!-- Slide 6 -->
+            <div class="hero-slide">
+                <div class="hero-slide-bg"></div>
+                <div class="hero-slide-image">
+                    <img src="6.png" alt="Support Local Artisans" class="slide-image">
+                </div>
+                <div class="hero-content">
+                    <h2>Support Local Artisans</h2>
+                    <p>Empower traditional craftspeople by purchasing directly from them. Every purchase helps preserve cultural heritage and supports sustainable livelihoods.</p>
+                    <a href="./marketplace.html" class="cta-button" data-translate="hero_button">Explore Bazaar</a>
+                </div>
+            </div>
+            <!-- Slide 7 -->
+            <div class="hero-slide">
+                <div class="hero-slide-bg"></div>
+                <div class="hero-slide-image">
+                    <img src="7.png" alt="Support Local Artisans" class="slide-image">
+                </div>
+                <div class="hero-content">
+                    <h2>Support Local Artisans</h2>
+                    <p>Empower traditional craftspeople by purchasing directly from them. Every purchase helps preserve cultural heritage and supports sustainable livelihoods.</p>
+                    <a href="./marketplace.html" class="cta-button" data-translate="hero_button">Explore Bazaar</a>
+                </div>
+            </div>
+            <!-- Slide 8 -->
+            <div class="hero-slide">
+                <div class="hero-slide-bg"></div>
+                <div class="hero-slide-image">
+                    <img src="8.png" alt="Support Local Artisans" class="slide-image">
+                </div>
+                <div class="hero-content">
+                    <h2>Support Local Artisans</h2>
+                    <p>Empower traditional craftspeople by purchasing directly from them. Every purchase helps preserve cultural heritage and supports sustainable livelihoods.</p>
+                    <a href="./marketplace.html" class="cta-button" data-translate="hero_button">Explore Bazaar</a>
+                </div>
+            </div>
+            <!-- Slide 9 -->
+            <div class="hero-slide">
+                <div class="hero-slide-bg"></div>
+                <div class="hero-slide-image">
+                    <img src="9.png" alt="Support Local Artisans" class="slide-image">
+                </div>
+                <div class="hero-content">
+                    <h2>Support Local Artisans</h2>
+                    <p>Empower traditional craftspeople by purchasing directly from them. Every purchase helps preserve cultural heritage and supports sustainable livelihoods.</p>
+                    <a href="./marketplace.html" class="cta-button" data-translate="hero_button">Explore Bazaar</a>
+                </div>
+            </div>
+            <!-- Slide 10 -->
+            <div class="hero-slide">
+                <div class="hero-slide-bg"></div>
+                <div class="hero-slide-image">
+                    <img src="10.png" alt="Support Local Artisans" class="slide-image">
+                </div>
+                <div class="hero-content">
+                    <h2>Support Local Artisans</h2>
+                    <p>Empower traditional craftspeople by purchasing directly from them. Every purchase helps preserve cultural heritage and supports sustainable livelihoods.</p>
+                    <a href="./marketplace.html" class="cta-button" data-translate="hero_button">Explore Bazaar</a>
+                </div>
+            </div>
+            <!-- Slide 11 -->
+            <div class="hero-slide">
+                <div class="hero-slide-bg"></div>
+                <div class="hero-slide-image">
+                    <img src="11.png" alt="Support Local Artisans" class="slide-image">
+                </div>
+                <div class="hero-content">
+                    <h2>Support Local Artisans</h2>
+                    <p>Empower traditional craftspeople by purchasing directly from them. Every purchase helps preserve cultural heritage and supports sustainable livelihoods.</p>
+                    <a href="./marketplace.html" class="cta-button" data-translate="hero_button">Explore Bazaar</a>
+                </div>
+            </div>
+            <!-- Slide 12 -->
+            <div class="hero-slide">
+                <div class="hero-slide-bg"></div>
+                <div class="hero-slide-image">
+                    <img src="12.png" alt="Support Local Artisans" class="slide-image">
+                </div>
+                <div class="hero-content">
+                    <h2>Support Local Artisans</h2>
+                    <p>Empower traditional craftspeople by purchasing directly from them. Every purchase helps preserve cultural heritage and supports sustainable livelihoods.</p>
+                    <a href="./marketplace.html" class="cta-button" data-translate="hero_button">Explore Bazaar</a>
+                </div>
+            </div>
+            <!-- Slide 13 -->
+            <div class="hero-slide">
+                <div class="hero-slide-bg"></div>
+                <div class="hero-slide-image">
+                    <img src="13.png" alt="Support Local Artisans" class="slide-image">
+                </div>
+                <div class="hero-content">
+                    <h2>Support Local Artisans</h2>
+                    <p>Empower traditional craftspeople by purchasing directly from them. Every purchase helps preserve cultural heritage and supports sustainable livelihoods.</p>
+                    <a href="./marketplace.html" class="cta-button" data-translate="hero_button">Explore Bazaar</a>
+                </div>
+            </div>
+            <!-- Slide 14 -->
+            <div class="hero-slide">
+                <div class="hero-slide-bg"></div>
+                <div class="hero-slide-image">
+                    <img src="14.png" alt="Support Local Artisans" class="slide-image">
+                </div>
+                <div class="hero-content">
+                    <h2>Support Local Artisans</h2>
+                    <p>Empower traditional craftspeople by purchasing directly from them. Every purchase helps preserve cultural heritage and supports sustainable livelihoods.</p>
+                    <a href="./marketplace.html" class="cta-button" data-translate="hero_button">Explore Bazaar</a>
+                </div>
+            </div>
+            <!-- Slide 15 -->
+            <div class="hero-slide">
+                <div class="hero-slide-bg"></div>
+                <div class="hero-slide-image">
+                    <img src="15.png" alt="Support Local Artisans" class="slide-image">
+                </div>
+                <div class="hero-content">
+                    <h2>Support Local Artisans</h2>
+                    <p>Empower traditional craftspeople by purchasing directly from them. Every purchase helps preserve cultural heritage and supports sustainable livelihoods.</p>
+                    <a href="./marketplace.html" class="cta-button" data-translate="hero_button">Explore Bazaar</a>
+                </div>
+            </div>
+            <!-- Slide 16 -->
+            <div class="hero-slide">
+                <div class="hero-slide-bg"></div>
+                <div class="hero-slide-image">
+                    <img src="16.png" alt="Support Local Artisans" class="slide-image">
+                </div>
+                <div class="hero-content">
+                    <h2>Support Local Artisans</h2>
+                    <p>Empower traditional craftspeople by purchasing directly from them. Every purchase helps preserve cultural heritage and supports sustainable livelihoods.</p>
+                    <a href="./marketplace.html" class="cta-button" data-translate="hero_button">Explore Bazaar</a>
+                </div>
+            </div>
+            <!-- Slide 17 -->
+            <div class="hero-slide">
+                <div class="hero-slide-bg"></div>
+                <div class="hero-slide-image">
+                    <img src="17.png" alt="Support Local Artisans" class="slide-image">
+                </div>
+                <div class="hero-content">
+                    <h2>Support Local Artisans</h2>
+                    <p>Empower traditional craftspeople by purchasing directly from them. Every purchase helps preserve cultural heritage and supports sustainable livelihoods.</p>
+                    <a href="./marketplace.html" class="cta-button" data-translate="hero_button">Explore Bazaar</a>
+                </div>
+            </div>
+            <!-- Slide 18 -->
+            <div class="hero-slide">
+                <div class="hero-slide-bg"></div>
+                <div class="hero-slide-image">
+                    <img src="18.png" alt="Support Local Artisans" class="slide-image">
+                </div>
+                <div class="hero-content">
+                    <h2>Support Local Artisans</h2>
+                    <p>Empower traditional craftspeople by purchasing directly from them. Every purchase helps preserve cultural heritage and supports sustainable livelihoods.</p>
+                    <a href="./marketplace.html" class="cta-button" data-translate="hero_button">Explore Bazaar</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Navigation Arrows -->
+        <div class="carousel-arrow prev" id="heroPrev">
+            <i class="fas fa-chevron-left"></i>
+        </div>
+        <div class="carousel-arrow next" id="heroNext">
+            <i class="fas fa-chevron-right"></i>
+        </div>
+        
+        <!-- Dots Navigation -->
+        <div class="carousel-nav" id="carouselNav">
+            <div class="carousel-dot active" data-slide="0"></div>
+            <div class="carousel-dot" data-slide="1"></div>
+            <div class="carousel-dot" data-slide="2"></div>
         </div>
     </section>
 
     <!-- Features Section -->
     <section class="features">
         <div class="container">
-            <div class="section-title">
-                <h2>Why Choose SwaDesi Bazaar</h2>
-                <p>We're redefining local commerce with cutting-edge technology and traditional values</p>
+            <div class="section-title" id="featuresTitle">
+                <h2 data-translate="features_title">Why Choose SwaDesi Bazaar</h2>
+                <p data-translate="features_description">We're redefining local commerce with cutting-edge technology and traditional values</p>
             </div>
             <div class="features-grid">
-                <div class="feature-card">
+                <div class="feature-card" id="feature1">
                     <div class="feature-icon">
                         <i class="fas fa-map-marker-alt"></i>
                     </div>
-                    <h3>Hyperlocal Discovery</h3>
-                    <p>Find sellers and products within your neighborhood with our real-time location-based marketplace.</p>
+                    <h3 data-translate="feature1_title">Hyperlocal Discovery</h3>
+                    <p data-translate="feature1_description">Find sellers and products within your neighborhood with our real-time location-based marketplace.</p>
                 </div>
-                <div class="feature-card">
+                <div class="feature-card" id="feature2">
                     <div class="feature-icon">
                         <i class="fas fa-robot"></i>
                     </div>
-                    <h3>AI-Powered Assistance</h3>
-                    <p>Our multilingual AI assistant helps you navigate the platform in your preferred language.</p>
+                    <h3 data-translate="feature2_title">AI-Powered Assistance</h3>
+                    <p data-translate="feature2_description">Our multilingual AI assistant helps you navigate the platform in your preferred language.</p>
                 </div>
-                <div class="feature-card">
+                <div class="feature-card" id="feature3">
                     <div class="feature-icon">
                         <i class="fas fa-shipping-fast"></i>
                     </div>
-                    <h3>Same-Day Delivery</h3>
-                    <p>Get your orders delivered on the same day by our network of local delivery partners.</p>
+                    <h3 data-translate="feature3_title">Same-Day Delivery</h3>
+                    <p data-translate="feature3_description">Get your orders delivered on the same day by our network of local delivery partners.</p>
                 </div>
-                <div class="feature-card">
+                <div class="feature-card" id="feature4">
                     <div class="feature-icon">
                         <i class="fas fa-shield-alt"></i>
                     </div>
-                    <h3>Secure Transactions</h3>
-                    <p>Shop with confidence using our secure payment gateway with buyer protection.</p>
+                    <h3 data-translate="feature4_title">Secure Transactions</h3>
+                    <p data-translate="feature4_description">Shop with confidence using our secure payment gateway with buyer protection.</p>
                 </div>
             </div>
         </div>
@@ -998,37 +1565,37 @@
     <!-- Categories Section -->
     <section class="categories">
         <div class="container">
-            <div class="section-title">
-                <h2>Shop By Category</h2>
-                <p>Explore our curated collection of authentic local products</p>
+            <div class="section-title" id="categoriesTitle">
+                <h2 data-translate="categories_title">Shop By Category</h2>
+                <p data-translate="categories_description">Explore our curated collection of authentic local products</p>
             </div>
             <div class="categories-grid">
-                <div class="category-card">
+                <div class="category-card" id="category1">
                     <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Handicrafts">
                     <div class="category-overlay">
-                        <h3>Handicrafts</h3>
-                        <p>Traditional Artistry</p>
+                        <h3 data-translate="category1_title">Handicrafts</h3>
+                        <p data-translate="category1_description">Traditional Artistry</p>
                     </div>
                 </div>
-                <div class="category-card">
-                    <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Home Decor">
+                <div class="category-card" id="category2">
+                    <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80" alt="Home Decor">
                     <div class="category-overlay">
-                        <h3>Home Decor</h3>
-                        <p>Elegant & Authentic</p>
+                        <h3 data-translate="category2_title">Home Decor</h3>
+                        <p data-translate="category2_description">Elegant & Authentic</p>
                     </div>
                 </div>
-                <div class="category-card">
-                    <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Clothing">
+                <div class="category-card" id="category3">
+                    <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80" alt="Clothing">
                     <div class="category-overlay">
-                        <h3>Clothing</h3>
-                        <p>Traditional Wear</p>
+                        <h3 data-translate="category3_title">Clothing</h3>
+                        <p data-translate="category3_description">Traditional Wear</p>
                     </div>
                 </div>
-                <div class="category-card">
-                    <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Jewelry">
+                <div class="category-card" id="category4">
+                    <img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80" alt="Jewelry">
                     <div class="category-overlay">
-                        <h3>Jewelry</h3>
-                        <p>Handcrafted Pieces</p>
+                        <h3 data-translate="category4_title">Jewelry</h3>
+                        <p data-translate="category4_description">Handcrafted Pieces</p>
                     </div>
                 </div>
             </div>
@@ -1038,25 +1605,25 @@
     <!-- Trending Products -->
     <section class="trending">
         <div class="container">
-            <div class="trending-header">
-                <h2>Trending Near You</h2>
-                <a href="marketplace.html" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
+            <div class="trending-header" id="trendingHeader">
+                <h2 data-translate="trending_title">Trending Near You</h2>
+                <a href="marketplace.html" class="view-all" data-translate="view_all">View All <i class="fas fa-arrow-right"></i></a>
             </div>
             <div class="products-grid">
-                <div class="product-card" data-product-id="1">
+                <div class="product-card" data-product-id="1" id="product1">
                     <div class="product-image">
-                        <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Handmade Pot">
-                        <span class="product-badge">Local Favorite</span>
+                        <img src="https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80" alt="Handmade Pot">
+                        <span class="product-badge" data-translate="local_favorite">Local Favorite</span>
                     </div>
                     <div class="product-info">
-                        <h3>Handmade Terracotta Pot</h3>
+                        <h3 data-translate="product1_title">Handmade Terracotta Pot</h3>
                         <div class="product-seller">
                             <div class="seller-avatar"></div>
-                            <span>Suresh Handmade Pots</span>
+                            <span data-translate="product1_seller">Suresh Handmade Pots</span>
                         </div>
                         <div class="product-location">
                             <i class="fas fa-map-marker-alt"></i>
-                            <span>Varanasi, UP • 2.5 km away</span>
+                            <span data-translate="product1_location">Varanasi, UP • 2.5 km away</span>
                         </div>
                         <div class="product-price">
                             <span class="price">₹1,250</span>
@@ -1066,20 +1633,20 @@
                         </div>
                     </div>
                 </div>
-                <div class="product-card" data-product-id="2">
+                <div class="product-card" data-product-id="2" id="product2">
                     <div class="product-image">
-                        <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Silk Saree">
-                        <span class="product-badge">Limited Stock</span>
+                        <img src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80" alt="Silk Saree">
+                        <span class="product-badge" data-translate="limited_stock">Limited Stock</span>
                     </div>
                     <div class="product-info">
-                        <h3>Banarasi Silk Saree</h3>
+                        <h3 data-translate="product2_title">Banarasi Silk Saree</h3>
                         <div class="product-seller">
                             <div class="seller-avatar"></div>
-                            <span>Weaves of Varanasi</span>
+                            <span data-translate="product2_seller">Weaves of Varanasi</span>
                         </div>
                         <div class="product-location">
                             <i class="fas fa-map-marker-alt"></i>
-                            <span>Varanasi, UP • 3.2 km away</span>
+                            <span data-translate="product2_location">Varanasi, UP • 3.2 km away</span>
                         </div>
                         <div class="product-price">
                             <span class="price">₹8,499</span>
@@ -1089,20 +1656,20 @@
                         </div>
                     </div>
                 </div>
-                <div class="product-card" data-product-id="3">
+                <div class="product-card" data-product-id="3" id="product3">
                     <div class="product-image">
-                        <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Wooden Sculpture">
-                        <span class="product-badge">Best Seller</span>
+                        <img src="https://images.unsplash.com/photo-1565849904468-c45eaf861b43?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80" alt="Wooden Sculpture">
+                        <span class="product-badge" data-translate="best_seller">Best Seller</span>
                     </div>
                     <div class="product-info">
-                        <h3>Handcarved Wooden Elephant</h3>
+                        <h3 data-translate="product3_title">Handcarved Wooden Elephant</h3>
                         <div class="product-seller">
                             <div class="seller-avatar"></div>
-                            <span>Saharanpur Woodcraft</span>
+                            <span data-translate="product3_seller">Saharanpur Woodcraft</span>
                         </div>
                         <div class="product-location">
                             <i class="fas fa-map-marker-alt"></i>
-                            <span>Saharanpur, UP • 15 km away</span>
+                            <span data-translate="product3_location">Saharanpur, UP • 15 km away</span>
                         </div>
                         <div class="product-price">
                             <span class="price">₹3,200</span>
@@ -1112,20 +1679,20 @@
                         </div>
                     </div>
                 </div>
-                <div class="product-card" data-product-id="4">
+                <div class="product-card" data-product-id="4" id="product4">
                     <div class="product-image">
-                        <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Brass Diya">
-                        <span class="product-badge">New Arrival</span>
+                        <img src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80" alt="Brass Diya">
+                        <span class="product-badge" data-translate="new_arrival">New Arrival</span>
                     </div>
                     <div class="product-info">
-                        <h3>Traditional Brass Diya Set</h3>
+                        <h3 data-translate="product4_title">Traditional Brass Diya Set</h3>
                         <div class="product-seller">
                             <div class="seller-avatar"></div>
-                            <span>Moradabad Metal Art</span>
+                            <span data-translate="product4_seller">Moradabad Metal Art</span>
                         </div>
                         <div class="product-location">
                             <i class="fas fa-map-marker-alt"></i>
-                            <span>Moradabad, UP • 25 km away</span>
+                            <span data-translate="product4_location">Moradabad, UP • 25 km away</span>
                         </div>
                         <div class="product-price">
                             <span class="price">₹1,850</span>
@@ -1142,103 +1709,103 @@
     <!-- Local Sellers -->
     <section class="local-sellers">
         <div class="container">
-            <div class="section-title">
-                <h2>Featured Local Sellers</h2>
-                <p>Connect directly with artisans in your community</p>
+            <div class="section-title" id="sellersTitle">
+                <h2 data-translate="sellers_title">Featured Local Sellers</h2>
+                <p data-translate="sellers_description">Connect directly with artisans in your community</p>
             </div>
             <div class="sellers-container">
-                <div class="seller-card">
+                <div class="seller-card" id="seller1">
                     <div class="seller-header">
                         <div class="seller-avatar-lg">
-                            <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Seller">
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80" alt="Seller">
                         </div>
                         <div class="seller-info">
-                            <h3>Suresh Handmade Pots</h3>
+                            <h3 data-translate="seller1_name">Suresh Handmade Pots</h3>
                             <div class="seller-rating">
                                 <i class="fas fa-star"></i>
-                                <span>4.8 (124 reviews)</span>
+                                <span data-translate="seller1_rating">4.8 (124 reviews)</span>
                             </div>
                         </div>
                     </div>
                     <div class="seller-products">
                         <div class="seller-product">
-                            <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Product">
+                            <img src="https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80" alt="Product">
                             <div class="seller-product-info">
-                                <h4>Terracotta Planters Set</h4>
+                                <h4 data-translate="seller1_product1">Terracotta Planters Set</h4>
                                 <span class="price">₹2,400</span>
                             </div>
                         </div>
                         <div class="seller-product">
                             <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Product">
                             <div class="seller-product-info">
-                                <h4>Handpainted Ceramic Vase</h4>
+                                <h4 data-translate="seller1_product2">Handpainted Ceramic Vase</h4>
                                 <span class="price">₹1,850</span>
                             </div>
                         </div>
                     </div>
-                    <a href="marketplace.html" class="visit-shop">Visit Shop</a>
+                    <a href="marketplace.html" class="visit-shop" data-translate="visit_shop">Visit Shop</a>
                 </div>
-                <div class="seller-card">
+                <div class="seller-card" id="seller2">
                     <div class="seller-header">
                         <div class="seller-avatar-lg">
-                            <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Seller">
+                            <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80" alt="Seller">
                         </div>
                         <div class="seller-info">
-                            <h3>Weaves of Varanasi</h3>
+                            <h3 data-translate="seller2_name">Weaves of Varanasi</h3>
                             <div class="seller-rating">
                                 <i class="fas fa-star"></i>
-                                <span>4.9 (89 reviews)</span>
+                                <span data-translate="seller2_rating">4.9 (89 reviews)</span>
                             </div>
                         </div>
                     </div>
                     <div class="seller-products">
                         <div class="seller-product">
-                            <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Product">
+                            <img src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80" alt="Product">
                             <div class="seller-product-info">
-                                <h4>Banarasi Silk Saree</h4>
+                                <h4 data-translate="seller2_product1">Banarasi Silk Saree</h4>
                                 <span class="price">₹8,499</span>
                             </div>
                         </div>
                         <div class="seller-product">
                             <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Product">
                             <div class="seller-product-info">
-                                <h4>Zari Work Dupatta</h4>
+                                <h4 data-translate="seller2_product2">Zari Work Dupatta</h4>
                                 <span class="price">₹2,200</span>
                             </div>
                         </div>
                     </div>
-                    <a href="marketplace.html" class="visit-shop">Visit Shop</a>
+                    <a href="marketplace.html" class="visit-shop" data-translate="visit_shop">Visit Shop</a>
                 </div>
-                <div class="seller-card">
+                <div class="seller-card" id="seller3">
                     <div class="seller-header">
                         <div class="seller-avatar-lg">
-                            <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Seller">
+                            <img src="https://images.unsplash.com/photo-1507591064344-4c6ce005b128?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80" alt="Seller">
                         </div>
                         <div class="seller-info">
-                            <h3>Moradabad Metal Art</h3>
+                            <h3 data-translate="seller3_name">Moradabad Metal Art</h3>
                             <div class="seller-rating">
                                 <i class="fas fa-star"></i>
-                                <span>4.7 (156 reviews)</span>
+                                <span data-translate="seller3_rating">4.7 (156 reviews)</span>
                             </div>
                         </div>
                     </div>
                     <div class="seller-products">
                         <div class="seller-product">
-                            <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Product">
+                            <img src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80" alt="Product">
                             <div class="seller-product-info">
-                                <h4>Brass Diya Set</h4>
+                                <h4 data-translate="seller3_product1">Brass Diya Set</h4>
                                 <span class="price">₹1,850</span>
                             </div>
                         </div>
                         <div class="seller-product">
                             <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80" alt="Product">
                             <div class="seller-product-info">
-                                <h4>Copper Water Jug</h4>
+                                <h4 data-translate="seller3_product2">Copper Water Jug</h4>
                                 <span class="price">₹3,500</span>
                             </div>
                         </div>
                     </div>
-                    <a href="marketplace.html" class="visit-shop">Visit Shop</a>
+                    <a href="marketplace.html" class="visit-shop" data-translate="visit_shop">Visit Shop</a>
                 </div>
             </div>
         </div>
@@ -1249,45 +1816,422 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-column">
-                    <h3>SwaDesi Bazaar</h3>
-                    <p>Your Local Market, Powered by AI. Connecting you with authentic local sellers and artisans in your community.</p>
+                    <h3 data-translate="footer_title">SwaDesi Bazaar</h3>
+                    <p data-translate="footer_description">Your Local Market, Powered by AI. Connecting you with authentic local sellers and artisans in your community.</p>
                 </div>
                 <div class="footer-column">
-                    <h3>Quick Links</h3>
+                    <h3 data-translate="quick_links">Quick Links</h3>
                     <ul class="footer-links">
-                        <li><a href="index.html">Home</a></li>
-                        <li><a href="marketplace.html">Marketplace</a></li>
-                        <li><a href="#">Sell on SwaDesi</a></li>
-                        <li><a href="#">Careers</a></li>
-                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="index.html" data-translate="home">Home</a></li>
+                        <li><a href="marketplace.html" data-translate="marketplace">Marketplace</a></li>
+                        <li><a href="#" data-translate="sell">Sell on SwaDesi</a></li>
+                        <li><a href="#" data-translate="careers">Careers</a></li>
+                        <li><a href="#" data-translate="contact">Contact Us</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
-                    <h3>Customer Service</h3>
+                    <h3 data-translate="customer_service">Customer Service</h3>
                     <ul class="footer-links">
-                        <li><a href="#">Help Center</a></li>
-                        <li><a href="#">Returns & Refunds</a></li>
-                        <li><a href="#">Shipping Info</a></li>
-                        <li><a href="#">Track Your Order</a></li>
-                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#" data-translate="help">Help Center</a></li>
+                        <li><a href="#" data-translate="returns">Returns & Refunds</a></li>
+                        <li><a href="#" data-translate="shipping">Shipping Info</a></li>
+                        <li><a href="#" data-translate="track">Track Your Order</a></li>
+                        <li><a href="#" data-translate="privacy">Privacy Policy</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
-                    <h3>Contact Info</h3>
+                    <h3 data-translate="contact_info">Contact Info</h3>
                     <ul class="footer-links">
-                        <li><i class="fas fa-map-marker-alt"></i> 123 Local Market, New Delhi, India</li>
-                        <li><i class="fas fa-phone"></i> +91 98765 43210</li>
-                        <li><i class="fas fa-envelope"></i> support@swadesibazaar.com</li>
+                        <li><i class="fas fa-map-marker-alt"></i> <span data-translate="address">Tarakeswar, India</span></li>
+                        <li><i class="fas fa-phone"></i> <span data-translate="phone">+91 9064703308</span></li>
+                        <li><i class="fas fa-envelope"></i> <span data-translate="email">visionaryinnovators05@gmail.com</span></li>
                     </ul>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2025 SwaDesi Bazaar. All rights reserved.</p>
+                <p data-translate="copyright">&copy; 2025 SwaDesi Bazaar. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
     <script>
+        // Translation Data
+        const translations = {
+            en: {
+                hero_title: "Discover Authentic Local Treasures",
+                hero_description: "Connect directly with artisans and sellers in your community. Premium quality, handcrafted products with the convenience of modern e-commerce.",
+                hero_button: "Explore Local Sellers",
+                features_title: "Why Choose SwaDesi Bazaar",
+                features_description: "We're redefining local commerce with cutting-edge technology and traditional values",
+                feature1_title: "Hyperlocal Discovery",
+                feature1_description: "Find sellers and products within your neighborhood with our real-time location-based marketplace.",
+                feature2_title: "AI-Powered Assistance",
+                feature2_description: "Our multilingual AI assistant helps you navigate the platform in your preferred language.",
+                feature3_title: "Same-Day Delivery",
+                feature3_description: "Get your orders delivered on the same day by our network of local delivery partners.",
+                feature4_title: "Secure Transactions",
+                feature4_description: "Shop with confidence using our secure payment gateway with buyer protection.",
+                categories_title: "Shop By Category",
+                categories_description: "Explore our curated collection of authentic local products",
+                category1_title: "Handicrafts",
+                category1_description: "Traditional Artistry",
+                category2_title: "Home Decor",
+                category2_description: "Elegant & Authentic",
+                category3_title: "Clothing",
+                category3_description: "Traditional Wear",
+                category4_title: "Jewelry",
+                category4_description: "Handcrafted Pieces",
+                trending_title: "Trending Near You",
+                view_all: "View All",
+                local_favorite: "Local Favorite",
+                limited_stock: "Limited Stock",
+                best_seller: "Best Seller",
+                new_arrival: "New Arrival",
+                product1_title: "Handmade Terracotta Pot",
+                product1_seller: "Suresh Handmade Pots",
+                product1_location: "Varanasi, UP • 2.5 km away",
+                product2_title: "Banarasi Silk Saree",
+                product2_seller: "Weaves of Varanasi",
+                product2_location: "Varanasi, UP • 3.2 km away",
+                product3_title: "Handcarved Wooden Elephant",
+                product3_seller: "Saharanpur Woodcraft",
+                product3_location: "Saharanpur, UP • 15 km away",
+                product4_title: "Traditional Brass Diya Set",
+                product4_seller: "Moradabad Metal Art",
+                product4_location: "Moradabad, UP • 25 km away",
+                sellers_title: "Featured Local Sellers",
+                sellers_description: "Connect directly with artisans in your community",
+                seller1_name: "Suresh Handmade Pots",
+                seller1_rating: "4.8 (124 reviews)",
+                seller1_product1: "Terracotta Planters Set",
+                seller1_product2: "Handpainted Ceramic Vase",
+                seller2_name: "Weaves of Varanasi",
+                seller2_rating: "4.9 (89 reviews)",
+                seller2_product1: "Banarasi Silk Saree",
+                seller2_product2: "Zari Work Dupatta",
+                seller3_name: "Moradabad Metal Art",
+                seller3_rating: "4.7 (156 reviews)",
+                seller3_product1: "Brass Diya Set",
+                seller3_product2: "Copper Water Jug",
+                visit_shop: "Visit Shop",
+                footer_title: "SwaDesi Bazaar",
+                footer_description: "Your Local Market, Powered by AI. Connecting you with authentic local sellers and artisans in your community.",
+                quick_links: "Quick Links",
+                home: "Home",
+                marketplace: "Marketplace",
+                sell: "Sell on SwaDesi",
+                careers: "Careers",
+                contact: "Contact Us",
+                customer_service: "Customer Service",
+                help: "Help Center",
+                returns: "Returns & Refunds",
+                shipping: "Shipping Info",
+                track: "Track Your Order",
+                privacy: "Privacy Policy",
+                contact_info: "Contact Info",
+                address: "123 Local Market, New Delhi, India",
+                phone: "+91 98765 43210",
+                email: "support@swadesibazaar.com",
+                copyright: "© 2025 SwaDesi Bazaar. All rights reserved."
+            },
+            hi: {
+                hero_title: "प्रामाणिक स्थानीय खजाने की खोज करें",
+                hero_description: "अपने समुदाय में कारीगरों और विक्रेताओं से सीधे जुड़ें। आधुनिक ई-कॉमर्स की सुविधा के साथ प्रीमियम गुणवत्ता, हस्तनिर्मित उत्पाद।",
+                hero_button: "स्थानीय विक्रेताओं को देखें",
+                features_title: "स्वदेसी बाजार क्यों चुनें",
+                features_description: "हम अत्याधुनिक तकनीक और पारंपरिक मूल्यों के साथ स्थानीय वाणिज्य को नया रूप दे रहे हैं",
+                feature1_title: "हाइपरलोकल डिस्कवरी",
+                feature1_description: "हमारे रीयल-टाइम लोकेशन-आधारित बाजार के साथ अपने पड़ोस में विक्रेताओं और उत्पादों को खोजें।",
+                feature2_title: "एआई-संचालित सहायता",
+                feature2_description: "हमारा बहुभाषी एआई सहायक आपकी पसंदीदा भाषा में प्लेटफॉर्म नेविगेट करने में मदद करता है।",
+                feature3_title: "समान-दिवस वितरण",
+                feature3_description: "हमारे स्थानीय डिलीवरी पार्टनर्स के नेटवर्क द्वारा अपने ऑर्डर उसी दिन डिलीवर करवाएं।",
+                feature4_title: "सुरक्षित लेनदेन",
+                feature4_description: "खरीदार सुरक्षा के साथ हमारे सुरक्षित भुगतान गेटवे का उपयोग करके आत्मविश्वास से खरीदारी करें।",
+                categories_title: "श्रेणी के अनुसार खरीदारी करें",
+                categories_description: "प्रामाणिक स्थानीय उत्पादों के हमारे क्यूरेटेड संग्रह का अन्वेषण करें",
+                category1_title: "हस्तशिल्प",
+                category1_description: "पारंपरिक कलात्मकता",
+                category2_title: "होम डेकोर",
+                category2_description: "सुरुचिपूर्ण और प्रामाणिक",
+                category3_title: "कपड़े",
+                category3_description: "पारंपरिक पहनावा",
+                category4_title: "आभूषण",
+                category4_description: "हस्तनिर्मित टुकड़े",
+                trending_title: "आपके पास ट्रेंडिंग",
+                view_all: "सभी देखें",
+                local_favorite: "स्थानीय पसंदीदा",
+                limited_stock: "सीमित स्टॉक",
+                best_seller: "सर्वश्रेष्ठ विक्रेता",
+                new_arrival: "नया आगमन",
+                product1_title: "हस्तनिर्मित टेराकोटा बर्तन",
+                product1_seller: "सुरेश हस्तनिर्मित बर्तन",
+                product1_location: "वाराणसी, यूपी • 2.5 किमी दूर",
+                product2_title: "बनारसी सिल्क साड़ी",
+                product2_seller: "वाराणसी के बुनकर",
+                product2_location: "वाराणसी, यूपी • 3.2 किमी दूर",
+                product3_title: "हस्तनिर्मित लकड़ी का हाथी",
+                product3_seller: "सहारनपुर वुडक्राफ्ट",
+                product3_location: "सहारनपुर, यूपी • 15 किमी दूर",
+                product4_title: "पारंपरिक पीतल की दीया सेट",
+                product4_seller: "मुरादाबाद मेटल आर्ट",
+                product4_location: "मुरादाबाद, यूपी • 25 किमी दूर",
+                sellers_title: "फीचर्ड लोकल सेलर्स",
+                sellers_description: "अपने समुदाय में कारीगरों से सीधे जुड़ें",
+                seller1_name: "सुरेश हस्तनिर्मित बर्तन",
+                seller1_rating: "4.8 (124 समीक्षाएं)",
+                seller1_product1: "टेराकोटा प्लांटर्स सेट",
+                seller1_product2: "हस्तचित्रित सिरेमिक फूलदान",
+                seller2_name: "वाराणसी के बुनकर",
+                seller2_rating: "4.9 (89 समीक्षाएं)",
+                seller2_product1: "बनारसी सिल्क साड़ी",
+                seller2_product2: "जरी वर्क दुपट्टा",
+                seller3_name: "मुरादाबाद मेटल आर्ट",
+                seller3_rating: "4.7 (156 समीक्षाएं)",
+                seller3_product1: "पीतल की दीया सेट",
+                seller3_product2: "तांबे का जग",
+                visit_shop: "दुकान पर जाएं",
+                footer_title: "स्वदेसी बाजार",
+                footer_description: "आपका स्थानीय बाजार, एआई द्वारा संचालित। आपको आपके समुदाय में प्रामाणिक स्थानीय विक्रेताओं और कारीगरों से जोड़ना।",
+                quick_links: "त्वरित लिंक",
+                home: "होम",
+                marketplace: "बाजार",
+                sell: "स्वदेसी पर बेचें",
+                careers: "करियर",
+                contact: "हमसे संपर्क करें",
+                customer_service: "ग्राहक सेवा",
+                help: "सहायता केंद्र",
+                returns: "वापसी और धनवापसी",
+                shipping: "शिपिंग जानकारी",
+                track: "अपना ऑर्डर ट्रैक करें",
+                privacy: "गोपनीयता नीति",
+                contact_info: "संपर्क जानकारी",
+                address: "123 लोकल मार्केट, नई दिल्ली, भारत",
+                phone: "+91 98765 43210",
+                email: "support@swadesibazaar.com",
+                copyright: "© 2025 स्वदेसी बाजार। सर्वाधिकार सुरक्षित।"
+            }
+            // Additional languages would be added here
+        };
+
+        // Current language
+        let currentLanguage = 'en';
+
+        // Translation function
+        function translatePage(language) {
+            const elements = document.querySelectorAll('[data-translate]');
+            elements.forEach(element => {
+                const key = element.getAttribute('data-translate');
+                if (translations[language] && translations[language][key]) {
+                    element.textContent = translations[language][key];
+                }
+            });
+            
+            // Update active language in selector
+            document.getElementById('languageSelector').value = language;
+            
+            // Update active language in panel
+            document.querySelectorAll('.language-option').forEach(option => {
+                option.classList.remove('active');
+                if (option.getAttribute('data-lang') === language) {
+                    option.classList.add('active');
+                }
+            });
+            
+            currentLanguage = language;
+        }
+
+        // Hero Carousel Functionality
+        let currentSlide = 0;
+        const heroCarousel = document.getElementById('heroCarousel');
+        const heroSlides = document.querySelectorAll('.hero-slide');
+        const carouselDots = document.querySelectorAll('.carousel-dot');
+        const heroPrev = document.getElementById('heroPrev');
+        const heroNext = document.getElementById('heroNext');
+        let autoSlideInterval;
+
+        function goToSlide(slideIndex) {
+            // Wrap around if at the beginning or end
+            if (slideIndex < 0) {
+                slideIndex = heroSlides.length - 1;
+            } else if (slideIndex >= heroSlides.length) {
+                slideIndex = 0;
+            }
+            
+            // Update slides
+            heroSlides.forEach(slide => slide.classList.remove('active'));
+            heroSlides[slideIndex].classList.add('active');
+            
+            // Update dots
+            carouselDots.forEach(dot => dot.classList.remove('active'));
+            carouselDots[slideIndex].classList.add('active');
+            
+            currentSlide = slideIndex;
+            
+            // Reset auto slide timer
+            resetAutoSlide();
+        }
+
+        function nextSlide() {
+            goToSlide(currentSlide + 1);
+        }
+
+        function prevSlide() {
+            goToSlide(currentSlide - 1);
+        }
+
+        function resetAutoSlide() {
+            clearInterval(autoSlideInterval);
+            autoSlideInterval = setInterval(nextSlide, 5000);
+        }
+
+        // Initialize hero carousel
+        function initHeroCarousel() {
+            // Set up event listeners
+            heroPrev.addEventListener('click', prevSlide);
+            heroNext.addEventListener('click', nextSlide);
+            
+            carouselDots.forEach((dot, index) => {
+                dot.addEventListener('click', () => goToSlide(index));
+            });
+            
+            // Start auto slide
+            resetAutoSlide();
+            
+            // Pause auto slide on hover
+            heroCarousel.addEventListener('mouseenter', () => {
+                clearInterval(autoSlideInterval);
+            });
+            
+            heroCarousel.addEventListener('mouseleave', resetAutoSlide);
+        }
+
+        // Three.js 3D Scene
+        let scene, camera, renderer, controls;
+        let productModels = [];
+
+        function init3DScene() {
+            // Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xf8f5f0);
+
+            // Camera
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            document.getElementById('scene3d').appendChild(renderer.domElement);
+
+            // Controls
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.enableZoom = false;
+            controls.autoRotate = true;
+            controls.autoRotateSpeed = 1;
+
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(1, 1, 1);
+            scene.add(directionalLight);
+
+            // Create simple 3D product models (in a real app, you would load GLTF models)
+            createProductModels();
+
+            // Handle window resize
+            window.addEventListener('resize', onWindowResize);
+
+            // Start animation
+            animate();
+        }
+
+        function createProductModels() {
+            // Create placeholder geometries for products
+            // In a real application, you would load GLTF models here
+            const geometries = [
+                new THREE.BoxGeometry(1, 1, 1),
+                new THREE.SphereGeometry(0.7, 32, 32),
+                new THREE.ConeGeometry(0.7, 1.5, 8),
+                new THREE.CylinderGeometry(0.5, 0.5, 1.5, 32)
+            ];
+
+            const colors = [0xD4AF37, 0x8B4513, 0x1A1A1A, 0x6C757D];
+
+            geometries.forEach((geometry, index) => {
+                const material = new THREE.MeshStandardMaterial({ 
+                    color: colors[index],
+                    roughness: 0.4,
+                    metalness: 0.1
+                });
+                const mesh = new THREE.Mesh(geometry, material);
+                mesh.position.x = (index - 1.5) * 2.5;
+                mesh.rotation.y = Math.PI / 4;
+                scene.add(mesh);
+                productModels.push(mesh);
+            });
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // Rotate models slowly
+            productModels.forEach((model, index) => {
+                model.rotation.y += 0.005;
+                model.position.y = Math.sin(Date.now() * 0.001 + index) * 0.1;
+            });
+            
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        // Scroll-based animations
+        function initScrollAnimations() {
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate');
+                    }
+                });
+            }, observerOptions);
+
+            // Observe elements for animation
+            const elementsToAnimate = document.querySelectorAll('.section-title, .feature-card, .category-card, .product-card, .seller-card, .trending-header');
+            elementsToAnimate.forEach(el => observer.observe(el));
+        }
+
+        // Parallax effect
+        function initParallax() {
+            window.addEventListener('scroll', () => {
+                const scrolled = window.pageYOffset;
+                
+                // Header effect
+                const header = document.getElementById('mainHeader');
+                if (scrolled > 100) {
+                    header.classList.add('header-scrolled');
+                } else {
+                    header.classList.remove('header-scrolled');
+                }
+            });
+        }
+
         // Mobile Navigation
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
         const mobileNav = document.getElementById('mobileNav');
@@ -1378,8 +2322,39 @@
             });
         });
 
-        // Initialize cart count
-        updateCartCount();
+        // Translation panel toggle
+        const translationPanel = document.getElementById('translationPanel');
+        const translationToggle = document.getElementById('translationToggle');
+        const languageOptions = document.querySelectorAll('.language-option');
+        const languageSelector = document.getElementById('languageSelector');
+
+        translationToggle.addEventListener('click', () => {
+            translationPanel.classList.toggle('hidden');
+        });
+
+        languageOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                const lang = option.getAttribute('data-lang');
+                translatePage(lang);
+                translationPanel.classList.add('hidden');
+            });
+        });
+
+        languageSelector.addEventListener('change', (e) => {
+            translatePage(e.target.value);
+        });
+
+        // Initialize everything when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            init3DScene();
+            initHeroCarousel();
+            initScrollAnimations();
+            initParallax();
+            updateCartCount();
+            
+            // Set up translation
+            translatePage(currentLanguage);
+        });
     </script>
 </body>
 </html>

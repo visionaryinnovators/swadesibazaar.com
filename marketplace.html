@@ -77,6 +77,11 @@
             cursor: pointer;
         }
 
+        .logo-image {
+            height: 80px;
+            width: auto;
+        }
+
         .logo h1 {
             font-size: 28px;
             color: var(--primary);
@@ -1340,9 +1345,10 @@
                     <i class="fas fa-bars"></i>
                 </button>
                 <div class="logo">
-                    <a href="index.html" style="text-decoration: none;">
-                        <h1>Swa<span>Desi</span> Bazaar</h1>
+                    <a href="index.html">
+                        <img src="logo.png" alt="SwaDesi Bazaar Logo" class="logo-image">
                     </a>
+                    <div class="logo-text">SwaDesi Bazaar</div>
                 </div>
                 <div class="search-bar">
                     <input type="text" placeholder="Search for products, artisans, or categories...">
@@ -1423,7 +1429,7 @@
                 </button>
                 <div class="user-menu">
                     <div class="user-avatar">RS</div>
-                    <span>Rahul Sharma</span>
+                    <span>Rahul Sinha</span>
                 </div>
             </div>
         </div>
@@ -1453,11 +1459,11 @@
                     <li><a href="handicraft.html">Handicrafts</a></li>
                     <li><a href="homedecor.html">Home Decor</a></li>
                     <li><a href="clothing.html">Clothing</a></li>
-                    <li><a href="jewelry.html">Jewelry</a></li>
+                    <li><a href="jewellry.html">Jewelry</a></li>
                     <li><a href="pottery.html">Pottery</a></li>
                     <li><a href="woodwork.html">Woodwork</a></li>
                     <li><a href="metalwork.html">Metalwork</a></li>
-                    <li><a href="localfod.html">Local Food</a></li>
+                    <li><a href="localfood.html">Local Food</a></li>
                     <li><a href="localmarket.html">Local Market</a></li>
                     <li><a href="organicproduct.html">Organic Products</a></li>
                     <li><a href="trailor.html">Trailor</a></li>
@@ -1801,9 +1807,9 @@
                 <div class="footer-column">
                     <h3>Contact Info</h3>
                     <ul class="footer-links">
-                        <li><i class="fas fa-map-marker-alt"></i> 123 Local Market, New Delhi, India</li>
-                        <li><i class="fas fa-phone"></i> +91 98765 43210</li>
-                        <li><i class="fas fa-envelope"></i> support@swadesibazaar.com</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Tarakeswar, India</li>
+                        <li><i class="fas fa-phone"></i> +91 9064703308</li>
+                        <li><i class="fas fa-envelope"></i> visionaryinnovators05@gmail.com</li>
                     </ul>
                 </div>
             </div>
@@ -1819,12 +1825,13 @@
     <script>
         // Firebase Configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyC4wGDrRHs4gQN6p8Q9X7VqY9t8d4Jk8Xw",
-            authDomain: "swadesi-bazaar.firebaseapp.com",
-            projectId: "swadesi-bazaar",
-            storageBucket: "swadesi-bazaar.appspot.com",
-            messagingSenderId: "123456789012",
-            appId: "1:123456789012:web:abcdef1234567890"
+            apiKey: "AIzaSyBSUaOWX7giwjq31T4ExHjZkpu2BLZJRQM",
+            authDomain: "login-page-a394f.firebaseapp.com",
+            projectId: "login-page-a394f",
+            storageBucket: "login-page-a394f.firebasestorage.app",
+            messagingSenderId: "605712065355",
+            appId: "1:605712065355:web:8019336951dc5a3dee7ece",
+            measurementId: "G-R4JBKP5KNW"
         };
 
         // Initialize Firebase
@@ -2170,7 +2177,7 @@
             
             const map = L.map('nearbySellersMap').setView([28.6139, 77.2090], 12); // Delhi coordinates
             
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}/.png', {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
             
@@ -2224,7 +2231,7 @@
             
             const map = L.map('sellerLocationMap').setView([28.6139, 77.2090], 12);
             
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}/.png', {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
             

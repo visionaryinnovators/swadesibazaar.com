@@ -79,16 +79,20 @@
             cursor: pointer;
         }
 
-        .logo h1 {
+        .logo-icon {
+            height: 50px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .logo-text {
             font-size: 28px;
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
             background: var(--gold-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             letter-spacing: -0.5px;
-        }
-
-        .logo span {
-            color: var(--secondary);
         }
 
         .search-bar {
@@ -746,6 +750,7 @@
                 flex-wrap: wrap;
                 gap: 10px;
             }
+            
         }
     </style>
 </head>
@@ -755,7 +760,10 @@
         <div class="container">
             <div class="header-top">
                 <div class="logo">
-                    <h1>Artisan<span>Luxe</span></h1>
+                    <a href="index.html">
+                        <img src="logo.png" alt="SwaDesi Bazaar Logo" class="logo-icon">
+                    </a>
+                    <div class="logo-text">SwaDesi Bazaar</div>
                 </div>
                 <div class="search-bar">
                     <input type="text" placeholder="Search for luxury products, artisans...">
@@ -1035,34 +1043,27 @@
                 <div class="footer-column">
                     <h3>Quick Links</h3>
                     <ul class="footer-links">
-                        <li><a href="#">Home</a></li>
-                        <li><a href="#">About Us</a></li>
-                        <li><a href="#">Become an Artisan</a></li>
-                        <li><a href="#">VIP Membership</a></li>
-                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="aboutus.html">About Us</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3>Customer Service</h3>
                     <ul class="footer-links">
-                        <li><a href="#">Help Center</a></li>
-                        <li><a href="#">Returns & Refunds</a></li>
-                        <li><a href="#">Shipping Info</a></li>
-                        <li><a href="#">Track Your Order</a></li>
-                        <li><a href="#">Privacy Policy</a></li>
+                        
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3>Contact Info</h3>
                     <ul class="footer-links">
-                        <li><i class="fas fa-map-marker-alt"></i> Luxury District, Mumbai, India</li>
-                        <li><i class="fas fa-phone"></i> +91 98765 43210</li>
-                        <li><i class="fas fa-envelope"></i> concierge@artisanluxe.com</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Tarakeswar, India</li>
+                        <li><i class="fas fa-phone"></i> +91 9064703308</li>
+                        <li><i class="fas fa-envelope"></i> visionaryinnovators05@gmail.com</li>
                     </ul>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2023 Artisan Luxe. All rights reserved. | Crafting Luxury, Preserving Heritage</p>
+                <p>&copy; 2025 Artisan Luxe. All rights reserved. | Crafting Luxury, Preserving Heritage</p>
             </div>
         </div>
     </footer>
@@ -1073,12 +1074,13 @@
     <script>
         // Firebase Configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyC4wGDrRHs4gQN6p8Q9X7VqY9t8d4Jk8Xw",
-            authDomain: "artisan-luxe.firebaseapp.com",
-            projectId: "artisan-luxe",
-            storageBucket: "artisan-luxe.appspot.com",
-            messagingSenderId: "123456789012",
-            appId: "1:123456789012:web:abcdef1234567890"
+            apiKey: "AIzaSyBSUaOWX7giwjq31T4ExHjZkpu2BLZJRQM",
+            authDomain: "login-page-a394f.firebaseapp.com",
+            projectId: "login-page-a394f",
+            storageBucket: "login-page-a394f.firebasestorage.app",
+            messagingSenderId: "605712065355",
+            appId: "1:605712065355:web:8019336951dc5a3dee7ece",
+            measurementId: "G-R4JBKP5KNW"
         };
 
         // Initialize Firebase

@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Micro-Repair Assistant | AI-Powered Tool Repair</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #00e5ff;
+            --primary-light: #80f0ff;
+            --secondary: #7700ff;
+            --accent: #ff00cc;
+            --dark: #0a0a1a;
+            --darker: #050510;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --danger: #ff4444;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--darker), var(--dark));
+            color: var(--light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Glowing Elements */
+        .glow {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.15;
+            z-index: -1;
+        }
+
+        .glow-1 {
+            top: 10%;
+            left: 10%;
+            background: radial-gradient(circle, var(--primary), transparent);
+        }
+
+        .glow-2 {
+            bottom: 10%;
+            right: 10%;
+            background: radial-gradient(circle, var(--secondary), transparent);
+        }
+
+        .glow-3 {
+            top: 40%;
+            right: 20%;
+            background: radial-gradient(circle, var(--accent), transparent);
+        }
+
+        /* Header Styles */
+        header {
+            background: rgba(10, 10, 26, 0.8);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 229, 255, 0.1);
+            border-bottom: 1px solid rgba(0, 229, 255, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            font-size: 2rem;
+            color: var(--primary);
+            text-shadow: 0 0 15px var(--primary);
+            animation: pulse 2s infinite;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            position: relative;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+            text-shadow: 0 0 10px var(--primary);
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            color: var(--dark);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.5);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: var(--dark);
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.5);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.8);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(rgba(5, 5, 16, 0.85), rgba(5, 5, 16, 0.9));
+            color: white;
+            padding: 5rem 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero h2 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin: 0 auto 2.5rem;
+            opacity: 0.9;
+            max-width: 700px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        /* Scanner Section */
+        .scanner-section {
+            padding: 5rem 0;
+            background: rgba(10, 10, 26, 0.5);
+            border-top: 1px solid rgba(0, 229, 255, 0.1);
+            border-bottom: 1px solid rgba(0, 229, 255, 0.1);
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            display: inline-block;
+            padding-bottom: 10px;
+            text-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+        }
+
+        .section-title h2:after {
+            content: '';
+            position: absolute;
+            width: 80px;
+            height: 4px;
+            background: var(--secondary);
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 10px var(--secondary);
+        }
+
+        .scanner-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .scanner-box {
+            width: 100%;
+            height: 400px;
+            background: rgba(10, 10, 26, 0.7);
+            border-radius: 15px;
+            border: 2px dashed rgba(0, 229, 255, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .scanner-box.active {
+            border-color: var(--primary);
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.3);
+        }
+
+        .scanner-icon {
+            font-size: 5rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 20px var(--primary);
+        }
+
+        .scanner-text {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            max-width: 500px;
+        }
+
+        .scanner-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 229, 255, 0.1);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .scanner-box.scanning .scanner-overlay {
+            display: flex;
+        }
+
+        .scanning-animation {
+            width: 200px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 2px;
+            margin-bottom: 1rem;
+            animation: scanning 2s infinite;
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        .scanner-controls {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        /* Repair Steps */
+        .repair-steps {
+            padding: 5rem 0;
+        }
+
+        .steps-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .step {
+            background: rgba(10, 10, 26, 0.7);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 229, 255, 0.1);
+            transition: var(--transition);
+            display: none;
+        }
+
+        .step.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        .step-title {
+            font-size: 1.5rem;
+            color: var(--primary);
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
+        }
+
+        .step-content {
+            display: flex;
+            gap: 2rem;
+            align-items: flex-start;
+        }
+
+        .step-media {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
+            min-height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .step-media img, .step-media video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .step-media-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: var(--gray);
+        }
+
+        .step-media-placeholder i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .step-instructions {
+            flex: 1;
+        }
+
+        .step-instructions h4 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .step-instructions ol {
+            padding-left: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .step-instructions li {
+            margin-bottom: 0.8rem;
+        }
+
+        .step-tools {
+            background: rgba(0, 229, 255, 0.1);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .step-tools h5 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tools-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tool-tag {
+            background: rgba(0, 229, 255, 0.2);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .step-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+
+        /* Tool Database */
+        .tool-database {
+            padding: 5rem 0;
+            background: rgba(10, 10, 26, 0.5);
+            border-top: 1px solid rgba(0, 229, 255, 0.1);
+            border-bottom: 1px solid rgba(0, 229, 255, 0.1);
+        }
+
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .tool-card {
+            background: rgba(10, 10, 26, 0.7);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: var(--transition);
+            border: 1px solid rgba(0, 229, 255, 0.1);
+        }
+
+        .tool-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 229, 255, 0.2);
+        }
+
+        .tool-image {
+            height: 180px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+        }
+
+        .tool-content {
+            padding: 1.5rem;
+        }
+
+        .tool-content h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
+        }
+
+        .tool-content p {
+            color: rgba(248, 249, 250, 0.7);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        /* CTA Section */
+        .cta {
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.1), rgba(119, 0, 255, 0.1));
+            color: white;
+            padding: 5rem 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+        }
+
+        .cta p {
+            max-width: 700px;
+            margin: 0 auto 2.5rem;
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--darker);
+            color: white;
+            padding: 4rem 0 2rem;
+            border-top: 1px solid rgba(0, 229, 255, 0.1);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-column h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .footer-column h3:after {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 3px;
+            background: var(--secondary);
+            bottom: 0;
+            left: 0;
+            box-shadow: 0 0 10px var(--secondary);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-links a {
+            color: #aaa;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+            padding-left: 5px;
+            text-shadow: 0 0 10px var(--primary);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: white;
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            background: var(--primary);
+            color: var(--dark);
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0% {
+                text-shadow: 0 0 10px var(--primary);
+            }
+            50% {
+                text-shadow: 0 0 20px var(--primary), 0 0 30px var(--primary);
+            }
+            100% {
+                text-shadow: 0 0 10px var(--primary);
+            }
+        }
+
+        @keyframes scanning {
+            0% {
+                transform: translateY(-100px);
+            }
+            50% {
+                transform: translateY(100px);
+            }
+            100% {
+                transform: translateY(-100px);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .hero h2 {
+                font-size: 2.8rem;
+            }
+            
+            nav ul {
+                gap: 1rem;
+            }
+            
+            .step-content {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .hero h2 {
+                font-size: 2.2rem;
+            }
+            
+            .hero p {
+                font-size: 1.1rem;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .scanner-controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Glowing Background Elements -->
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+    <div class="glow glow-3"></div>
+    
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-tools"></i>
+                    <h1>Micro-Repair AI</h1>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="#scanner">Scanner</a></li>
+                        <li><a href="#repair-steps">Repair Steps</a></li>
+                        <li><a href="#tool-database">Tool Database</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </nav>
+                <div class="auth-buttons">
+                    <a href="#" class="btn btn-outline">Log In</a>
+                    <a href="#" class="btn btn-primary">Sign Up</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h2>Digital Micro-Repair Assistant</h2>
+                <p>AI-powered tool repair guidance with AR visualization. Scan broken tools for instant step-by-step repair instructions.</p>
+                <div class="hero-buttons">
+                    <a href="#scanner" class="btn btn-primary">Start Repair</a>
+                    <a href="#tool-database" class="btn btn-outline">Browse Tools</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Scanner Section -->
+    <section class="scanner-section" id="scanner">
+        <div class="container">
+            <div class="section-title">
+                <h2>AI Tool Scanner</h2>
+            </div>
+            <div class="scanner-container">
+                <div class="scanner-box" id="scanner-box">
+                    <div class="scanner-icon">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    <div class="scanner-text">
+                        <p>Position your tool within the frame and click "Start Scan" to identify the issue and get repair instructions.</p>
+                    </div>
+                    <div class="scanner-overlay">
+                        <div class="scanning-animation"></div>
+                        <p>Scanning tool... Please hold steady.</p>
+                    </div>
+                </div>
+                <div class="scanner-controls">
+                    <button class="btn btn-primary" id="start-scan">Start Scan</button>
+                    <button class="btn btn-outline" id="upload-image">Upload Image</button>
+                    <button class="btn btn-outline" id="select-tool">Select from Database</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Repair Steps -->
+    <section class="repair-steps" id="repair-steps">
+        <div class="container">
+            <div class="section-title">
+                <h2>Repair Instructions</h2>
+            </div>
+            <div class="steps-container">
+                <!-- Step 1 -->
+                <div class="step active" id="step-1">
+                    <div class="step-header">
+                        <div class="step-number">1</div>
+                        <h3 class="step-title">Tool Identification & Issue Diagnosis</h3>
+                    </div>
+                    <div class="step-content">
+                        <div class="step-media">
+                            <div class="step-media-placeholder">
+                                <i class="fas fa-search"></i>
+                                <p>Tool identification visualization</p>
+                            </div>
+                        </div>
+                        <div class="step-instructions">
+                            <h4>Diagnosis Results:</h4>
+                            <p><strong>Tool:</strong> Cordless Drill</p>
+                            <p><strong>Issue:</strong> Battery not holding charge</p>
+                            <p><strong>Difficulty:</strong> Intermediate</p>
+                            <p><strong>Estimated Time:</strong> 20-30 minutes</p>
+                            <div class="step-tools">
+                                <h5><i class="fas fa-toolbox"></i> Required Tools</h5>
+                                <div class="tools-list">
+                                    <span class="tool-tag">Screwdriver set</span>
+                                    <span class="tool-tag">Multimeter</span>
+                                    <span class="tool-tag">Replacement battery</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-navigation">
+                        <button class="btn btn-outline" disabled>Previous</button>
+                        <button class="btn btn-primary next-step" data-step="2">Next Step</button>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="step" id="step-2">
+                    <div class="step-header">
+                        <div class="step-number">2</div>
+                        <h3 class="step-title">Remove Battery Housing</h3>
+                    </div>
+                    <div class="step-content">
+                        <div class="step-media">
+                            <div class="step-media-placeholder">
+                                <i class="fas fa-video"></i>
+                                <p>AR demonstration video</p>
+                            </div>
+                        </div>
+                        <div class="step-instructions">
+                            <h4>Instructions:</h4>
+                            <ol>
+                                <li>Locate the screws on the battery housing</li>
+                                <li>Use appropriate screwdriver to remove screws</li>
+                                <li>Gently pry open the housing using plastic tool</li>
+                                <li>Be careful not to damage internal components</li>
+                            </ol>
+                            <div class="step-tools">
+                                <h5><i class="fas fa-toolbox"></i> Required Tools</h5>
+                                <div class="tools-list">
+                                    <span class="tool-tag">Phillips screwdriver</span>
+                                    <span class="tool-tag">Plastic pry tool</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-navigation">
+                        <button class="btn btn-outline prev-step" data-step="1">Previous</button>
+                        <button class="btn btn-primary next-step" data-step="3">Next Step</button>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="step" id="step-3">
+                    <div class="step-header">
+                        <div class="step-number">3</div>
+                        <h3 class="step-title">Test Battery Cells</h3>
+                    </div>
+                    <div class="step-content">
+                        <div class="step-media">
+                            <div class="step-media-placeholder">
+                                <i class="fas fa-bolt"></i>
+                                <p>Battery testing animation</p>
+                            </div>
+                        </div>
+                        <div class="step-instructions">
+                            <h4>Instructions:</h4>
+                            <ol>
+                                <li>Set multimeter to DC voltage setting</li>
+                                <li>Test each battery cell individually</li>
+                                <li>Identify cells with voltage below 3.6V</li>
+                                <li>Mark faulty cells for replacement</li>
+                            </ol>
+                            <div class="step-tools">
+                                <h5><i class="fas fa-toolbox"></i> Required Tools</h5>
+                                <div class="tools-list">
+                                    <span class="tool-tag">Multimeter</span>
+                                    <span class="tool-tag">Replacement cells</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-navigation">
+                        <button class="btn btn-outline prev-step" data-step="2">Previous</button>
+                        <button class="btn btn-primary next-step" data-step="4">Next Step</button>
+                    </div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="step" id="step-4">
+                    <div class="step-header">
+                        <div class="step-number">4</div>
+                        <h3 class="step-title">Replace Faulty Cells & Reassemble</h3>
+                    </div>
+                    <div class="step-content">
+                        <div class="step-media">
+                            <div class="step-media-placeholder">
+                                <i class="fas fa-cogs"></i>
+                                <p>Assembly animation</p>
+                            </div>
+                        </div>
+                        <div class="step-instructions">
+                            <h4>Instructions:</h4>
+                            <ol>
+                                <li>Carefully desolder faulty battery cells</li>
+                                <li>Solder in replacement cells with correct polarity</li>
+                                <li>Reassemble battery housing</li>
+                                <li>Test drill functionality</li>
+                            </ol>
+                            <div class="step-tools">
+                                <h5><i class="fas fa-toolbox"></i> Required Tools</h5>
+                                <div class="tools-list">
+                                    <span class="tool-tag">Soldering iron</span>
+                                    <span class="tool-tag">Replacement cells</span>
+                                    <span class="tool-tag">Screwdriver</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-navigation">
+                        <button class="btn btn-outline prev-step" data-step="3">Previous</button>
+                        <button class="btn btn-primary" id="complete-repair">Complete Repair</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tool Database -->
+    <section class="tool-database" id="tool-database">
+        <div class="container">
+            <div class="section-title">
+                <h2>Common Tool Database</h2>
+            </div>
+            <div class="tool-grid">
+                <div class="tool-card">
+                    <div class="tool-image">
+                        <i class="fas fa-toolbox"></i>
+                    </div>
+                    <div class="tool-content">
+                        <h3>Power Drills</h3>
+                        <p>Cordless and corded drills, drivers, and impacts</p>
+                        <a href="#" class="btn btn-outline">Browse Repairs</a>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-image">
+                        <i class="fas fa-cut"></i>
+                    </div>
+                    <div class="tool-content">
+                        <h3>Saws & Cutters</h3>
+                        <p>Circular saws, jigsaws, and cutting tools</p>
+                        <a href="#" class="btn btn-outline">Browse Repairs</a>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-image">
+                        <i class="fas fa-fan"></i>
+                    </div>
+                    <div class="tool-content">
+                        <h3>Garden Tools</h3>
+                        <p>Lawn mowers, trimmers, and garden equipment</p>
+                        <a href="#" class="btn btn-outline">Browse Repairs</a>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-image">
+                        <i class="fas fa-tint"></i>
+                    </div>
+                    <div class="tool-content">
+                        <h3>Water Pumps</h3>
+                        <p>Agricultural and domestic water pumps</p>
+                        <a href="#" class="btn btn-outline">Browse Repairs</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta" id="contact">
+        <div class="container">
+            <h2>Need Help With a Different Tool?</h2>
+            <p>Our AI assistant can help repair hundreds of tools and machines. Upload a photo or use our scanner to get started.</p>
+            <a href="#scanner" class="btn btn-primary">Start New Repair</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Micro-Repair AI</h3>
+                    <p>AI-powered repair assistance for tools, motors, and machines with step-by-step AR guidance.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Repair Categories</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Power Tools</a></li>
+                        <li><a href="#">Garden Equipment</a></li>
+                        <li><a href="#">Water Pumps</a></li>
+                        <li><a href="#">Small Engines</a></li>
+                        <li><a href="#">Household Appliances</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Resources</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Repair Tutorials</a></li>
+                        <li><a href="#">Tool Manuals</a></li>
+                        <li><a href="#">Spare Parts Guide</a></li>
+                        <li><a href="#">Safety Guidelines</a></li>
+                        <li><a href="#">Community Forum</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Support</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">Report Issue</a></li>
+                        <li><a href="#">Feedback</a></li>
+                        <li><a href="#">App Download</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-column">
+                <h3>Contact Info</h3>
+                <ul class="footer-links">
+                    <li><i class="fas fa-map-marker-alt"></i> Tarakeswar, India</li>
+                    <li><i class="fas fa-phone"></i> +91 9064703308</li>
+                    <li><i class="fas fa-envelope"></i> visionaryinnovators05@gmail.com</li>
+                </ul>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 Digital Micro-Repair Assistant. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Scanner functionality
+        document.getElementById('start-scan').addEventListener('click', function() {
+            const scannerBox = document.getElementById('scanner-box');
+            scannerBox.classList.add('scanning', 'active');
+            
+            // Simulate scanning process
+            setTimeout(function() {
+                scannerBox.classList.remove('scanning');
+                alert('Tool identified: Cordless Drill with battery issues. Displaying repair instructions.');
+                
+                // Show first repair step
+                document.getElementById('step-1').classList.add('active');
+            }, 3000);
+        });
+
+        // Step navigation
+        document.querySelectorAll('.next-step').forEach(button => {
+            button.addEventListener('click', function() {
+                const currentStep = this.closest('.step');
+                const nextStepId = 'step-' + this.getAttribute('data-step');
+                
+                currentStep.classList.remove('active');
+                document.getElementById(nextStepId).classList.add('active');
+                
+                // Scroll to the top of the new step
+                document.getElementById(nextStepId).scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+
+        document.querySelectorAll('.prev-step').forEach(button => {
+            button.addEventListener('click', function() {
+                const currentStep = this.closest('.step');
+                const prevStepId = 'step-' + this.getAttribute('data-step');
+                
+                currentStep.classList.remove('active');
+                document.getElementById(prevStepId).classList.add('active');
+                
+                // Scroll to the top of the previous step
+                document.getElementById(prevStepId).scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+
+        // Complete repair
+        document.getElementById('complete-repair').addEventListener('click', function() {
+            alert('Congratulations! You have successfully completed the repair. Your tool should now be working properly.');
+        });
+
+        // Upload image functionality
+        document.getElementById('upload-image').addEventListener('click', function() {
+            alert('Image upload functionality would be implemented here. For this demo, we\'ll simulate tool identification.');
+            
+            const scannerBox = document.getElementById('scanner-box');
+            scannerBox.classList.add('active');
+            
+            // Simulate scanning process
+            setTimeout(function() {
+                alert('Tool identified: Cordless Drill with battery issues. Displaying repair instructions.');
+                
+                // Show first repair step
+                document.getElementById('step-1').classList.add('active');
+                document.getElementById('step-1').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 1500);
+        });
+
+        // Select from database
+        document.getElementById('select-tool').addEventListener('click', function() {
+            alert('Tool selection from database would open here. For this demo, we\'ll proceed with the cordless drill example.');
+            
+            // Show first repair step
+            document.getElementById('step-1').classList.add('active');
+            document.getElementById('step-1').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if(targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if(targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AquaShare AI | Dynamic Water Sharing Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #00e5ff;
+            --primary-light: #80f0ff;
+            --secondary: #0066cc;
+            --accent: #00cc88;
+            --dark: #0a1929;
+            --darker: #051423;
+            --light: #f0f8ff;
+            --gray: #8fa3bf;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--darker), var(--dark));
+            color: var(--light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Glowing Elements */
+        .glow {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.15;
+            z-index: -1;
+        }
+
+        .glow-1 {
+            top: 10%;
+            left: 10%;
+            background: radial-gradient(circle, var(--primary), transparent);
+        }
+
+        .glow-2 {
+            bottom: 10%;
+            right: 10%;
+            background: radial-gradient(circle, var(--secondary), transparent);
+        }
+
+        .glow-3 {
+            top: 40%;
+            right: 20%;
+            background: radial-gradient(circle, var(--accent), transparent);
+        }
+
+        /* Header Styles */
+        header {
+            background: rgba(10, 25, 41, 0.85);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 229, 255, 0.1);
+            border-bottom: 1px solid rgba(0, 229, 255, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            font-size: 2rem;
+            color: var(--primary);
+            text-shadow: 0 0 15px var(--primary);
+            animation: pulse 2s infinite;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            position: relative;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+            text-shadow: 0 0 10px var(--primary);
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: var(--dark);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.5);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: var(--dark);
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.5);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.8);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(rgba(5, 20, 35, 0.85), rgba(5, 20, 35, 0.9)), url('https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 8rem 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero h2 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            max-width: 800px;
+            margin: 0 auto 2.5rem;
+            opacity: 0.9;
+        }
+
+        .hero-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        /* Section Styles */
+        .section-title {
+            text-align: center;
+            margin: 4rem 0 2rem;
+            position: relative;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            display: inline-block;
+            padding-bottom: 10px;
+            text-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+        }
+
+        .section-title h2:after {
+            content: '';
+            position: absolute;
+            width: 80px;
+            height: 4px;
+            background: var(--accent);
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 10px var(--accent);
+        }
+
+        /* How It Works */
+        .how-it-works {
+            padding: 5rem 0;
+            background: rgba(10, 25, 41, 0.5);
+        }
+
+        .steps {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .step {
+            flex: 1;
+            min-width: 250px;
+            text-align: center;
+            padding: 2rem;
+            background: rgba(10, 25, 41, 0.7);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: var(--transition);
+            border: 1px solid rgba(0, 229, 255, 0.1);
+        }
+
+        .step:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 229, 255, 0.2);
+        }
+
+        .step-icon {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 15px var(--primary);
+        }
+
+        .step h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-light);
+        }
+
+        /* AI Dashboard */
+        .ai-dashboard {
+            padding: 5rem 0;
+        }
+
+        .dashboard-content {
+            display: flex;
+            align-items: center;
+            gap: 3rem;
+            margin-top: 3rem;
+        }
+
+        .dashboard-text {
+            flex: 1;
+        }
+
+        .dashboard-text h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            text-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+        }
+
+        .dashboard-text p {
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .dashboard-features {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-features li {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dashboard-features i {
+            color: var(--accent);
+            text-shadow: 0 0 10px var(--accent);
+        }
+
+        .dashboard-visual {
+            flex: 1;
+            background: rgba(10, 25, 41, 0.7);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 30px rgba(0, 229, 255, 0.2);
+            border: 1px solid rgba(0, 229, 255, 0.1);
+            padding: 2rem;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+        }
+
+        .dashboard-title {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .water-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(0, 229, 255, 0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid rgba(0, 229, 255, 0.2);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+            text-shadow: 0 0 10px var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .prediction-chart {
+            background: rgba(0, 229, 255, 0.05);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(0, 229, 255, 0.1);
+        }
+
+        .chart-title {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--primary-light);
+        }
+
+        .chart-placeholder {
+            height: 200px;
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.1), rgba(0, 204, 136, 0.1));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .ai-recommendation {
+            background: rgba(0, 204, 136, 0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+            border: 1px solid rgba(0, 204, 136, 0.2);
+        }
+
+        .recommendation-title {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Benefits Section */
+        .benefits {
+            padding: 5rem 0;
+            background: rgba(10, 25, 41, 0.5);
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .benefit-card {
+            background: rgba(10, 25, 41, 0.7);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: var(--transition);
+            border: 1px solid rgba(0, 229, 255, 0.1);
+        }
+
+        .benefit-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 229, 255, 0.2);
+        }
+
+        .benefit-icon {
+            font-size: 3rem;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 15px var(--accent);
+        }
+
+        .benefit-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-light);
+        }
+
+        /* CTA Section */
+        .cta {
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.1), rgba(0, 102, 204, 0.1));
+            color: white;
+            padding: 5rem 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+        }
+
+        .cta p {
+            max-width: 700px;
+            margin: 0 auto 2.5rem;
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--darker);
+            color: white;
+            padding: 4rem 0 2rem;
+            border-top: 1px solid rgba(0, 229, 255, 0.1);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-column h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .footer-column h3:after {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 3px;
+            background: var(--accent);
+            bottom: 0;
+            left: 0;
+            box-shadow: 0 0 10px var(--accent);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-links a {
+            color: var(--gray);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+            padding-left: 5px;
+            text-shadow: 0 0 10px var(--primary);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: white;
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            background: var(--primary);
+            color: var(--dark);
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0% {
+                text-shadow: 0 0 10px var(--primary);
+            }
+            50% {
+                text-shadow: 0 0 20px var(--primary), 0 0 30px var(--primary);
+            }
+            100% {
+                text-shadow: 0 0 10px var(--primary);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .dashboard-content {
+                flex-direction: column;
+            }
+            
+            .hero h2 {
+                font-size: 2.8rem;
+            }
+            
+            nav ul {
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .hero h2 {
+                font-size: 2.2rem;
+            }
+            
+            .hero p {
+                font-size: 1.1rem;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .steps {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Glowing Background Elements -->
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+    <div class="glow glow-3"></div>
+    
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-tint"></i>
+                    <h1>AquaShare AI</h1>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="#how-it-works">How It Works</a></li>
+                        <li><a href="#dashboard">AI Dashboard</a></li>
+                        <li><a href="#benefits">Benefits</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </nav>
+                <div class="auth-buttons">
+                    <a href="#" class="btn btn-outline">Log In</a>
+                    <a href="#" class="btn btn-primary">Sign Up</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h2>Dynamic Water Sharing Platform</h2>
+            <p>AI-powered solution for water-scarce areas. Digitally share water from wells or ponds with intelligent prediction of needs and optimized availability.</p>
+            <div class="hero-buttons">
+                <a href="#" class="btn btn-primary">Join Network</a>
+                <a href="#" class="btn btn-outline">Watch Demo</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="container">
+            <div class="section-title">
+                <h2>How AquaShare AI Works</h2>
+            </div>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-water"></i>
+                    </div>
+                    <h3>Register Water Sources</h3>
+                    <p>Add your wells, ponds, or other water sources to the platform with location and capacity details.</p>
+                </div>
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3>AI Predicts Needs</h3>
+                    <p>Our AI analyzes weather, crop patterns, and historical data to predict water requirements.</p>
+                </div>
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-share-alt"></i>
+                    </div>
+                    <h3>Smart Sharing</h3>
+                    <p>The platform automatically connects those with surplus water to those in need based on AI recommendations.</p>
+                </div>
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Optimize Usage</h3>
+                    <p>Track water usage, receive conservation tips, and maximize efficiency with AI insights.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Dashboard Section -->
+    <section class="ai-dashboard" id="dashboard">
+        <div class="container">
+            <div class="section-title">
+                <h2>AI-Powered Water Management Dashboard</h2>
+            </div>
+            <div class="dashboard-content">
+                <div class="dashboard-text">
+                    <h2>Intelligent Water Distribution</h2>
+                    <p>Our AI dashboard provides real-time insights into water availability, demand patterns, and optimal distribution strategies.</p>
+                    <ul class="dashboard-features">
+                        <li><i class="fas fa-check-circle"></i> Predictive water requirement analysis</li>
+                        <li><i class="fas fa-check-circle"></i> Real-time water source monitoring</li>
+                        <li><i class="fas fa-check-circle"></i> Automated distribution scheduling</li>
+                        <li><i class="fas fa-check-circle"></i> Conservation recommendations</li>
+                        <li><i class="fas fa-check-circle"></i> Emergency shortage alerts</li>
+                    </ul>
+                    <a href="#" class="btn btn-primary">Access Dashboard</a>
+                </div>
+                <div class="dashboard-visual">
+                    <div class="dashboard-header">
+                        <div class="dashboard-title">Water Management Overview</div>
+                        <div class="dashboard-status">
+                            <span style="color: var(--accent);">
+                                <i class="fas fa-circle"></i> System Active
+                            </span>
+                        </div>
+                    </div>
+                    <div class="water-stats">
+                        <div class="stat-card">
+                            <div class="stat-value">78%</div>
+                            <div class="stat-label">Available Capacity</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">42</div>
+                            <div class="stat-label">Active Shares</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">15</div>
+                            <div class="stat-label">Requests Fulfilled</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">94%</div>
+                            <div class="stat-label">Efficiency Score</div>
+                        </div>
+                    </div>
+                    <div class="prediction-chart">
+                        <div class="chart-title">Water Demand Prediction (Next 7 Days)</div>
+                        <div class="chart-placeholder">
+                            <i class="fas fa-chart-area" style="font-size: 3rem; margin-right: 10px;"></i>
+                            Interactive Prediction Chart
+                        </div>
+                    </div>
+                    <div class="ai-recommendation">
+                        <div class="recommendation-title">
+                            <i class="fas fa-robot"></i> AI Recommendation
+                        </div>
+                        <p>Based on weather forecasts and historical usage patterns, we recommend increasing water sharing by 15% in the northern sector over the next 3 days to prepare for increased demand.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section class="benefits" id="benefits">
+        <div class="container">
+            <div class="section-title">
+                <h2>Benefits of AquaShare AI</h2>
+            </div>
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-hand-holding-water"></i>
+                    </div>
+                    <h3>Water Equity</h3>
+                    <p>Ensure fair distribution of water resources, especially during scarcity periods, through AI-driven allocation.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <h3>Sustainability</h3>
+                    <p>Reduce water wastage and promote conservation with intelligent usage tracking and recommendations.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Community Building</h3>
+                    <p>Foster cooperation and strengthen community bonds through shared resource management.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h3>Data Insights</h3>
+                    <p>Gain valuable insights into water usage patterns and make informed decisions for future planning.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3>Efficiency</h3>
+                    <p>Optimize water distribution routes and timing to minimize energy consumption and maximize impact.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Resilience</h3>
+                    <p>Build community resilience to water scarcity through predictive planning and shared resources.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta" id="contact">
+        <div class="container">
+            <h2>Ready to Transform Water Management in Your Community?</h2>
+            <p>Join AquaShare AI today and be part of the solution to water scarcity through intelligent sharing and AI-powered optimization.</p>
+            <a href="#" class="btn btn-primary">Get Started Now</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>AquaShare AI</h3>
+                    <p>AI-powered dynamic water sharing platform for sustainable community water management in water-scarce regions.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Platform</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">How It Works</a></li>
+                        <li><a href="#">AI Dashboard</a></li>
+                        <li><a href="#">Water Sources</a></li>
+                        <li><a href="#">Sharing Network</a></li>
+                        <li><a href="#">Analytics</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Resources</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Documentation</a></li>
+                        <li><a href="#">Case Studies</a></li>
+                        <li><a href="#">Water Conservation Tips</a></li>
+                        <li><a href="#">Community Guidelines</a></li>
+                        <li><a href="#">Research Papers</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Support</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">Community Forum</a></li>
+                        <li><a href="#">System Status</a></li>
+                        <li><a href="#">Report Issue</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contact Info</h3>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-map-marker-alt"></i> Tarakeswar, India</li>
+                        <li><i class="fas fa-phone"></i> +91 9064703308</li>
+                        <li><i class="fas fa-envelope"></i> visionaryinnovators05@gmail.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 AquaShare AI. All rights reserved. | Sustainable Water Management Through AI</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Simple script for smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if(targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if(targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Simple animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe elements for animation
+        document.querySelectorAll('.step, .benefit-card').forEach(element => {
+            element.style.opacity = '0';
+            element.style.transform = 'translateY(20px)';
+            element.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            observer.observe(element);
+        });
+
+        // Add glowing effect to buttons on hover
+        document.querySelectorAll('.btn').forEach(button => {
+            button.addEventListener('mouseenter', function() {
+                this.style.boxShadow = '0 0 25px rgba(0, 229, 255, 0.7)';
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                if(this.classList.contains('btn-primary')) {
+                    this.style.boxShadow = '0 0 20px rgba(0, 229, 255, 0.5)';
+                } else {
+                    this.style.boxShadow = 'none';
+                }
+            });
+        });
+
+        // Simulate live data updates in the dashboard
+        function updateDashboardStats() {
+            const stats = document.querySelectorAll('.stat-value');
+            if(stats.length > 0) {
+                // Randomly fluctuate the values slightly to simulate live data
+                stats[0].textContent = (75 + Math.floor(Math.random() * 6)) + '%';
+                stats[1].textContent = (40 + Math.floor(Math.random() * 5));
+                stats[3].textContent = (92 + Math.floor(Math.random() * 5)) + '%';
+            }
+        }
+
+        // Update stats every 10 seconds
+        setInterval(updateDashboardStats, 10000);
+    </script>
+</body>
+</html>

@@ -76,6 +76,11 @@
             color: var(--secondary);
         }
 
+        .logo-image {
+            height: 100px;
+            width: auto;
+        }
+
         /* Authentication Page Styles */
         .auth-container {
             display: flex;
@@ -431,7 +436,10 @@
             
             <div class="auth-right">
                 <div class="logo">
-                    <h1>Swa<span>Desi</span> Bazaar</h1>
+                    <a href="index.html">
+                        <img src="logo.png" alt="SwaDesi Bazaar Logo" class="logo-image">
+                    </a>
+                    <div class="logo-text">SwaDesi Bazaar</div>
                 </div>
                 
                 <div class="auth-tabs">
@@ -560,12 +568,13 @@
     <script>
         // Firebase Configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyC4wGDrRHs4gQN6p8Q9X7VqY9t8d4Jk8Xw",
-            authDomain: "swadesi-bazaar.firebaseapp.com",
-            projectId: "swadesi-bazaar",
-            storageBucket: "swadesi-bazaar.appspot.com",
-            messagingSenderId: "123456789012",
-            appId: "1:123456789012:web:abcdef1234567890"
+            apiKey: "AIzaSyBSUaOWX7giwjq31T4ExHjZkpu2BLZJRQM",
+            authDomain: "login-page-a394f.firebaseapp.com",
+            projectId: "login-page-a394f",
+            storageBucket: "login-page-a394f.firebasestorage.app",
+            messagingSenderId: "605712065355",
+            appId: "1:605712065355:web:8019336951dc5a3dee7ece",
+            measurementId: "G-R4JBKP5KNW"
         };
 
         // Initialize Firebase

@@ -10,18 +10,19 @@
     
     <style>
         :root {
-            --primary: #2E8B57;
-            --primary-dark: #1F6B41;
-            --secondary: #1A1A1A;
+            --primary: #00ff88;
+            --primary-dark: #00cc6a;
+            --secondary: #0a0a0a;
             --accent: #8B4513;
-            --light: #F8F5F0;
-            --gray: #6C757D;
-            --white: #FFFFFF;
-            --gold: #D4AF37;
-            --error: #e74c3c;
-            --success: #2ecc71;
-            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --light: #0f1217;
+            --gray: #a0a0a0;
+            --white: #ffffff;
+            --gold: #ffd700;
+            --error: #ff4d4d;
+            --success: #00ff88;
+            --shadow: 0 10px 30px rgba(0, 255, 136, 0.15);
             --transition: all 0.3s ease;
+            --glow: 0 0 10px rgba(0, 255, 136, 0.7);
         }
 
         * {
@@ -32,10 +33,11 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            color: var(--secondary);
+            color: var(--white);
             background-color: var(--light);
             line-height: 1.6;
             overflow-x: hidden;
+            background: linear-gradient(135deg, #0a0a0a 0%, #0f1217 50%, #0a1a14 100%);
         }
 
         h1, h2, h3, h4, h5 {
@@ -70,11 +72,13 @@
 
         /* Header Styles */
         header {
-            background-color: var(--white);
+            background-color: rgba(10, 10, 10, 0.9);
             box-shadow: var(--shadow);
             position: sticky;
             top: 0;
             z-index: 1000;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
         }
 
         .header-top {
@@ -95,19 +99,21 @@
             font-size: 28px;
             color: var(--primary);
             letter-spacing: -0.5px;
+            text-shadow: var(--glow);
         }
 
         .logo span {
-            color: var(--secondary);
+            color: var(--white);
         }
 
         .logo .ai-badge {
             background: var(--gold);
-            color: white;
+            color: var(--secondary);
             font-size: 10px;
             padding: 2px 8px;
             border-radius: 10px;
             margin-left: 5px;
+            font-weight: 700;
         }
 
         .nav-links {
@@ -117,7 +123,7 @@
         }
 
         .nav-links a {
-            color: var(--secondary);
+            color: var(--white);
             text-decoration: none;
             font-weight: 500;
             transition: var(--transition);
@@ -126,6 +132,7 @@
 
         .nav-links a:hover {
             color: var(--primary);
+            text-shadow: var(--glow);
         }
 
         .nav-links a::after {
@@ -137,6 +144,7 @@
             left: 0;
             background-color: var(--primary);
             transition: var(--transition);
+            box-shadow: var(--glow);
         }
 
         .nav-links a:hover::after {
@@ -151,15 +159,16 @@
 
         .language-selector select {
             padding: 8px 15px;
-            border: 1px solid #E5E5E5;
+            border: 1px solid rgba(0, 255, 136, 0.3);
             border-radius: 5px;
-            background-color: white;
+            background-color: rgba(10, 10, 10, 0.8);
             font-size: 14px;
+            color: var(--white);
         }
 
         .auth-buttons a {
             text-decoration: none;
-            color: var(--secondary);
+            color: var(--white);
             font-weight: 500;
             padding: 8px 15px;
             border-radius: 5px;
@@ -172,23 +181,36 @@
 
         .auth-buttons a.signup {
             background: var(--primary);
-            color: white;
+            color: var(--secondary);
+            font-weight: 600;
         }
 
         .auth-buttons a.signup:hover {
             background: var(--primary-dark);
+            box-shadow: var(--glow);
         }
 
         /* Hero Section */
         .hero {
             position: relative;
             height: 700px;
-            background: linear-gradient(135deg, rgba(46, 139, 87, 0.9) 0%, rgba(31, 107, 65, 0.8) 100%), url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2832&q=80') no-repeat center center;
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1) 0%, rgba(10, 26, 20, 0.9) 100%), url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2832&q=80') no-repeat center center;
             background-size: cover;
             color: white;
             display: flex;
             align-items: center;
             overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 50%, rgba(0, 255, 136, 0.1) 0%, transparent 50%);
+            z-index: 1;
         }
 
         .hero-content {
@@ -200,6 +222,7 @@
             font-size: 52px;
             margin-bottom: 20px;
             line-height: 1.2;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
         }
 
         .hero p {
@@ -210,8 +233,8 @@
 
         .cta-button {
             display: inline-block;
-            background: var(--gold);
-            color: white;
+            background: var(--primary);
+            color: var(--secondary);
             padding: 16px 35px;
             border-radius: 5px;
             text-decoration: none;
@@ -220,19 +243,36 @@
             border: none;
             cursor: pointer;
             font-size: 18px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: var(--glow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: 0.5s;
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
         }
 
         .cta-button:hover {
-            background: #C19B2E;
+            background: var(--primary-dark);
             transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 20px rgba(0, 255, 136, 0.4);
         }
 
         /* Features Section */
         .features {
             padding: 100px 0;
-            background-color: var(--white);
+            background-color: transparent;
         }
 
         .section-title {
@@ -242,8 +282,9 @@
 
         .section-title h2 {
             font-size: 42px;
-            color: var(--secondary);
+            color: var(--white);
             margin-bottom: 15px;
+            text-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
         }
 
         .section-title p {
@@ -260,25 +301,38 @@
         }
 
         .feature-card {
-            background: var(--white);
+            background: rgba(20, 25, 30, 0.7);
             border-radius: 15px;
             padding: 40px 30px;
             box-shadow: var(--shadow);
             transition: var(--transition);
             text-align: center;
-            border: 1px solid rgba(46, 139, 87, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.1);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
         }
 
         .feature-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 15px 30px rgba(0, 255, 136, 0.2);
             border-color: var(--primary);
         }
 
         .feature-icon {
             width: 80px;
             height: 80px;
-            background: rgba(46, 139, 87, 0.1);
+            background: rgba(0, 255, 136, 0.1);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -286,11 +340,13 @@
             margin: 0 auto 25px;
             font-size: 32px;
             color: var(--primary);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
         }
 
         .feature-card h3 {
             font-size: 24px;
             margin-bottom: 15px;
+            color: var(--white);
         }
 
         .feature-card p {
@@ -301,24 +357,39 @@
         /* Digital Twin Section */
         .digital-twin {
             padding: 100px 0;
-            background: linear-gradient(135deg, #f8f5f0 0%, #e8f5e8 100%);
+            background: linear-gradient(135deg, rgba(15, 18, 23, 0.8) 0%, rgba(10, 26, 20, 0.8) 100%);
+            position: relative;
+        }
+
+        .digital-twin::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(0,255,136,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.5;
         }
 
         .twin-container {
             display: flex;
             align-items: center;
             gap: 60px;
+            position: relative;
+            z-index: 1;
         }
 
         .twin-visual {
             flex: 1;
             border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
             height: 500px;
             background: url('https://images.unsplash.com/photo-1586771107445-d3ca888129ce?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2942&q=80') no-repeat center center;
             background-size: cover;
             position: relative;
+            border: 1px solid rgba(0, 255, 136, 0.2);
         }
 
         .twin-overlay {
@@ -327,13 +398,14 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(0, 0, 0, 0.5);
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-size: 24px;
             font-weight: 600;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
         }
 
         .twin-content {
@@ -343,7 +415,8 @@
         .twin-content h2 {
             font-size: 38px;
             margin-bottom: 20px;
-            color: var(--secondary);
+            color: var(--white);
+            text-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
         }
 
         .twin-content p {
@@ -364,17 +437,19 @@
             align-items: center;
             gap: 15px;
             font-size: 16px;
+            color: var(--gray);
         }
 
         .twin-features i {
             color: var(--primary);
             font-size: 18px;
+            text-shadow: 0 0 5px rgba(0, 255, 136, 0.5);
         }
 
         /* AI Assistant Section */
         .ai-assistant-section {
             padding: 100px 0;
-            background-color: var(--white);
+            background-color: transparent;
         }
 
         .assistant-container {
@@ -390,7 +465,8 @@
         .assistant-content h2 {
             font-size: 38px;
             margin-bottom: 20px;
-            color: var(--secondary);
+            color: var(--white);
+            text-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
         }
 
         .assistant-content p {
@@ -402,10 +478,12 @@
 
         .assistant-demo {
             flex: 1;
-            background: var(--light);
+            background: rgba(20, 25, 30, 0.7);
             border-radius: 15px;
             padding: 30px;
             box-shadow: var(--shadow);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            backdrop-filter: blur(10px);
         }
 
         .assistant-header {
@@ -414,7 +492,7 @@
             gap: 15px;
             margin-bottom: 20px;
             padding-bottom: 15px;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
         }
 
         .assistant-avatar {
@@ -425,8 +503,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
+            color: var(--secondary);
             font-size: 20px;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
         }
 
         .assistant-messages {
@@ -446,16 +525,18 @@
         }
 
         .message.bot {
-            background: #f0f0f0;
+            background: rgba(40, 45, 50, 0.8);
             align-self: flex-start;
             border-bottom-left-radius: 5px;
+            color: var(--white);
         }
 
         .message.user {
             background: var(--primary);
-            color: white;
+            color: var(--secondary);
             align-self: flex-end;
             border-bottom-right-radius: 5px;
+            font-weight: 500;
         }
 
         .assistant-input {
@@ -466,14 +547,16 @@
         .assistant-input input {
             flex: 1;
             padding: 15px;
-            border: 1px solid #E5E5E5;
+            border: 1px solid rgba(0, 255, 136, 0.3);
             border-radius: 50px;
             font-size: 16px;
+            background: rgba(30, 35, 40, 0.8);
+            color: var(--white);
         }
 
         .assistant-input button {
             background: var(--primary);
-            color: white;
+            color: var(--secondary);
             border: none;
             width: 50px;
             height: 50px;
@@ -483,96 +566,84 @@
             justify-content: center;
             cursor: pointer;
             transition: var(--transition);
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
         }
 
         .assistant-input button:hover {
             background: var(--primary-dark);
+            transform: scale(1.05);
         }
 
-        /* Pricing Section */
-        .pricing {
+        /* Features Showcase Section */
+        .features-showcase {
             padding: 100px 0;
-            background: linear-gradient(135deg, #f8f5f0 0%, #e8f5e8 100%);
+            background: linear-gradient(135deg, rgba(10, 26, 20, 0.8) 0%, rgba(15, 18, 23, 0.8) 100%);
         }
 
-        .pricing-grid {
+        .showcase-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 30px;
         }
 
-        .pricing-card {
-            background: var(--white);
+        .showcase-card {
+            background: rgba(20, 25, 30, 0.7);
             border-radius: 15px;
             overflow: hidden;
             box-shadow: var(--shadow);
             transition: var(--transition);
             position: relative;
+            border: 1px solid rgba(0, 255, 136, 0.1);
+            backdrop-filter: blur(10px);
         }
 
-        .pricing-card.featured {
-            border: 2px solid var(--primary);
-            transform: scale(1.05);
-        }
-
-        .pricing-card:hover {
+        .showcase-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 15px 30px rgba(0, 255, 136, 0.2);
+            border-color: var(--primary);
         }
 
-        .pricing-card.featured:hover {
-            transform: scale(1.05) translateY(-10px);
-        }
-
-        .pricing-header {
+        .showcase-header {
             padding: 30px;
             text-align: center;
-            background: var(--primary);
-            color: white;
+            background: rgba(0, 255, 136, 0.1);
+            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
         }
 
-        .pricing-header h3 {
+        .showcase-header h3 {
             font-size: 24px;
             margin-bottom: 10px;
+            color: var(--white);
         }
 
-        .pricing-price {
-            font-size: 48px;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .pricing-period {
-            font-size: 16px;
-            opacity: 0.8;
-        }
-
-        .pricing-features {
+        .showcase-features {
             padding: 30px;
             list-style: none;
         }
 
-        .pricing-features li {
+        .showcase-features li {
             margin-bottom: 15px;
             display: flex;
             align-items: center;
             gap: 10px;
+            color: var(--gray);
         }
 
-        .pricing-features i {
+        .showcase-features i {
             color: var(--primary);
+            text-shadow: 0 0 5px rgba(0, 255, 136, 0.5);
         }
 
-        .pricing-actions {
+        .showcase-actions {
             padding: 0 30px 30px;
         }
 
-        .pricing-btn {
+        .showcase-btn {
             display: block;
             width: 100%;
             padding: 15px;
             background: var(--primary);
-            color: white;
+            color: var(--secondary);
             border: none;
             border-radius: 5px;
             font-size: 16px;
@@ -581,24 +652,18 @@
             transition: var(--transition);
             text-align: center;
             text-decoration: none;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
         }
 
-        .pricing-btn:hover {
+        .showcase-btn:hover {
             background: var(--primary-dark);
-        }
-
-        .pricing-card.featured .pricing-btn {
-            background: var(--gold);
-        }
-
-        .pricing-card.featured .pricing-btn:hover {
-            background: #C19B2E;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
         }
 
         /* Testimonials */
         .testimonials {
             padding: 100px 0;
-            background-color: var(--white);
+            background-color: transparent;
         }
 
         .testimonials-grid {
@@ -608,16 +673,19 @@
         }
 
         .testimonial-card {
-            background: var(--white);
+            background: rgba(20, 25, 30, 0.7);
             border-radius: 15px;
             padding: 30px;
             box-shadow: var(--shadow);
             transition: var(--transition);
+            border: 1px solid rgba(0, 255, 136, 0.1);
+            backdrop-filter: blur(10px);
         }
 
         .testimonial-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 15px 30px rgba(0, 255, 136, 0.2);
+            border-color: var(--primary);
         }
 
         .testimonial-content {
@@ -637,12 +705,18 @@
             width: 50px;
             height: 50px;
             border-radius: 50%;
-            background: #E5E5E5;
+            background: rgba(0, 255, 136, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-weight: bold;
         }
 
         .author-info h4 {
             font-size: 18px;
             margin-bottom: 5px;
+            color: var(--white);
         }
 
         .author-info p {
@@ -655,6 +729,7 @@
             background: var(--secondary);
             color: white;
             padding: 80px 0 0;
+            border-top: 1px solid rgba(0, 255, 136, 0.2);
         }
 
         .footer-content {
@@ -668,6 +743,7 @@
             font-size: 20px;
             margin-bottom: 20px;
             color: var(--primary);
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
         }
 
         .footer-links {
@@ -676,6 +752,9 @@
 
         .footer-links li {
             margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .footer-links a {
@@ -686,6 +765,7 @@
 
         .footer-links a:hover {
             color: var(--primary);
+            text-shadow: 0 0 5px rgba(0, 255, 136, 0.5);
         }
 
         .footer-bottom {
@@ -735,12 +815,8 @@
                 font-size: 32px;
             }
             
-            .features-grid, .pricing-grid, .testimonials-grid {
+            .features-grid, .showcase-grid, .testimonials-grid {
                 grid-template-columns: 1fr;
-            }
-            
-            .pricing-card.featured {
-                transform: none;
             }
         }
 
@@ -768,13 +844,13 @@
                 <div class="container">
                     <div class="header-top">
                         <div class="logo" id="logo">
-                            <h1>AgriVision<span>AI</span> <span class="ai-badge">Premium</span></h1>
+                            <h1>AgriVision<span>AI</span> <span class="ai-badge">PREMIUM</span></h1>
                         </div>
                         <ul class="nav-links">
                             <li><a href="#features">Features</a></li>
                             <li><a href="#digital-twin">Digital Twin</a></li>
                             <li><a href="#ai-assistant">AI Assistant</a></li>
-                            <li><a href="#pricing">Pricing</a></li>
+                            <li><a href="#features-showcase">Solutions</a></li>
                             <li><a href="#testimonials">Testimonials</a></li>
                         </ul>
                         <div class="header-actions">
@@ -897,7 +973,7 @@
                             <p>Interact with our AI assistant in your preferred language. Get personalized guidance, ask questions, and receive real-time recommendations for your farm.</p>
                             
                             <div style="margin-bottom: 30px;">
-                                <h3 style="margin-bottom: 15px;">Try asking:</h3>
+                                <h3 style="margin-bottom: 15px; color: var(--white);">Try asking:</h3>
                                 <ul class="twin-features">
                                     <li><i class="fas fa-microphone"></i> "Mujhe apne kheth mein aaj kya karna hai?"</li>
                                     <li><i class="fas fa-microphone"></i> "How do I treat leaf rust on my wheat crop?"</li>
@@ -939,66 +1015,57 @@
                 </div>
             </section>
 
-            <!-- Pricing Section -->
-            <section class="pricing" id="pricing">
+            <!-- Features Showcase Section -->
+            <section class="features-showcase" id="features-showcase">
                 <div class="container">
                     <div class="section-title">
-                        <h2>Choose Your Plan</h2>
-                        <p>Flexible pricing designed for farmers of all scales</p>
+                        <h2>Premium AI Solutions</h2>
+                        <p>Explore our specialized AI-powered solutions for modern farming</p>
                     </div>
-                    <div class="pricing-grid">
-                        <div class="pricing-card">
-                            <div class="pricing-header">
-                                <h3>Basic</h3>
-                                <div class="pricing-price">₹999</div>
-                                <div class="pricing-period">per month</div>
+                    <div class="showcase-grid">
+                        <div class="showcase-card">
+                            <div class="showcase-header">
+                                <h3>Pest Detection AI</h3>
                             </div>
-                            <ul class="pricing-features">
-                                <li><i class="fas fa-check"></i> Basic Digital Twin</li>
-                                <li><i class="fas fa-check"></i> Satellite Monitoring</li>
-                                <li><i class="fas fa-check"></i> Pest Detection Alerts</li>
-                                <li><i class="fas fa-times"></i> AI Assistant</li>
-                                <li><i class="fas fa-times"></i> IoT Sensor Integration</li>
-                                <li><i class="fas fa-times"></i> Yield Prediction</li>
+                            <ul class="showcase-features">
+                                <li><i class="fas fa-check"></i> Real-time pest identification</li>
+                                <li><i class="fas fa-check"></i> Treatment recommendations</li>
+                                <li><i class="fas fa-check"></i> Early warning system</li>
+                                <li><i class="fas fa-check"></i> Multi-crop support</li>
+                                <li><i class="fas fa-check"></i> Historical data analysis</li>
                             </ul>
-                            <div class="pricing-actions">
-                                <a href="#" class="pricing-btn">Get Started</a>
+                            <div class="showcase-actions">
+                                <a href="pestdetection.html" class="showcase-btn">Explore Feature</a>
                             </div>
                         </div>
-                        <div class="pricing-card featured">
-                            <div class="pricing-header">
-                                <h3>Premium</h3>
-                                <div class="pricing-price">₹2,499</div>
-                                <div class="pricing-period">per month</div>
+                        <div class="showcase-card">
+                            <div class="showcase-header">
+                                <h3>Smart Irrigation AI</h3>
                             </div>
-                            <ul class="pricing-features">
-                                <li><i class="fas fa-check"></i> Advanced Digital Twin</li>
-                                <li><i class="fas fa-check"></i> Drone + Satellite Imaging</li>
-                                <li><i class="fas fa-check"></i> Real-time Pest Detection</li>
-                                <li><i class="fas fa-check"></i> Multilingual AI Assistant</li>
-                                <li><i class="fas fa-check"></i> IoT Sensor Integration</li>
-                                <li><i class="fas fa-check"></i> Accurate Yield Prediction</li>
+                            <ul class="showcase-features">
+                                <li><i class="fas fa-check"></i> Soil moisture monitoring</li>
+                                <li><i class="fas fa-check"></i> Weather integration</li>
+                                <li><i class="fas fa-check"></i> Water usage optimization</li>
+                                <li><i class="fas fa-check"></i> Automated scheduling</li>
+                                <li><i class="fas fa-check"></i> Drought prediction</li>
                             </ul>
-                            <div class="pricing-actions">
-                                <a href="#" class="pricing-btn">Get Started</a>
+                            <div class="showcase-actions">
+                                <a href="smartirrigation.html" class="showcase-btn">Explore Feature</a>
                             </div>
                         </div>
-                        <div class="pricing-card">
-                            <div class="pricing-header">
-                                <h3>Enterprise</h3>
-                                <div class="pricing-price">Custom</div>
-                                <div class="pricing-period">tailored pricing</div>
+                        <div class="showcase-card">
+                            <div class="showcase-header">
+                                <h3>Yield Prediction AI</h3>
                             </div>
-                            <ul class="pricing-features">
-                                <li><i class="fas fa-check"></i> All Premium Features</li>
-                                <li><i class="fas fa-check"></i> Custom AI Models</li>
-                                <li><i class="fas fa-check"></i> API Access</li>
-                                <li><i class="fas fa-check"></i> Dedicated Support</li>
-                                <li><i class="fas fa-check"></i> Multi-Farm Management</li>
-                                <li><i class="fas fa-check"></i> Advanced Analytics</li>
+                            <ul class="showcase-features">
+                                <li><i class="fas fa-check"></i> Accurate yield forecasting</li>
+                                <li><i class="fas fa-check"></i> Growth stage analysis</li>
+                                <li><i class="fas fa-check"></i> Market trend integration</li>
+                                <li><i class="fas fa-check"></i> Harvest timing optimization</li>
+                                <li><i class="fas fa-check"></i> Profitability analysis</li>
                             </ul>
-                            <div class="pricing-actions">
-                                <a href="#" class="pricing-btn">Contact Sales</a>
+                            <div class="showcase-actions">
+                                <a href="yieldpredictionai.html" class="showcase-btn">Explore Feature</a>
                             </div>
                         </div>
                     </div>
@@ -1018,7 +1085,7 @@
                                 "AgriVision AI detected a pest infestation in my soybean crop two weeks before it became visible. The treatment recommendation saved my entire harvest. This technology is revolutionary for Indian farmers."
                             </div>
                             <div class="testimonial-author">
-                                <div class="author-avatar"></div>
+                                <div class="author-avatar">RK</div>
                                 <div class="author-info">
                                     <h4>Rajesh Kumar</h4>
                                     <p>Wheat & Soybean Farmer, Madhya Pradesh</p>
@@ -1030,7 +1097,7 @@
                                 "The AI assistant in Hindi has been a game-changer. I simply ask what to do each day, and it gives me personalized advice. My yield has increased by 22% in just one season."
                             </div>
                             <div class="testimonial-author">
-                                <div class="author-avatar"></div>
+                                <div class="author-avatar">PS</div>
                                 <div class="author-info">
                                     <h4>Priya Sharma</h4>
                                     <p>Rice Farmer, Punjab</p>
@@ -1042,7 +1109,7 @@
                                 "The digital twin helped me optimize irrigation across my 50-acre farm. I reduced water usage by 35% while improving crop health. The ROI was achieved in just 4 months."
                             </div>
                             <div class="testimonial-author">
-                                <div class="author-avatar"></div>
+                                <div class="author-avatar">VS</div>
                                 <div class="author-info">
                                     <h4>Vikram Singh</h4>
                                     <p>Commercial Farmer, Maharashtra</p>
@@ -1067,31 +1134,31 @@
                                 <li><a href="#">Home</a></li>
                                 <li><a href="#features">Features</a></li>
                                 <li><a href="#digital-twin">Digital Twin</a></li>
-                                <li><a href="#pricing">Pricing</a></li>
+                                <li><a href="#ai-assistant">AI Assistant</a></li>
                                 <li><a href="#">Blog</a></li>
                             </ul>
                         </div>
                         <div class="footer-column">
-                            <h3>Support</h3>
+                            <h3>AI Solutions</h3>
                             <ul class="footer-links">
-                                <li><a href="#">Help Center</a></li>
-                                <li><a href="#">Farm Setup Guide</a></li>
-                                <li><a href="#">API Documentation</a></li>
-                                <li><a href="#">Contact Us</a></li>
-                                <li><a href="#">Privacy Policy</a></li>
+                                <li><a href="pest-detection.html">Pest Detection AI</a></li>
+                                <li><a href="smart-irrigation.html">Smart Irrigation AI</a></li>
+                                <li><a href="yield-prediction.html">Yield Prediction AI</a></li>
+                                <li><a href="#">Soil Analysis AI</a></li>
+                                <li><a href="#">Crop Health AI</a></li>
                             </ul>
                         </div>
                         <div class="footer-column">
                             <h3>Contact Info</h3>
                             <ul class="footer-links">
-                                <li><i class="fas fa-map-marker-alt"></i> AgriTech Park, Hyderabad, India</li>
-                                <li><i class="fas fa-phone"></i> +91 98765 43210</li>
-                                <li><i class="fas fa-envelope"></i> support@agrivisionai.com</li>
+                                <li><i class="fas fa-map-marker-alt"></i> Tarakeswar, India</li>
+                                <li><i class="fas fa-phone"></i> +91 9064703308</li>
+                                <li><i class="fas fa-envelope"></i> visionaryinnovators05@gmail.com</li>
                             </ul>
                         </div>
                     </div>
                     <div class="footer-bottom">
-                        <p>&copy; 2023 AgriVision AI. All rights reserved. Proudly supporting Atmanirbhar Krishi Bharat.</p>
+                        <p>&copy; 2025 AgriVision AI. All rights reserved. Proudly supporting Atmanirbhar Krishi Bharat.</p>
                     </div>
                 </div>
             </footer>
@@ -1217,19 +1284,27 @@
             });
         });
 
-        // Add some interactive elements to pricing cards
-        const pricingCards = document.querySelectorAll('.pricing-card');
-        pricingCards.forEach(card => {
+        // Add some interactive elements to showcase cards
+        const showcaseCards = document.querySelectorAll('.showcase-card');
+        showcaseCards.forEach(card => {
             card.addEventListener('mouseenter', () => {
-                card.style.transform = card.classList.contains('featured') 
-                    ? 'scale(1.05) translateY(-5px)' 
-                    : 'translateY(-5px)';
+                card.style.transform = 'translateY(-10px)';
             });
             
             card.addEventListener('mouseleave', () => {
-                card.style.transform = card.classList.contains('featured') 
-                    ? 'scale(1.05)' 
-                    : 'translateY(0)';
+                card.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Add glowing effect to feature icons on hover
+        const featureIcons = document.querySelectorAll('.feature-icon');
+        featureIcons.forEach(icon => {
+            icon.addEventListener('mouseenter', () => {
+                icon.style.boxShadow = '0 0 20px rgba(0, 255, 136, 0.7)';
+            });
+            
+            icon.addEventListener('mouseleave', () => {
+                icon.style.boxShadow = '0 0 15px rgba(0, 255, 136, 0.3)';
             });
         });
     </script>

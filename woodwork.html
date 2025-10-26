@@ -115,6 +115,12 @@
             cursor: pointer;
         }
 
+        .logo-image {
+            height: 40px;
+            width: auto;
+            object-fit: contain;
+        }
+
         .logo h1 {
             font-size: 28px;
             color: var(--primary);
@@ -122,6 +128,17 @@
         }
 
         .logo span {
+            color: var(--secondary);
+        }
+
+        .logo-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .logo-text span {
             color: var(--secondary);
         }
 
@@ -823,7 +840,8 @@
                 <div class="container">
                     <div class="header-top">
                         <div class="logo" id="logo">
-                            <h1>Artisan<span>Woods</span></h1>
+                            <img src="logo.png" alt="SwaDesi Bazaar Logo" class="logo-image" onerror="this.style.display='none'; document.querySelector('.logo-text').style.display='block';">
+                            <div class="logo-text">SwaDesi <span>Bazaar</span></div>
                         </div>
                         <div class="search-bar">
                             <input type="text" placeholder="Search for premium woodwork, artisans, or categories...">
@@ -918,14 +936,13 @@
                         <div class="footer-column">
                             <h3>Contact Info</h3>
                             <ul class="footer-links">
-                                <li><i class="fas fa-map-marker-alt"></i> 123 Artisan Lane, Jaipur, India</li>
-                                <li><i class="fas fa-phone"></i> +91 98765 43210</li>
-                                <li><i class="fas fa-envelope"></i> support@artisanwoods.com</li>
-                            </ul>
-                        </div>
-                    </div>
+                                <li><i class="fas fa-map-marker-alt"></i> Tarakeswar, India</li>
+                                <li><i class="fas fa-phone"></i> +91 9064703308</li>
+                        <li><i class="fas fa-envelope"></i> visionaryinnovators05@gmail.com</li>
+                    </ul>
+                </div>
                     <div class="footer-bottom">
-                        <p>&copy; 2023 Artisan Woods. All rights reserved.</p>
+                        <p>&copy; 2025 Artisan Woods. All rights reserved.</p>
                     </div>
                 </div>
             </footer>
@@ -1101,6 +1118,7 @@
                         <button type="submit" class="submit-btn">Add Product</button>
                     </form>
                 </div>
+                
             </div>
         </div>
     </div>
@@ -1111,12 +1129,13 @@
     <script>
         // Firebase Configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyC4wGDrRHs4gQN6p8Q9X7VqY9t8d4Jk8Xw",
-            authDomain: "artisan-woods.firebaseapp.com",
-            projectId: "artisan-woods",
-            storageBucket: "artisan-woods.appspot.com",
-            messagingSenderId: "123456789012",
-            appId: "1:123456789012:web:abcdef1234567890"
+            apiKey: "AIzaSyBSUaOWX7giwjq31T4ExHjZkpu2BLZJRQM",
+            authDomain: "login-page-a394f.firebaseapp.com",
+            projectId: "login-page-a394f",
+            storageBucket: "login-page-a394f.firebasestorage.app",
+            messagingSenderId: "605712065355",
+            appId: "1:605712065355:web:8019336951dc5a3dee7ece",
+            measurementId: "G-R4JBKP5KNW"
         };
 
         // Initialize Firebase

@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered Crop Swap | AgriSphere AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #00ff88;
+            --primary-light: #80ffc2;
+            --secondary: #ff00aa;
+            --accent: #7700ff;
+            --dark: #0a0a1a;
+            --darker: #050510;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--darker), var(--dark));
+            color: var(--light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Glowing Elements */
+        .glow {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.15;
+            z-index: -1;
+        }
+
+        .glow-1 {
+            top: 10%;
+            left: 10%;
+            background: radial-gradient(circle, var(--primary), transparent);
+        }
+
+        .glow-2 {
+            bottom: 10%;
+            right: 10%;
+            background: radial-gradient(circle, var(--secondary), transparent);
+        }
+
+        .glow-3 {
+            top: 40%;
+            right: 20%;
+            background: radial-gradient(circle, var(--accent), transparent);
+        }
+
+        /* Header Styles */
+        header {
+            background: rgba(10, 10, 26, 0.8);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 255, 136, 0.1);
+            border-bottom: 1px solid rgba(0, 255, 136, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            font-size: 2rem;
+            color: var(--primary);
+            text-shadow: 0 0 15px var(--primary);
+            animation: pulse 2s infinite;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            position: relative;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+            text-shadow: 0 0 10px var(--primary);
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            color: var(--dark);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: var(--dark);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.8);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(rgba(5, 5, 16, 0.85), rgba(5, 5, 16, 0.9)), url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 5rem 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero h2 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            max-width: 800px;
+            margin: 0 auto 2.5rem;
+            opacity: 0.9;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .sidebar {
+            flex: 1;
+            background: rgba(10, 10, 26, 0.7);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 255, 136, 0.1);
+            height: fit-content;
+        }
+
+        .content {
+            flex: 2;
+        }
+
+        .section-title {
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .section-title h2 {
+            font-size: 1.8rem;
+            color: var(--primary);
+            text-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+        }
+
+        .section-title h2:after {
+            content: '';
+            position: absolute;
+            width: 50px;
+            height: 3px;
+            background: var(--secondary);
+            bottom: 0;
+            left: 0;
+            box-shadow: 0 0 10px var(--secondary);
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--primary-light);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            background: rgba(5, 5, 16, 0.7);
+            color: var(--light);
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+        }
+
+        /* Cards */
+        .card {
+            background: rgba(10, 10, 26, 0.7);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: var(--transition);
+            border: 1px solid rgba(0, 255, 136, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 255, 136, 0.1);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: var(--dark);
+            padding: 1.5rem;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* AI Prediction Section */
+        .ai-prediction {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .prediction-card {
+            flex: 1;
+            text-align: center;
+            padding: 1.5rem;
+            background: rgba(5, 5, 16, 0.5);
+            border-radius: 10px;
+            border: 1px solid rgba(0, 255, 136, 0.1);
+        }
+
+        .prediction-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+            margin: 1rem 0;
+        }
+
+        .prediction-label {
+            color: var(--gray);
+        }
+
+        /* Crop Grid */
+        .crop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .crop-card {
+            background: rgba(10, 10, 26, 0.7);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: var(--transition);
+            border: 1px solid rgba(0, 255, 136, 0.1);
+        }
+
+        .crop-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4), 0 0 15px rgba(0, 255, 136, 0.1);
+        }
+
+        .crop-image {
+            height: 150px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--dark);
+            font-size: 3rem;
+        }
+
+        .crop-details {
+            padding: 1.2rem;
+        }
+
+        .crop-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        .crop-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        /* Map Container */
+        .map-container {
+            height: 400px;
+            background: rgba(5, 5, 16, 0.5);
+            border-radius: 10px;
+            margin-top: 2rem;
+            overflow: hidden;
+            border: 1px solid rgba(0, 255, 136, 0.1);
+            position: relative;
+        }
+
+        .map-placeholder {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: var(--gray);
+        }
+
+        .map-placeholder i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+            text-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--darker);
+            color: white;
+            padding: 3rem 0 2rem;
+            border-top: 1px solid rgba(0, 255, 136, 0.1);
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-column h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .footer-column h3:after {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 3px;
+            background: var(--secondary);
+            bottom: 0;
+            left: 0;
+            box-shadow: 0 0 10px var(--secondary);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-links a {
+            color: #aaa;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+            padding-left: 5px;
+            text-shadow: 0 0 10px var(--primary);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: white;
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            background: var(--primary);
+            color: var(--dark);
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0% {
+                text-shadow: 0 0 10px var(--primary);
+            }
+            50% {
+                text-shadow: 0 0 20px var(--primary), 0 0 30px var(--primary);
+            }
+            100% {
+                text-shadow: 0 0 10px var(--primary);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .hero h2 {
+                font-size: 2.8rem;
+            }
+            
+            nav ul {
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .hero h2 {
+                font-size: 2.2rem;
+            }
+            
+            .hero p {
+                font-size: 1.1rem;
+            }
+            
+            .ai-prediction {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Glowing Background Elements -->
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+    <div class="glow glow-3"></div>
+    
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-seedling"></i>
+                    <h1>AgriSphere AI</h1>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">Solutions</a></li>
+                        <li><a href="#" class="active">Crop Swap</a></li>
+                        <li><a href="#">Dashboard</a></li>
+                        <li><a href="#">About</a></li>
+                    </ul>
+                </nav>
+                <div class="auth-buttons">
+                    <a href="#" class="btn btn-outline">Log In</a>
+                    <a href="#" class="btn btn-primary">Sign Up</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h2>AI-Powered Crop Swap</h2>
+            <p>Digitally swap surplus crops or seeds with neighbors instead of selling at low prices. AI predicts needs, optimal routes, and minimizes wastage.</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="main-content">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="section-title">
+                    <h2>Swap Settings</h2>
+                </div>
+                
+                <div class="form-group">
+                    <label for="crop-type">Crop Type</label>
+                    <select id="crop-type" class="form-control">
+                        <option value="">Select Crop</option>
+                        <option value="wheat">Wheat</option>
+                        <option value="rice">Rice</option>
+                        <option value="corn">Corn</option>
+                        <option value="soybean">Soybean</option>
+                        <option value="potato">Potato</option>
+                        <option value="tomato">Tomato</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="quantity">Quantity (kg)</label>
+                    <input type="number" id="quantity" class="form-control" placeholder="Enter quantity">
+                </div>
+                
+                <div class="form-group">
+                    <label for="location">Your Location</label>
+                    <input type="text" id="location" class="form-control" placeholder="Enter your location">
+                </div>
+                
+                <div class="form-group">
+                    <label for="radius">Search Radius (km)</label>
+                    <input type="range" id="radius" class="form-control" min="5" max="100" value="20">
+                    <div id="radius-value" style="text-align: center; margin-top: 5px; color: var(--primary);">20 km</div>
+                </div>
+                
+                <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Find Matches</button>
+                
+                <div class="ai-prediction" style="margin-top: 2rem;">
+                    <div class="prediction-card">
+                        <div class="prediction-value">87%</div>
+                        <div class="prediction-label">Match Score</div>
+                    </div>
+                    <div class="prediction-card">
+                        <div class="prediction-value">24</div>
+                        <div class="prediction-label">Potential Swaps</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Content -->
+            <div class="content">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-robot"></i> AI Recommendations
+                    </div>
+                    <div class="card-body">
+                        <p>Based on your location and crop type, our AI recommends the following swaps to maximize value and minimize transportation costs:</p>
+                        
+                        <div class="crop-grid">
+                            <div class="crop-card">
+                                <div class="crop-image">
+                                    <i class="fas fa-wheat"></i>
+                                </div>
+                                <div class="crop-details">
+                                    <div class="crop-name">Organic Wheat</div>
+                                    <div class="crop-info">
+                                        <span>Quantity: 50kg</span>
+                                        <span>Distance: 5km</span>
+                                    </div>
+                                    <button class="btn btn-outline" style="width: 100%;">Propose Swap</button>
+                                </div>
+                            </div>
+                            
+                            <div class="crop-card">
+                                <div class="crop-image">
+                                    <i class="fas fa-seedling"></i>
+                                </div>
+                                <div class="crop-details">
+                                    <div class="crop-name">Heirloom Tomatoes</div>
+                                    <div class="crop-info">
+                                        <span>Quantity: 30kg</span>
+                                        <span>Distance: 8km</span>
+                                    </div>
+                                    <button class="btn btn-outline" style="width: 100%;">Propose Swap</button>
+                                </div>
+                            </div>
+                            
+                            <div class="crop-card">
+                                <div class="crop-image">
+                                    <i class="fas fa-apple-alt"></i>
+                                </div>
+                                <div class="crop-details">
+                                    <div class="crop-name">Fresh Potatoes</div>
+                                    <div class="crop-info">
+                                        <span>Quantity: 75kg</span>
+                                        <span>Distance: 12km</span>
+                                    </div>
+                                    <button class="btn btn-outline" style="width: 100%;">Propose Swap</button>
+                                </div>
+                            </div>
+                            
+                            <div class="crop-card">
+                                <div class="crop-image">
+                                    <i class="fas fa-carrot"></i>
+                                </div>
+                                <div class="crop-details">
+                                    <div class="crop-name">Organic Carrots</div>
+                                    <div class="crop-info">
+                                        <span>Quantity: 40kg</span>
+                                        <span>Distance: 15km</span>
+                                    </div>
+                                    <button class="btn btn-outline" style="width: 100%;">Propose Swap</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-route"></i> Optimal Swap Routes
+                    </div>
+                    <div class="card-body">
+                        <p>AI-calculated optimal routes for crop collection and delivery to minimize fuel consumption and time:</p>
+                        
+                        <div class="map-container">
+                            <div class="map-placeholder">
+                                <i class="fas fa-map-marked-alt"></i>
+                                <p>Interactive Map Showing Optimal Routes</p>
+                                <p style="font-size: 0.9rem; margin-top: 0.5rem;">Based on real-time traffic and distance data</p>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; justify-content: space-between; margin-top: 1.5rem;">
+                            <div>
+                                <h4 style="color: var(--primary); margin-bottom: 0.5rem;">Route Efficiency</h4>
+                                <p>Estimated time: 45 minutes</p>
+                                <p>Distance: 28 km</p>
+                            </div>
+                            <div>
+                                <h4 style="color: var(--primary); margin-bottom: 0.5rem;">Environmental Impact</h4>
+                                <p>CO2 Saved: 12 kg</p>
+                                <p>Fuel Saved: 5 liters</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-chart-line"></i> AI Predictive Analytics
+                    </div>
+                    <div class="card-body">
+                        <p>Our AI analyzes market trends and predicts future crop values to help you make informed swapping decisions:</p>
+                        
+                        <div class="ai-prediction">
+                            <div class="prediction-card">
+                                <div class="prediction-value">+15%</div>
+                                <div class="prediction-label">Wheat Value (30 days)</div>
+                            </div>
+                            <div class="prediction-card">
+                                <div class="prediction-value">-8%</div>
+                                <div class="prediction-label">Tomato Value (30 days)</div>
+                            </div>
+                            <div class="prediction-card">
+                                <div class="prediction-value">92%</div>
+                                <div class="prediction-label">Swap Success Rate</div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(5, 5, 16, 0.5); border-radius: 8px;">
+                            <h4 style="color: var(--primary); margin-bottom: 0.5rem;">AI Recommendation</h4>
+                            <p>Based on current market analysis, we recommend swapping your wheat for tomatoes now, as wheat prices are predicted to rise while tomato prices may decline in the coming weeks.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>AgriSphere AI</h3>
+                    <p>Revolutionizing agriculture through AI-powered solutions for farmers, businesses, and rural communities.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Solutions</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Crop Swap Network</a></li>
+                        <li><a href="#">Repair Assistant</a></li>
+                        <li><a href="#">Waste-to-Resource Map</a></li>
+                        <li><a href="#">Water Sharing Platform</a></li>
+                        <li><a href="#">Cultural Preservation</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Company</h3>
+                    <ul class="footer-links">
+                        <li><a href="aboutus.html">About Us</a></li>
+                        <li><a href="ourteam.html">Our Team</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contact Info</h3>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-map-marker-alt"></i> Tarakeswar, India</li>
+                        <li><i class="fas fa-phone"></i> +91 9064703308</li>
+                        <li><i class="fas fa-envelope"></i> visionaryinnovators05@gmail.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 AgriSphere AI. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Update radius value display
+        document.getElementById('radius').addEventListener('input', function() {
+            document.getElementById('radius-value').textContent = this.value + ' km';
+        });
+
+        // Simulate AI loading and recommendations
+        document.querySelector('.btn-primary').addEventListener('click', function() {
+            // Show loading state
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Finding Matches...';
+            
+            // Simulate API call delay
+            setTimeout(() => {
+                this.innerHTML = 'Find Matches';
+                
+                // Update AI predictions with new values
+                document.querySelector('.prediction-value').textContent = '92%';
+                document.querySelectorAll('.prediction-value')[1].textContent = '31';
+                
+                // Show success message
+                alert('AI has found 31 potential crop swaps in your area!');
+            }, 2000);
+        });
+
+        // Add interactivity to crop cards
+        document.querySelectorAll('.crop-card .btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const cropName = this.closest('.crop-card').querySelector('.crop-name').textContent;
+                alert(`Swap proposal sent for ${cropName}! The farmer will be notified.`);
+            });
+        });
+
+        // Simple animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe cards for animation
+        document.querySelectorAll('.card, .crop-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            observer.observe(card);
+        });
+
+        // Add glowing effect to buttons on hover
+        document.querySelectorAll('.btn').forEach(button => {
+            button.addEventListener('mouseenter', function() {
+                this.style.boxShadow = '0 0 25px rgba(0, 255, 136, 0.7)';
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                if(this.classList.contains('btn-primary')) {
+                    this.style.boxShadow = '0 0 20px rgba(0, 255, 136, 0.5)';
+                } else {
+                    this.style.boxShadow = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

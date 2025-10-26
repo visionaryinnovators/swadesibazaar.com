@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Energy Harvesting Tracker | AgriSphere AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #00ff88;
+            --primary-light: #80ffc2;
+            --secondary: #ff00aa;
+            --accent: #7700ff;
+            --dark: #0a0a1a;
+            --darker: #050510;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--darker), var(--dark));
+            color: var(--light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Glowing Elements */
+        .glow {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.15;
+            z-index: -1;
+        }
+
+        .glow-1 {
+            top: 10%;
+            left: 10%;
+            background: radial-gradient(circle, var(--primary), transparent);
+        }
+
+        .glow-2 {
+            bottom: 10%;
+            right: 10%;
+            background: radial-gradient(circle, var(--secondary), transparent);
+        }
+
+        .glow-3 {
+            top: 40%;
+            right: 20%;
+            background: radial-gradient(circle, var(--accent), transparent);
+        }
+
+        /* Header Styles */
+        header {
+            background: rgba(10, 10, 26, 0.8);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 255, 136, 0.1);
+            border-bottom: 1px solid rgba(0, 255, 136, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            font-size: 2rem;
+            color: var(--primary);
+            text-shadow: 0 0 15px var(--primary);
+            animation: pulse 2s infinite;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            position: relative;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+            text-shadow: 0 0 10px var(--primary);
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            color: var(--dark);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: var(--dark);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.8);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(rgba(5, 5, 16, 0.85), rgba(5, 5, 16, 0.9)), url('https://images.unsplash.com/photo-1509391366360-2e959784a276?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 5rem 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero h2 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            max-width: 800px;
+            margin: 0 auto 2.5rem;
+            opacity: 0.9;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 4rem 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            display: inline-block;
+            padding-bottom: 10px;
+            text-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+        }
+
+        .section-title h2:after {
+            content: '';
+            position: absolute;
+            width: 80px;
+            height: 4px;
+            background: var(--secondary);
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 10px var(--secondary);
+        }
+
+        /* Energy Sources */
+        .energy-sources {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .source-card {
+            background: rgba(10, 10, 26, 0.7);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: var(--transition);
+            border: 1px solid rgba(0, 255, 136, 0.1);
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .source-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 255, 136, 0.2);
+        }
+
+        .source-icon {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 15px var(--primary);
+        }
+
+        .source-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .source-card p {
+            color: rgba(248, 249, 250, 0.7);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Simulation Dashboard */
+        .simulation-dashboard {
+            background: rgba(10, 10, 26, 0.7);
+            border-radius: 15px;
+            padding: 2.5rem;
+            margin-bottom: 4rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 255, 136, 0.1);
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-header h3 {
+            font-size: 1.8rem;
+            color: var(--primary);
+        }
+
+        .simulation-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .control-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .control-group input, .control-group select {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            background: rgba(5, 5, 16, 0.7);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .control-group input:focus, .control-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .slider-container input {
+            flex: 1;
+        }
+
+        .slider-value {
+            min-width: 50px;
+            text-align: center;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Energy Visualization */
+        .energy-visualization {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .visualization-card {
+            background: rgba(5, 5, 16, 0.7);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid rgba(0, 255, 136, 0.1);
+        }
+
+        .visualization-card h4 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .energy-bar {
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .energy-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .solar-fill {
+            background: linear-gradient(90deg, #ffcc00, #ff9900);
+        }
+
+        .wind-fill {
+            background: linear-gradient(90deg, #00ccff, #0066ff);
+        }
+
+        .human-fill {
+            background: linear-gradient(90deg, #ff00aa, #cc00ff);
+        }
+
+        .energy-value {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        /* AI Recommendations */
+        .ai-recommendations {
+            background: rgba(10, 10, 26, 0.7);
+            border-radius: 15px;
+            padding: 2.5rem;
+            margin-bottom: 4rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 255, 136, 0.1);
+        }
+
+        .recommendation-card {
+            background: rgba(5, 5, 16, 0.7);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--primary);
+        }
+
+        .recommendation-card h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .recommendation-card p {
+            color: rgba(248, 249, 250, 0.8);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--darker);
+            color: white;
+            padding: 4rem 0 2rem;
+            border-top: 1px solid rgba(0, 255, 136, 0.1);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-column h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .footer-column h3:after {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 3px;
+            background: var(--secondary);
+            bottom: 0;
+            left: 0;
+            box-shadow: 0 0 10px var(--secondary);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-links a {
+            color: #aaa;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+            padding-left: 5px;
+            text-shadow: 0 0 10px var(--primary);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: white;
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            background: var(--primary);
+            color: var(--dark);
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0% {
+                text-shadow: 0 0 10px var(--primary);
+            }
+            50% {
+                text-shadow: 0 0 20px var(--primary), 0 0 30px var(--primary);
+            }
+            100% {
+                text-shadow: 0 0 10px var(--primary);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .hero h2 {
+                font-size: 2.5rem;
+            }
+            
+            nav ul {
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .hero h2 {
+                font-size: 2rem;
+            }
+            
+            .hero p {
+                font-size: 1.1rem;
+            }
+            
+            .simulation-controls {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Glowing Background Elements -->
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+    <div class="glow glow-3"></div>
+    
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-seedling"></i>
+                    <h1>AgriSphere AI</h1>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="index.html#features">Solutions</a></li>
+                        <li><a href="index.html#dashboard">Dashboard</a></li>
+                        <li><a href="index.html#testimonials">Testimonials</a></li>
+                        <li><a href="index.html#contact">Contact</a></li>
+                    </ul>
+                </nav>
+                <div class="auth-buttons">
+                    <a href="#" class="btn btn-outline">Log In</a>
+                    <a href="#" class="btn btn-primary">Sign Up</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h2>Personal Energy Harvesting Tracker</h2>
+            <p>Simulate solar, wind, and human energy collection. Our AI analyzes your data to suggest optimal energy usage and storage strategies for your household.</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <section class="main-content">
+        <div class="container">
+            <!-- Energy Sources -->
+            <div class="section-title">
+                <h2>Energy Sources</h2>
+            </div>
+            <div class="energy-sources">
+                <div class="source-card">
+                    <div class="source-icon">
+                        <i class="fas fa-sun"></i>
+                    </div>
+                    <h3>Solar Energy</h3>
+                    <p>Harness the power of sunlight with photovoltaic panels. Our AI calculates optimal panel placement and energy generation based on your location.</p>
+                </div>
+                <div class="source-card">
+                    <div class="source-icon">
+                        <i class="fas fa-wind"></i>
+                    </div>
+                    <h3>Wind Energy</h3>
+                    <p>Capture wind energy with small-scale turbines. AI analyzes wind patterns to maximize efficiency based on your local conditions.</p>
+                </div>
+                <div class="source-card">
+                    <div class="source-icon">
+                        <i class="fas fa-running"></i>
+                    </div>
+                    <h3>Human Energy</h3>
+                    <p>Convert physical activity into usable energy with kinetic harvesters. Track your daily movements to power small devices.</p>
+                </div>
+            </div>
+
+            <!-- Simulation Dashboard -->
+            <div class="section-title">
+                <h2>Energy Simulation</h2>
+            </div>
+            <div class="simulation-dashboard">
+                <div class="dashboard-header">
+                    <h3>Configure Your Energy Setup</h3>
+                    <button class="btn btn-primary" id="run-simulation">Run Simulation</button>
+                </div>
+                
+                <div class="simulation-controls">
+                    <div class="control-group">
+                        <label for="location">Your Location</label>
+                        <select id="location">
+                            <option value="tropical">Tropical Region</option>
+                            <option value="temperate">Temperate Region</option>
+                            <option value="arid">Arid Region</option>
+                            <option value="coastal">Coastal Region</option>
+                        </select>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="household-size">Household Size</label>
+                        <select id="household-size">
+                            <option value="1">1 person</option>
+                            <option value="2">2 people</option>
+                            <option value="3">3 people</option>
+                            <option value="4">4 people</option>
+                            <option value="5">5+ people</option>
+                        </select>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="solar-panels">Solar Panel Area (m²)</label>
+                        <div class="slider-container">
+                            <input type="range" id="solar-panels" min="0" max="50" value="10">
+                            <span class="slider-value" id="solar-value">10</span>
+                        </div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="wind-turbines">Wind Turbines</label>
+                        <div class="slider-container">
+                            <input type="range" id="wind-turbines" min="0" max="5" value="1">
+                            <span class="slider-value" id="wind-value">1</span>
+                        </div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="activity-level">Daily Activity Level</label>
+                        <div class="slider-container">
+                            <input type="range" id="activity-level" min="1" max="10" value="5">
+                            <span class="slider-value" id="activity-value">5</span>
+                        </div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="battery-capacity">Battery Storage (kWh)</label>
+                        <div class="slider-container">
+                            <input type="range" id="battery-capacity" min="1" max="20" value="5">
+                            <span class="slider-value" id="battery-value">5</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Energy Visualization -->
+                <div class="energy-visualization">
+                    <div class="visualization-card">
+                        <h4>Solar Energy Generation</h4>
+                        <div class="energy-bar">
+                            <div class="energy-fill solar-fill" id="solar-fill" style="width: 40%"></div>
+                        </div>
+                        <div class="energy-value" id="solar-energy">4.2 kWh/day</div>
+                    </div>
+                    
+                    <div class="visualization-card">
+                        <h4>Wind Energy Generation</h4>
+                        <div class="energy-bar">
+                            <div class="energy-fill wind-fill" id="wind-fill" style="width: 25%"></div>
+                        </div>
+                        <div class="energy-value" id="wind-energy">2.1 kWh/day</div>
+                    </div>
+                    
+                    <div class="visualization-card">
+                        <h4>Human Energy Generation</h4>
+                        <div class="energy-bar">
+                            <div class="energy-fill human-fill" id="human-fill" style="width: 15%"></div>
+                        </div>
+                        <div class="energy-value" id="human-energy">0.8 kWh/day</div>
+                    </div>
+                </div>
+                
+                <!-- Total Energy -->
+                <div style="text-align: center; margin-top: 2rem;">
+                    <h3 style="color: var(--primary); margin-bottom: 1rem;">Total Daily Energy: <span id="total-energy">7.1 kWh</span></h3>
+                    <p style="color: rgba(248, 249, 250, 0.8);">Estimated based on your configuration</p>
+                </div>
+            </div>
+
+            <!-- AI Recommendations -->
+            <div class="section-title">
+                <h2>AI Recommendations</h2>
+            </div>
+            <div class="ai-recommendations">
+                <div class="recommendation-card">
+                    <h4><i class="fas fa-lightbulb"></i> Energy Optimization</h4>
+                    <p>Based on your location and energy usage patterns, consider adding 2 more solar panels to maximize daytime energy production.</p>
+                </div>
+                
+                <div class="recommendation-card">
+                    <h4><i class="fas fa-battery-half"></i> Storage Strategy</h4>
+                    <p>Your current battery capacity is sufficient for 8 hours of backup. For better resilience during outages, consider upgrading to 10 kWh storage.</p>
+                </div>
+                
+                <div class="recommendation-card">
+                    <h4><i class="fas fa-chart-line"></i> Usage Patterns</h4>
+                    <p>Shift high-energy activities like laundry to midday when solar production peaks to reduce grid dependency by 23%.</p>
+                </div>
+                
+                <div class="recommendation-card">
+                    <h4><i class="fas fa-tint"></i> Water Heating</h4>
+                    <p>Consider installing a solar water heater to reduce electricity consumption for water heating by up to 70%.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>AgriSphere AI</h3>
+                    <p>Revolutionizing agriculture through AI-powered solutions for farmers, businesses, and rural communities.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Solutions</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Crop Swap Network</a></li>
+                        <li><a href="#">Repair Assistant</a></li>
+                        <li><a href="#">Waste-to-Resource Map</a></li>
+                        <li><a href="#">Water Sharing Platform</a></li>
+                        <li><a href="#">Cultural Preservation</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Company</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Our Team</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Press</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Resources</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Case Studies</a></li>
+                        <li><a href="#">Webinars</a></li>
+                        <li><a href="#">Documentation</a></li>
+                        <li><a href="#">Support</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-column">
+                <h3>Contact Info</h3>
+                <ul class="footer-links">
+                    <li><i class="fas fa-map-marker-alt"></i> Tarakeswar, India</li>
+                    <li><i class="fas fa-phone"></i> +91 9064703308</li>
+                    <li><i class="fas fa-envelope"></i> visionaryinnovators05@gmail.com</li>
+                </ul>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 AgriSphere AI. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Update slider values
+        document.getElementById('solar-panels').addEventListener('input', function() {
+            document.getElementById('solar-value').textContent = this.value;
+        });
+        
+        document.getElementById('wind-turbines').addEventListener('input', function() {
+            document.getElementById('wind-value').textContent = this.value;
+        });
+        
+        document.getElementById('activity-level').addEventListener('input', function() {
+            document.getElementById('activity-value').textContent = this.value;
+        });
+        
+        document.getElementById('battery-capacity').addEventListener('input', function() {
+            document.getElementById('battery-value').textContent = this.value;
+        });
+
+        // Run simulation
+        document.getElementById('run-simulation').addEventListener('click', function() {
+            // Get values from inputs
+            const solarPanels = parseInt(document.getElementById('solar-panels').value);
+            const windTurbines = parseInt(document.getElementById('wind-turbines').value);
+            const activityLevel = parseInt(document.getElementById('activity-level').value);
+            const location = document.getElementById('location').value;
+            const householdSize = parseInt(document.getElementById('household-size').value);
+            
+            // Calculate energy values based on inputs
+            let solarEnergy = 0;
+            let windEnergy = 0;
+            let humanEnergy = 0;
+            
+            // Solar calculation (based on panels and location)
+            if (location === 'tropical') {
+                solarEnergy = solarPanels * 0.55;
+            } else if (location === 'temperate') {
+                solarEnergy = solarPanels * 0.45;
+            } else if (location === 'arid') {
+                solarEnergy = solarPanels * 0.65;
+            } else if (location === 'coastal') {
+                solarEnergy = solarPanels * 0.4;
+            }
+            
+            // Wind calculation
+            if (location === 'coastal') {
+                windEnergy = windTurbines * 3.2;
+            } else if (location === 'arid') {
+                windEnergy = windTurbines * 2.5;
+            } else {
+                windEnergy = windTurbines * 1.8;
+            }
+            
+            // Human energy calculation
+            humanEnergy = activityLevel * 0.15 * householdSize;
+            
+            // Update visualization
+            document.getElementById('solar-fill').style.width = Math.min(solarEnergy * 15, 100) + '%';
+            document.getElementById('wind-fill').style.width = Math.min(windEnergy * 20, 100) + '%';
+            document.getElementById('human-fill').style.width = Math.min(humanEnergy * 50, 100) + '%';
+            
+            // Update energy values
+            document.getElementById('solar-energy').textContent = solarEnergy.toFixed(1) + ' kWh/day';
+            document.getElementById('wind-energy').textContent = windEnergy.toFixed(1) + ' kWh/day';
+            document.getElementById('human-energy').textContent = humanEnergy.toFixed(1) + ' kWh/day';
+            
+            const totalEnergy = solarEnergy + windEnergy + humanEnergy;
+            document.getElementById('total-energy').textContent = totalEnergy.toFixed(1) + ' kWh';
+            
+            // Update recommendations based on simulation
+            updateRecommendations(solarEnergy, windEnergy, humanEnergy, location, householdSize);
+        });
+
+        // Function to update AI recommendations based on simulation results
+        function updateRecommendations(solar, wind, human, location, household) {
+            const recommendationsContainer = document.querySelector('.ai-recommendations');
+            recommendationsContainer.innerHTML = '<div class="section-title"><h2>AI Recommendations</h2></div>';
+            
+            let recommendations = [];
+            
+            // Solar recommendations
+            if (solar < 3) {
+                recommendations.push({
+                    icon: 'fas fa-sun',
+                    title: 'Solar Expansion',
+                    text: `Consider adding ${Math.ceil((5 - solar) / 0.5)} more solar panels to reach optimal energy production for your household size.`
+                });
+            } else if (solar > 8) {
+                recommendations.push({
+                    icon: 'fas fa-bolt',
+                    title: 'Excess Energy Utilization',
+                    text: 'You have significant solar surplus. Consider investing in battery storage or exploring energy sharing options with neighbors.'
+                });
+            }
+            
+            // Wind recommendations
+            if (wind < 2 && (location === 'coastal' || location === 'arid')) {
+                recommendations.push({
+                    icon: 'fas fa-wind',
+                    title: 'Wind Potential',
+                    text: 'Your location has good wind resources. Adding one more turbine could increase your energy production by 40-60%.'
+                });
+            }
+            
+            // Human energy recommendations
+            if (human < 0.5 * household) {
+                recommendations.push({
+                    icon: 'fas fa-running',
+                    title: 'Activity Optimization',
+                    text: 'Consider integrating kinetic energy harvesters in high-traffic areas to capture more human energy.'
+                });
+            }
+            
+            // Battery recommendations
+            const batteryCapacity = parseInt(document.getElementById('battery-capacity').value);
+            const totalEnergy = solar + wind + human;
+            
+            if (batteryCapacity < totalEnergy * 0.3) {
+                recommendations.push({
+                    icon: 'fas fa-battery-half',
+                    title: 'Storage Upgrade',
+                    text: `Your battery storage covers ${(batteryCapacity/totalEnergy*100).toFixed(0)}% of daily production. Consider upgrading to ${Math.ceil(totalEnergy * 0.5)} kWh for better energy resilience.`
+                });
+            }
+            
+            // Location-specific recommendations
+            if (location === 'tropical') {
+                recommendations.push({
+                    icon: 'fas fa-cloud-sun',
+                    title: 'Rainy Season Preparation',
+                    text: 'During monsoon season, solar production may drop by 30-40%. Plan for alternative energy sources or grid supplementation.'
+                });
+            }
+            
+            // Add default recommendation if none generated
+            if (recommendations.length === 0) {
+                recommendations.push({
+                    icon: 'fas fa-check-circle',
+                    title: 'Optimal Configuration',
+                    text: 'Your current energy setup is well-balanced. Continue monitoring performance and consider seasonal adjustments.'
+                });
+            }
+            
+            // Add efficiency recommendation
+            recommendations.push({
+                icon: 'fas fa-chart-line',
+                title: 'Energy Efficiency',
+                text: 'Upgrading to LED lighting and energy-efficient appliances could reduce your consumption by 15-20%.'
+            });
+            
+            // Render recommendations
+            recommendations.forEach(rec => {
+                const card = document.createElement('div');
+                card.className = 'recommendation-card';
+                card.innerHTML = `
+                    <h4><i class="${rec.icon}"></i> ${rec.title}</h4>
+                    <p>${rec.text}</p>
+                `;
+                recommendationsContainer.appendChild(card);
+            });
+        }
+
+        // Initialize with default values
+        document.getElementById('run-simulation').click();
+    </script>
+</body>
+</html>
